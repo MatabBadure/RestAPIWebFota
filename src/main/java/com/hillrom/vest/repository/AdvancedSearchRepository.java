@@ -1,24 +1,15 @@
 package com.hillrom.vest.repository;
 
-import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_SETTINGS_DEVIATION_COUNT;
-import static com.hillrom.vest.config.AdherenceScoreConstants.ADHERENCE_SETTING_DEFAULT_DAYS;
-import static com.hillrom.vest.security.AuthoritiesConstants.CLINIC_ADMIN;
-import static com.hillrom.vest.security.AuthoritiesConstants.HCP;
-import static com.hillrom.vest.security.AuthoritiesConstants.PATIENT;
-import static com.hillrom.vest.util.RelationshipLabelConstants.SELF;
-
 import java.math.BigInteger;
-import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -32,92 +23,134 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.querydsl.QueryDslPredicateExecutor;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.hillrom.vest.config.Constants;
-import com.hillrom.vest.domain.Authority;
-import com.hillrom.vest.domain.Clinic;
-import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.util.QueryConstants;
-import com.hillrom.vest.security.AuthoritiesConstants;
-import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.HCPClinicService;
-import com.hillrom.vest.util.ExceptionConstants;
-import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.AdvancedClinicDTO;
+import com.hillrom.vest.web.rest.dto.AdvancedHcpDTO;
+import com.hillrom.vest.web.rest.dto.AdvancedPatientDTO;
 import com.hillrom.vest.web.rest.dto.ClinicVO;
 import com.hillrom.vest.web.rest.dto.HcpVO;
-import com.hillrom.vest.web.rest.dto.HillRomUserVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 
 @Repository
 public class AdvancedSearchRepository {
-	
-	private final Logger log = LoggerFactory.getLogger(AdvancedSearchRepository.class);
+
+	private final Logger log = LoggerFactory
+			.getLogger(AdvancedSearchRepository.class);
 
 	private static final String ORDER_BY_CLAUSE_START = " order by ";
-	
+
 	@Inject
 	private EntityManager entityManager;
 
 	@Inject
 	private HCPClinicService hcpClinicService;
-	
+
 	@Inject
 	private UserPatientRepository userPatientRepository;
 	
 	@Inject
-	private AuthorityRepository authorityRepository;
-	
+	private HillromTypeCodeFormatRepository hillromTypeCodeFormatRepository;
 
+	/*
+	 * This method takes the DTO object, pageable and sortOrder paramters
+	 * Returns Page<ClinicVO>
+	 */
 	public Page<ClinicVO> advancedSearchClinics(AdvancedClinicDTO advancedClinicDTO, Pageable pageable,Map<String, Boolean> sortOrder) throws HillromException {
-
-		String advancedSearchClinicsQuery = "SELECT clinic.id as id, " + 
-											"clinic.name as name, "+
-										    "clinic.address as address, "+
-										    "clinic.zipcode as zipcode, "+
-										    "city_state_zip_map.country as country, "+
-										    "clinic.city as city, "+
-										    "clinic.state as state, "+
-										    "clinic.phone_number as phone, "+
-										    "clinic.fax_number as fax, "+
-										    "clinic.hillrom_id as hillromId, "+
-										    "clinic.parent_clinic_id as parentClinicId, "+
-										    "clinic.is_deleted as deletedFlag, "+
-										    "clinic.is_parent as parentFlag, "+
-										    "clinic.clinic_admin_id as clinicAdminId, "+
-										    "clinic.created_date as createdDate, "+
-										    "clinic.address2 as address2, "+
-										    "clinic.speciality as speciality, "+
-										    "clinic.adherence_setting as adherenceSetting, "+
-										    "clinic.adherenceSetting_modified_date as adherenceSettingModDate"+
-										    " FROM CLINIC clinic"+
-										    " LEFT OUTER JOIN CITY_STATE_ZIP_MAP city_state_zip_map on clinic.zipcode =  city_state_zip_map.zip"+
-										    " WHERE clinic.name like %"+ advancedClinicDTO.getName() + "%"+
-										    " AND clinic.parentFlag in " + (advancedClinicDTO.getClinicType().equalsIgnoreCase("All")?"(true,false)":advancedClinicDTO.getClinicType().equalsIgnoreCase("Parent")?"true":"false") +
-										    " AND clinic.speciality like %"+ advancedClinicDTO.getSpecialty() + "%"+ 
-										    " AND clinic.city like %"+ advancedClinicDTO.getCity() + "%"+
-										    " AND clinic.state like %"+ advancedClinicDTO.getState() + "%"+
-										    " AND clinic.zipcode like %"+ advancedClinicDTO.getZipcode() + "%"+
-										    " AND city_state_zip_map.country like %"+ advancedClinicDTO.getCountry() + "%"+
-										    " AND clinic.deletedFlag in " + (advancedClinicDTO.getStatus().equalsIgnoreCase("All")?"(true,false)":advancedClinicDTO.getStatus().equalsIgnoreCase("Inactive")?"true":"false") +
-										    " AND clinic.adherenceSetting in ("+ advancedClinicDTO.getAdherenceWindowSelected() + ")";                                                                    
-		                                                                                                        
-				
-
-		log.debug("Query : " + advancedSearchClinicsQuery);
 		
-		String countSqlQuery = "select count(hillromUsers.id) from (" + advancedSearchClinicsQuery + ") hillromAdvancedSearchClinics";
+		String advancedSearchClinicsQuery = QueryConstants.QUERY_ADVANCED_CLINIC_SEARCH_FOR_ALL_DEVICETYPE_HILLROM_LOGIN;
+		String whereClause = " WHERE ";
+		StringBuilder filter = new StringBuilder();
+		StringBuilder finalQuery = new StringBuilder();
+		
+		try{
+
+		/*Query formation
+		 * filter: used to append the values from AdvancedClinicDTO
+		*/
+			if(!StringUtils.isBlank(advancedClinicDTO.getClinicName())){
+				filter = filter.append("clinic.name like").append(" '%").append(advancedClinicDTO.getClinicName()).append("%' "); 
+			}
+										    
+			filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedClinicDTO.getClinicType())) ? (filter.append(" AND ")) : (filter.append(""));
+			if(!StringUtils.isBlank(advancedClinicDTO.getClinicType())){
+				if(advancedClinicDTO.getClinicType().equalsIgnoreCase("Parent")){
+					filter = filter.append("clinic.is_parent =").append(" 1 ");
+				}
+				else if(advancedClinicDTO.getClinicType().equalsIgnoreCase("Satellite")){
+					filter = filter.append("clinic.is_parent =").append(" 0 ");
+				}
+				else {
+					filter = filter.append("clinic.is_parent like").append(" '%%' ");
+				}
+			}
+											
+			filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedClinicDTO.getClinicSpecialty())) ? (filter.append(" AND ")) : (filter.append(""));
+			if(!StringUtils.isBlank(advancedClinicDTO.getClinicSpecialty())){
+				filter = filter.append("clinic.speciality like").append(" '%").append(advancedClinicDTO.getClinicSpecialty()).append("%' ");
+			}
+										    
+			filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedClinicDTO.getCountry())) ? (filter.append(" AND ")) : (filter.append(""));
+			if(!StringUtils.isBlank(advancedClinicDTO.getCountry())){
+			   	filter = filter.append("city_state_zip_map.country like").append(" '%").append(advancedClinicDTO.getCountry()).append("%' ");
+			}
+										    
+										    
+			filter = (filter.length()>0) &&(advancedClinicDTO.getState().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
+			if(advancedClinicDTO.getState().size()>0){
+				String csvStates = String.join("','", advancedClinicDTO.getState());  //Forming the comma & single quote separated list
+				filter = filter.append("clinic.state IN('").append(csvStates).append("') ");
+			}
+										    
+			filter = (filter.length()>0) &&(advancedClinicDTO.getCity().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
+			if(advancedClinicDTO.getCity().size()>0){
+				String csvCities = String.join("','", advancedClinicDTO.getCity());
+				filter = filter.append("clinic.city IN('").append(csvCities).append("') ");
+			}
+										    
+										    
+			filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedClinicDTO.getZipcode())) ? (filter.append(" AND ")) : (filter.append(""));
+			if(!StringUtils.isBlank(advancedClinicDTO.getZipcode())){
+				filter = filter.append("clinic.zipcode = ").append(advancedClinicDTO.getZipcode());
+			}
+										    
+			filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedClinicDTO.getClinicStatus())) ? (filter.append(" AND ")) : (filter.append(""));
+			if(!StringUtils.isBlank(advancedClinicDTO.getClinicStatus())){
+				if(advancedClinicDTO.getClinicStatus().equalsIgnoreCase("All")){
+					filter = filter.append("clinic.is_deleted IN(0,1)");
+				}
+				else if(advancedClinicDTO.getClinicStatus().equalsIgnoreCase("Active"))
+					filter = filter.append("clinic.is_deleted =").append(" 0 ");
+				else if(advancedClinicDTO.getClinicStatus().equalsIgnoreCase("Inactive"))
+					filter = filter.append("clinic.is_deleted =").append(" 1 ");
+			}
+										    
+			filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedClinicDTO.getAdherenceWindowSelected())) ? (filter.append(" AND ")) : (filter.append(""));
+			if(!StringUtils.isBlank(advancedClinicDTO.getAdherenceWindowSelected())){
+				filter = filter.append("clinic.adherence_setting = ").append(advancedClinicDTO.getAdherenceWindowSelected());
+			}
+										    
+										    
+		finalQuery = finalQuery.append(advancedSearchClinicsQuery);
+		//checking if the filter object is null , if not finalQuery = where+filter 
+		if(filter.length()>0){
+			finalQuery.append(whereClause);
+			finalQuery.append(filter);
+		}
+
+		log.debug("Query : " + finalQuery);
+		
+		String countSqlQuery = "select count(hillromAdvancedSearchClinics.id) from (" + finalQuery + ") hillromAdvancedSearchClinics";
 
 		Query countQuery = entityManager.createNativeQuery(countSqlQuery);
 		BigInteger count = (BigInteger) countQuery.getSingleResult();
 
 		
-		Query query = getOrderedByQuery(advancedSearchClinicsQuery, sortOrder);
+		Query query = getOrderedByQuery(finalQuery, sortOrder);
 		setPaginationParams(pageable, query);
 
 		List<ClinicVO> advancedSearchClinicsList = new ArrayList<>();
@@ -136,7 +169,7 @@ public class AdvancedSearchRepository {
 			String parentClinicId = (String) record[10];
 			Boolean deleted = (Boolean) record[11];
 			Boolean	parent = (Boolean) record[12];
-			Long clinicAdminId = ((BigInteger) record[13]).longValue(); 
+			String clinicAdminId = Objects.nonNull(record[13])?record[13].toString():null; 
 			DateTime createdAt = new DateTime(record[14]);
 			String address2 = (String) record[15];
 			String speciality = (String) record[16];
@@ -144,34 +177,335 @@ public class AdvancedSearchRepository {
 			DateTime adherenceSettingModifiedDte = new DateTime( record[18]);
 
 				    
-			ClinicVO advancedSearchClinicVO = new ClinicVO(id,name,address,address2,zipcode,city,state,country,phoneNumber, faxNumber, speciality, clinicAdminId,
-					parent, parentClinicId,hillromId,deleted,createdAt,adherenceSetting, adherenceSettingModifiedDte);
-			advancedSearchClinicsList.add(advancedSearchClinicVO);
+			ClinicVO advancedSearchClinicVO = new ClinicVO(id, name, address,address2, zipcode, country, city, state,
+					phoneNumber, faxNumber, speciality,	clinicAdminId, parent, parentClinicId, hillromId,
+					deleted, createdAt, adherenceSetting, adherenceSettingModifiedDte);
+			
+			advancedSearchClinicsList.add(advancedSearchClinicVO); 
+			
 		});
-
+		
 		Page<ClinicVO> page = new PageImpl<ClinicVO>(advancedSearchClinicsList, null, count.intValue());
 
 		return page;
+		}
+		
+		
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		return null;
 	}
-	 
 	
-//	SELECT cl.name, ux.speciality,ux.credentials,cszm.country,ux.city,ux.state,us.zipcode,us.is_deleted 
-//	from hillromvest_prod.USER us
-//	left outer join hillromvest_prod.USER_EXTENSION ux on us.id = ux.user_id
-//	left outer join hillromvest_prod.CLINIC_USER_ASSOC cua on cua.users_id = us.id
-//	left outer join hillromvest_prod.CLINIC cl on cl.id = cua.clinics_id
-//	left outer join hillromvest_prod.USER_AUTHORITY ua on ua.user_id = us.id
-//	left outer join hillromvest_prod.CITY_STATE_ZIP_MAP cszm on us.zipcode = cszm.zip
-//	where ua.authority_name = 'HCP' AND
-//	cl.name IS null or cl.name like '%%' AND
-//	ux.speciality IS null or ux.speciality  like '%%' AND
-//	ux.credentials IS null or ux.credentials  like '%%' AND
-//	cszm.country  like '%%' AND
-//	ux.city  like '%%' AND
-//	ux.state  like '%%' AND
-//	us.zipcode  like '%%' AND
-//	us.is_deleted in (false,true)
+	//----------------------------------------------------------------------------------------------------------------------------------------------
 	
+	// Advanced Patient Search for Admin log in
+	public Page<PatientUserVO> advancedSearchPatients(AdvancedPatientDTO advancedPatientDTO, Pageable pageable,Map<String, Boolean> sortOrder) {      
+		
+		//String BaseQuery = "select * from ("+QueryConstants.QUERY_ADVANCED_PATIENT_SEARCH_FOR_ALL_DEVICETYPE_HILLROM_LOGIN+") kt";
+		String BaseQuery = QueryConstants.QUERY_ADVANCED_PATIENT_SEARCH_FOR_ALL_DEVICETYPE_HILLROM_LOGIN_UNIONS;
+		String age = "TIMESTAMPDIFF(YEAR,kt.pdob,CURDATE())"; // used to calculate age from dob field
+		String whereClause = " WHERE ";
+		StringBuilder filter = new StringBuilder();
+		StringBuilder finalQuery = new StringBuilder();
+		
+		try{
+			
+
+		/*Query formation
+		 * filter: used to append the values from AdvancedPatientDTO
+		 */
+		if(!StringUtils.isBlank(advancedPatientDTO.getName())){
+			filter = filter.append("(kt.pfirstName like ").append("'%").append(advancedPatientDTO.getName()).append("%'"); 
+			filter = filter.append(" OR ").append("kt.plastName like ").append("'%").append(advancedPatientDTO.getName()).append("%') ");
+		}
+	    
+		filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getHillromId())) ? (filter.append(" AND ")) : (filter.append(""));
+		if(!StringUtils.isBlank(advancedPatientDTO.getHillromId())){
+	    	filter = filter.append("kt.phillrom_id like ").append("'%").append(advancedPatientDTO.getHillromId()).append("%' ");
+	    }
+		
+		filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getEmail())) ? (filter.append(" AND ")) : (filter.append(""));
+		if(!StringUtils.isBlank(advancedPatientDTO.getEmail())){
+	    	filter = filter.append("kt.pemail like ").append("'%").append(advancedPatientDTO.getEmail()).append("%' ");
+	    }
+		
+		if(!advancedPatientDTO.getGender().equalsIgnoreCase("All")){
+			filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getGender())) ? (filter.append(" AND ")) : (filter.append(""));
+			if(!StringUtils.isBlank(advancedPatientDTO.getGender())){
+				if(advancedPatientDTO.getGender().equalsIgnoreCase("Male"))
+					filter = filter.append("kt.pgender IN ").append("('Male')");
+				else if(advancedPatientDTO.getGender().equalsIgnoreCase("Female"))
+					filter = filter.append("kt.pgender IN ").append("('Female')");
+				else if(advancedPatientDTO.getGender().equalsIgnoreCase("Other"))
+					filter = filter.append("kt.pgender IN ").append("('Other')");
+			}
+		}
+	    
+	    filter = (filter.length()>0)&&(advancedPatientDTO.getAge().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
+	    if(advancedPatientDTO.getAge().size()>0){
+	    	filter = filter.append("(").append(age).append(rangeBuilder(advancedPatientDTO.getAge(),"age")).append(")"); 
+	    	// rangeBuilder method used to form the where clause for age 
+	    }
+	   
+	    if(!advancedPatientDTO.getCountry().equalsIgnoreCase("All")){
+	    filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getCountry())) ? (filter.append(" AND ")) : (filter.append(""));
+	    	if(!StringUtils.isBlank(advancedPatientDTO.getCountry())){
+	    		filter = filter.append("kt.pcountry IN ").append("('").append(advancedPatientDTO.getCountry()).append("') ");
+	    	}
+	    }
+	    
+	    filter = (filter.length()>0) &&(advancedPatientDTO.getState().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
+	    if(advancedPatientDTO.getState().size()>0){
+	    	String csvStates = String.join("','", advancedPatientDTO.getState());  //Forming the comma & single quote separated list
+	    	filter = filter.append("kt.state IN ('").append(csvStates).append("') ");
+	    }
+	    
+	    filter = (filter.length()>0) &&(advancedPatientDTO.getCity().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
+	    if(advancedPatientDTO.getCity().size()>0){
+	    	String csvCities = String.join("','", advancedPatientDTO.getCity());	//Forming the comma & single quote separated list
+	    	filter = filter.append("kt.pcity IN ('").append(csvCities).append("') ");
+	    }
+	    
+	    
+	    filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getZipcode())) ? (filter.append(" AND ")) : (filter.append(""));
+	    if(!StringUtils.isBlank(advancedPatientDTO.getZipcode())){
+	    	filter = filter.append("kt.pzipcode like").append(" '%").append(advancedPatientDTO.getZipcode()).append("%' ");
+	    }
+		
+	    filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getClinicLevelStatus())) ? (filter.append(" AND ")) : (filter.append(""));
+	    if(!StringUtils.isBlank(advancedPatientDTO.getClinicLevelStatus())){
+	    	if(advancedPatientDTO.getClinicLevelStatus().equalsIgnoreCase("All"))
+	    	{
+	    		filter = filter.append("kt.isDeleted IN (true,false)");
+	    	}
+	    	else if(advancedPatientDTO.getClinicLevelStatus().equalsIgnoreCase("Active"))
+	    	filter = filter.append("kt.isDeleted IN ").append("(false)");
+	    	else if(advancedPatientDTO.getClinicLevelStatus().equalsIgnoreCase("Inactive"))
+		    	filter = filter.append("kt.isDeleted IN ").append("(true)");	
+	    }
+		
+	    filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getDiagnosis())) ? (filter.append(" AND ")) : (filter.append(""));
+	    if(!StringUtils.isBlank(advancedPatientDTO.getDiagnosis())){
+	    	filter = filter.append("(kt.diag1 like '%").append(advancedPatientDTO.getDiagnosis()).append("%' ").append("OR kt.diag2 like '%")
+	    			.append(advancedPatientDTO.getDiagnosis()).append("%' ").append("OR kt.diag3 like '%").append(advancedPatientDTO.getDiagnosis()).append("%' ")
+	    			.append("OR kt.diag4 like '%").append(advancedPatientDTO.getDiagnosis()).append("%') ");
+	    }
+	    
+	    filter= (filter.length()>0)&&(advancedPatientDTO.getAdherenceScoreRange().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
+	    if(advancedPatientDTO.getAdherenceScoreRange().size()>0){
+	    	filter = filter.append("(kt.adherence").append(rangeBuilder(advancedPatientDTO.getAdherenceScoreRange(),"adherence")).append(")");
+	    	// rangeBuilder method used to form the where clause for adherence 
+	    }
+
+	    if(!advancedPatientDTO.getDeviceType().equalsIgnoreCase("All")){
+	    filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getDeviceType())) ? (filter.append(" AND ")) : (filter.append(""));
+	    if(!StringUtils.isBlank(advancedPatientDTO.getDeviceType())){
+	    	if(advancedPatientDTO.getDeviceType().equalsIgnoreCase("VEST"))
+	    		filter = filter.append("kt.devType IN ('ALL','VEST') ");
+	    	else if(advancedPatientDTO.getDeviceType().equalsIgnoreCase("MONARCH"))
+		    	filter = filter.append("kt.devType IN ('ALL','MONARCH') ");
+	    	}
+	    }
+	    
+	    filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getDeviceStatus())) ? (filter.append(" AND ")) : (filter.append(""));
+	    if(!StringUtils.isBlank(advancedPatientDTO.getDeviceStatus())){
+	    	if(advancedPatientDTO.getDeviceStatus().equalsIgnoreCase("All"))
+	    	{
+	    		filter = filter.append("(kt.deviceActiveInactive IN (false,true) OR kt.deviceActiveInactive IS NULL)");
+	    	}
+	    	else if(advancedPatientDTO.getDeviceStatus().equalsIgnoreCase("Active"))
+	    	filter = filter.append("kt.deviceActiveInactive IN (true)");
+	    	else if(advancedPatientDTO.getDeviceStatus().equalsIgnoreCase("Inactive"))
+		    	filter = filter.append("kt.deviceActiveInactive IN (false)");	
+	    }
+	    
+	    filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getDeviceActiveDateFrom()) 
+				|| !StringUtils.isBlank(advancedPatientDTO.getDeviceActiveDateTo())) ? (filter.append(" AND ")) : (filter.append(""));
+				if(!StringUtils.isBlank(advancedPatientDTO.getDeviceActiveDateFrom())||!StringUtils.isBlank(advancedPatientDTO.getDeviceActiveDateTo())){
+					if(!StringUtils.isBlank(advancedPatientDTO.getDeviceActiveDateFrom())&&!StringUtils.isBlank(advancedPatientDTO.getDeviceActiveDateTo())){
+						filter = filter.append("(date(kt.activeDeviceAddedDate) BETWEEN '").append(dateFormat(advancedPatientDTO.getDeviceActiveDateFrom())).append("'")
+								.append(" AND ").append("'").append(dateFormat(advancedPatientDTO.getDeviceActiveDateTo())).append("')");
+					}
+					else if(!StringUtils.isBlank(advancedPatientDTO.getDeviceActiveDateFrom())){
+						filter = filter.append("date(kt.activeDeviceAddedDate) >= '").append(dateFormat(advancedPatientDTO.getDeviceActiveDateFrom())).append("' ");
+					}
+					else if(!StringUtils.isBlank(advancedPatientDTO.getDeviceActiveDateTo())){
+						filter = filter.append("date(kt.activeDeviceAddedDate) <= '").append(dateFormat(advancedPatientDTO.getDeviceActiveDateTo())).append("' ");
+					}
+				}
+	    
+	    filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getSerialNo())) ? (filter.append(" AND ")) : (filter.append(""));
+	    if(!StringUtils.isBlank(advancedPatientDTO.getSerialNo())){
+	    	filter = filter.append("kt.deviceSerialNumber like '%").append(advancedPatientDTO.getSerialNo()).append("%' ");
+	    }
+	    
+	    filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getMinHMRRange()) 
+	    					|| !StringUtils.isBlank(advancedPatientDTO.getMaxHMRRange())) ? (filter.append(" AND ")) : (filter.append(""));
+	    if(!StringUtils.isBlank(advancedPatientDTO.getMinHMRRange())||!StringUtils.isBlank(advancedPatientDTO.getMaxHMRRange())){
+	    	if(!StringUtils.isBlank(advancedPatientDTO.getMinHMRRange())&&!StringUtils.isBlank(advancedPatientDTO.getMaxHMRRange())){
+	    	filter = filter.append("(kt.hmr BETWEEN '").append(Integer.parseInt(advancedPatientDTO.getMinHMRRange())*60).append("'") //converting hmr mins into seconds
+	    			 .append(" AND ").append("'").append(Integer.parseInt(advancedPatientDTO.getMaxHMRRange())*60).append("')");
+	    	}
+	    	else if(!StringUtils.isBlank(advancedPatientDTO.getMinHMRRange())){
+	    		filter = filter.append("kt.hmr >= ").append(Integer.parseInt(advancedPatientDTO.getMinHMRRange())*60);
+		    }
+		    else if(!StringUtils.isBlank(advancedPatientDTO.getMaxHMRRange())){
+		    	filter = filter.append("kt.hmr <= ").append(Integer.parseInt(advancedPatientDTO.getMaxHMRRange())*60);
+		    }
+	    }
+	    
+	    if(!advancedPatientDTO.getAdherenceReset().equalsIgnoreCase("All")){
+	    		filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getAdherenceReset())) ? (filter.append(" AND ")) : (filter.append(""));
+	    	if(advancedPatientDTO.getAdherenceReset().equalsIgnoreCase("Yes"))
+	    		filter = filter.append("kt.adherenceReset IS NOT NULL");
+	    	else if(advancedPatientDTO.getAdherenceReset().equalsIgnoreCase("No"))
+		    	filter = filter.append("kt.adherenceReset IS NULL");	
+	    }
+	    
+	    if(!advancedPatientDTO.getNoTransmissionRecorded().equalsIgnoreCase("All")){
+    		filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getNoTransmissionRecorded())) ? (filter.append(" AND ")) : (filter.append(""));
+    		if(advancedPatientDTO.getNoTransmissionRecorded().equalsIgnoreCase("Yes"))
+    			filter = filter.append("kt.transmissionRecorded IS NULL");
+    		else if(advancedPatientDTO.getNoTransmissionRecorded().equalsIgnoreCase("No"))
+    			filter = filter.append("kt.transmissionRecorded IS NOT NULL");	
+	    }
+	    
+
+	    if(!advancedPatientDTO.getBelowFrequencySetting().equalsIgnoreCase("All")){
+    		filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getBelowFrequencySetting())) ? (filter.append(" AND ")) : (filter.append(""));
+    		if(advancedPatientDTO.getBelowFrequencySetting().equalsIgnoreCase("Yes"))
+    			filter = filter.append("kt.isSettingsDeviated = 1");
+    		else if(advancedPatientDTO.getBelowFrequencySetting().equalsIgnoreCase("No"))
+    			filter = filter.append("(kt.isSettingsDeviated IS NULL OR kt.isSettingsDeviated = 0)");	
+	    }
+	    
+	    if(!advancedPatientDTO.getBelowTherapyMin().equalsIgnoreCase("All")){
+    		filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getBelowTherapyMin())) ? (filter.append(" AND ")) : (filter.append(""));
+    		if(advancedPatientDTO.getBelowTherapyMin().equalsIgnoreCase("Yes"))
+    			filter = filter.append("kt.isHMRNonCompliant = 1");
+    		else if(advancedPatientDTO.getBelowTherapyMin().equalsIgnoreCase("No"))
+    			filter = filter.append("(kt.isHMRNonCompliant IS NULL OR kt.isHMRNonCompliant = 0)");	
+	    }
+	    
+	    if(!advancedPatientDTO.getMissedTherapyDays().equalsIgnoreCase("All")){
+    		filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getMissedTherapyDays())) ? (filter.append(" AND ")) : (filter.append(""));
+    		if(advancedPatientDTO.getMissedTherapyDays().equalsIgnoreCase("Yes"))
+    			filter = filter.append("kt.isMissedTherapy = 1");
+    		else if(advancedPatientDTO.getMissedTherapyDays().equalsIgnoreCase("No"))
+    			filter = filter.append("(kt.isMissedTherapy IS NULL OR kt.isMissedTherapy = 0)");	
+	    }
+	    
+	    finalQuery = finalQuery.append(BaseQuery);
+		//checking if the filter object is null , if not finalQuery = where+filter 
+		if(filter.length()>0){
+			finalQuery.append(whereClause);
+			finalQuery.append(filter);
+		}
+
+		log.debug("Advanced Patient Search Query : " + finalQuery);
+
+		String countSqlQuery = "select count(patientUsers.patientId) from ( " + finalQuery + "  )  patientUsers";
+
+		Query countQuery = entityManager.createNativeQuery(countSqlQuery);
+		BigInteger count = (BigInteger) countQuery.getSingleResult();
+
+		
+		Query query = getOrderedByQuery(finalQuery, sortOrder);
+		setPaginationParams(pageable, query);
+
+		List<Object[]> results = query.getResultList();
+
+		List<PatientUserVO> patientUsers = new LinkedList<>();
+
+		results.stream().forEach((record) -> {
+			Long id = ((BigInteger) record[1]).longValue();
+			String email = (String) record[2];
+			String firstName = (String) record[3];
+			String lastName = (String) record[4];
+			Boolean isDeleted = (Boolean) record[5];
+			String zipcode = (String) record[6];
+			String address = (String) record[7];
+			String city = (String) record[8];
+			Date dob = (Date) record[9];
+			String gender = (String) record[10];
+			String title = (String) record[11];
+			String hillromId = (String) record[12];
+			Timestamp createdAt = (Timestamp) record[13];
+			Boolean isActivated = (Boolean) record[14];
+			DateTime createdAtDatetime = new DateTime(createdAt);
+			String state = (String) record[15];
+			Integer adherence = (Integer) record[16];
+			Date lastTransmissionDate = (Date) record[36];
+			String mrnId = (String) record[18];
+			String hcpNamesCSV = (String) record[19];
+			String clinicNamesCSV = (String) record[20];
+			Boolean isExpired = (Boolean) record[21];
+			String devType = (String) record[26];
+
+			java.util.Date localLastTransmissionDate = null;
+
+			if (Objects.nonNull(lastTransmissionDate)) {
+				localLastTransmissionDate = new java.util.Date(lastTransmissionDate.getTime());
+
+			}
+
+			LocalDate dobLocalDate = null;
+			if (Objects.nonNull(dob)) {
+				dobLocalDate = new LocalDate(dob.getTime());
+			}
+
+			PatientUserVO patientUserVO = new PatientUserVO(id, email, firstName, lastName, isDeleted, zipcode, address,
+					city, dobLocalDate, gender, title, hillromId, createdAtDatetime, isActivated, state,
+					Objects.nonNull(adherence) ? adherence : 0, localLastTransmissionDate,devType);
+			// mrnId,hcpNamesCSV,clinicNamesCSV
+			patientUserVO.setMrnId(mrnId);
+			patientUserVO.setHcpNamesCSV(hcpNamesCSV);
+			patientUserVO.setClinicNamesCSV(clinicNamesCSV);
+			patientUserVO.setExpired(isExpired);
+			patientUsers.add(patientUserVO);
+		});
+		Page<PatientUserVO> page = new PageImpl<PatientUserVO>(patientUsers, null, count.intValue());
+
+		return page;
+	}
+	catch(Exception e){
+		e.printStackTrace();
+	}
+	return null;
+}
+	
+	//----------------------------------------------------------------------------------------------------------------------------------------------
+	
+	/*public Page<HcpVO> advancedSearchHcps(AdvancedHcpDTO advancedHcpDTO,
+			Pageable pageable, Map<String, Boolean> sortOrder) {
+		
+		String baseQuery = QueryConstants.QUERY_ADVANCED_HCP_SEARCH_FOR_ALL_DEVICETYPE_HILLROM_LOGIN;
+		String whereClause = " WHERE ";
+		StringBuilder filter = new StringBuilder();
+		StringBuilder finalQuery = new StringBuilder();
+		try{
+		
+			Query formation
+			 * filter: used to append the values from AdvancedPatientDTO
+			 
+			if(!StringUtils.isBlank(advancedHcpDTO.getName())){
+				filter = filter.append("(kt.pfirstName like ").append("'%").append(advancedHcpDTO.getName()).append("%'"); 
+				filter = filter.append(" OR ").append("kt.plastName like ").append("'%").append(advancedHcpDTO.getName()).append("%') ");
+			} 
+			
+			filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedHcpDTO.getHillromId())) ? (filter.append(" AND ")) : (filter.append(""));
+			if(!StringUtils.isBlank(advancedHcpDTO.getHillromId())){
+		    	filter = filter.append("kt.phillrom_id like ").append("'%").append(advancedHcpDTO.getHillromId()).append("%' ");
+		    }
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		return null;
+	}*/
+	//----------------------------------------------------------------------------------------------------------------------------------------------
+
 	private void setPaginationParams(Pageable pageable, Query query) {
 
 		int firstResult = pageable.getOffset();
@@ -179,8 +513,9 @@ public class AdvancedSearchRepository {
 		query.setFirstResult(firstResult);
 		query.setMaxResults(maxResult);
 	}
-	
-	private Query getOrderedByQuery(String queryString, Map<String, Boolean> columnNames) {
+
+	private Query getOrderedByQuery(StringBuilder finalQuery,
+			Map<String, Boolean> columnNames) {
 
 		StringBuilder sb = new StringBuilder();
 		// Append order by only if there is any sort request.
@@ -191,7 +526,7 @@ public class AdvancedSearchRepository {
 		int limit = columnNames.size();
 		int i = 0;
 		for (String columnName : columnNames.keySet()) {
-			if(!Constants.ADHERENCE.equalsIgnoreCase(columnName))
+			if (!Constants.ADHERENCE.equalsIgnoreCase(columnName))
 				sb.append("lower(").append(columnName).append(")");
 			else
 				sb.append(columnName);
@@ -205,12 +540,60 @@ public class AdvancedSearchRepository {
 				sb.append(", ");
 			}
 		}
-		
-		log.debug("Search Query :: "+queryString + sb.toString());
-		
-		Query jpaQuery = entityManager.createNativeQuery(queryString + sb.toString());
+
+		log.debug("Search Query :: " + finalQuery + sb.toString());
+
+		Query jpaQuery = entityManager.createNativeQuery(finalQuery
+				+ sb.toString());
 		return jpaQuery;
 	}
+	/**
+	 * Query builder for age/adherence_score range
+	 * @param rangeList
+	 * @param specifier
+	 * @return
+	 */
+	public String rangeBuilder(List<String> rangeList, String specifier){
+		
+		String sqlQuery = " BETWEEN ";
 
+				String list = String.join(" ", rangeList);
+				String newlist = list.replaceAll("-","AND");
+				String splitStr[]= newlist.split(" ");
+
+				StringBuilder builder = new StringBuilder(sqlQuery);
+
+				for (String s : splitStr )
+				{
+					s=s.replaceAll("above","200");
+					s=s.replaceAll("AND"," AND ");
+
+					if(specifier.equalsIgnoreCase("age")){
+						builder = builder.append(s).append(" or TIMESTAMPDIFF(YEAR,kt.pdob,CURDATE()) BETWEEN ");
+					}
+					else if(specifier.equalsIgnoreCase("adherence"))
+						builder = builder.append(s).append(" or kt.adherence BETWEEN ");
+				}  
+
+				String newStr = new String(builder);
+				int i =newStr.lastIndexOf("or");
+				newStr =newStr.substring(0, i).concat("");
+
+				return newStr;
+		}
+	/**
+	 * 
+	 * To convert the date format
+	 * @param dt
+	 * @return
+	 * @throws ParseException
+	 */
+	
+	public static String dateFormat(String dt) throws ParseException{
+		Date initDate =  new SimpleDateFormat("MM/dd/yyyy").parse(dt);
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		String parsedDate = formatter.format(initDate);
+		return parsedDate.toString();
+	}
 
 }

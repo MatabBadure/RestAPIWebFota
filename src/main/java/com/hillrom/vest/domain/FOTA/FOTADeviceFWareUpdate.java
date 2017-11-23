@@ -9,9 +9,11 @@ import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.Audited;
 import org.joda.time.DateTime;
 
 @Entity
+@Audited
 @Table(name = "FOTA_DEVICE_FWARE_UPDATE_LOG")
 public class FOTADeviceFWareUpdate {
 	@Id

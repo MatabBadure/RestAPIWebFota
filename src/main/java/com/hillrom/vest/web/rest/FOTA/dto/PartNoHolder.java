@@ -20,8 +20,8 @@ public class PartNoHolder {
 	private final static Logger log = LoggerFactory
 			.getLogger(PartNoHolder.class);
 	private String part_No;
+	private String devSN;
 	private String version_No;
-	private DateTime effectiveDate;
 	private DateTime downloadTime;
 	private int totalChunk;
 	private int chunkSize;
@@ -420,6 +420,12 @@ public class PartNoHolder {
 		return result;
 	}
 
+	public String getDevSN() {
+		return devSN;
+	}
+	public void setDevSN(String devSN) {
+		this.devSN = devSN;
+	}
 	public DateTime getDownloadTime() {
 		return downloadTime;
 	}
@@ -448,13 +454,13 @@ public class PartNoHolder {
 		this.version_No = version_No;
 	}
 
-	public DateTime getEffectiveDate() {
+	/*public DateTime getEffectiveDate() {
 		return effectiveDate;
 	}
 
 	public void setEffectiveDate(DateTime effectiveDate) {
 		this.effectiveDate = effectiveDate;
-	}
+	}*/
 
 	public void setPart_No(String part_No) {
 		this.part_No = part_No;

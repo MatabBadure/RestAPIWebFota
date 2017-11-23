@@ -125,38 +125,56 @@ public class ClinicService {
     			}
     		}
     		assignUpdatedValues(clinicDTO, clinic);
-    		if(Objects.nonNull(clinicDTO.getParent()) && clinicDTO.getParent()) {
-    			List<String> existingChildClinicIds = new ArrayList<String>();
-    			List<String> newChildClinicIds = new ArrayList<String>();
-    			for(Clinic childClinic : clinic.getChildClinics()) {
-    				existingChildClinicIds.add(childClinic.getId().toString());
-    			}
-    			for(Map<String, String> childClinic : clinicDTO.getChildClinicList()) {
-    				newChildClinicIds.add(childClinic.get("id"));
-    			}
-    			List<String> clinicsToBeRemoved = RandomUtil.getDifference(existingChildClinicIds, newChildClinicIds);
-    			
-    			//TODO : to be refactored with clinicRepository.findAll(clinicsToBeRemoved)
-    			for(String clinicId : clinicsToBeRemoved) {
-    				Clinic childClinic = clinicRepository.getOne(clinicId);
-    				
-    				childClinic.setParentClinic(null);
-    				clinicRepository.save(childClinic);
-    				clinic.getChildClinics().remove(childClinic);
-    			}
-    		} else if(Objects.nonNull(clinicDTO.getParentClinic()) && StringUtils.isNotBlank(clinicDTO.getParentClinic().get("id"))) {
-        		if(!id.equals(clinicDTO.getParentClinic().get("id"))) {
-        			Clinic parentClinic = clinicRepository.getOne(clinicDTO.getParentClinic().get("id"));
-        			parentClinic.setParent(true);
-        			clinicRepository.save(parentClinic);
-        			clinic.setParentClinic(parentClinic);       			
-        		} else {
-        			throw new HillromException(ExceptionConstants.HR_542);
-        		} 
-        	} else {
-       			clinicRepository.save(clinic);
-        	} 
-    		clinicRepository.save(clinic);
+
+    		if((clinicDTO.getMakeParent()) || (clinicDTO.getMakeChild())){
+	    		if(clinicDTO.getMakeParent()){
+	    			clinic.setParent(true);
+	    			clinic.setParentClinic(null);
+	    			clinicRepository.save(clinic);
+	    		}
+	    		
+	    		if(clinicDTO.getMakeChild()){
+	    			clinic.setParent(false);
+	    			Clinic parentClinic = clinic.getParentClinic();
+	    			parentClinic.setChildClinics(clinic.getChildClinics());
+	    			clinicRepository.save(parentClinic);
+	    			clinicRepository.save(clinic);
+	    		}
+    		}else {
+    		
+	    		if(Objects.nonNull(clinicDTO.getParent()) && clinicDTO.getParent()) {
+	    			List<String> existingChildClinicIds = new ArrayList<String>();
+	    			List<String> newChildClinicIds = new ArrayList<String>();
+	    			for(Clinic childClinic : clinic.getChildClinics()) {
+	    				existingChildClinicIds.add(childClinic.getId().toString());
+	    			}
+	    			for(Map<String, String> childClinic : clinicDTO.getChildClinicList()) {
+	    				newChildClinicIds.add(childClinic.get("id"));
+	    			}
+	    			List<String> clinicsToBeRemoved = RandomUtil.getDifference(existingChildClinicIds, newChildClinicIds);
+	    			
+	    			//TODO : to be refactored with clinicRepository.findAll(clinicsToBeRemoved)
+	    			for(String clinicId : clinicsToBeRemoved) {
+	    				Clinic childClinic = clinicRepository.getOne(clinicId);
+	    				
+	    				childClinic.setParentClinic(null);
+	    				clinicRepository.save(childClinic);
+	    				clinic.getChildClinics().remove(childClinic);
+	    			}
+	    		} else if(Objects.nonNull(clinicDTO.getParentClinic()) && StringUtils.isNotBlank(clinicDTO.getParentClinic().get("id"))) {
+	        		if(!id.equals(clinicDTO.getParentClinic().get("id"))) {
+	        			Clinic parentClinic = clinicRepository.getOne(clinicDTO.getParentClinic().get("id"));
+	        			parentClinic.setParent(true);
+	        			clinicRepository.save(parentClinic);
+	        			clinic.setParentClinic(parentClinic);       			
+	        		} else {
+	        			throw new HillromException(ExceptionConstants.HR_542);
+	        		} 
+	        	} else {
+	       			clinicRepository.save(clinic);
+	        	} 
+	    		clinicRepository.save(clinic);
+    		}
         } else {
 	      	throw new HillromException(ExceptionConstants.HR_543);
 	    }

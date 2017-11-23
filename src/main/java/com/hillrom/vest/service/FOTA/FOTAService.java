@@ -541,7 +541,8 @@ public class FOTAService {
 				}
             }
 
-            record_length = hexRecord[0];
+            //record_length = hexRecord[0];
+            record_length = (int)(hexRecord[0]&0xFF);
             if ((record_length + 5) != hexRecord.length) {
                 try {
 					throw new Exception("Invalid record length (" + recordIdx + ")");

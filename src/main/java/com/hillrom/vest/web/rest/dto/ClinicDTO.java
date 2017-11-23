@@ -64,9 +64,9 @@ public class ClinicDTO {
     private Boolean adherenceSettingFlag;
 	//end: HILL-2004
     
-    private Boolean makeParent;
+    private Boolean makeParent=false;
     
-    private Boolean makeChild;
+    private Boolean makeChild=false;
     
 	public ClinicDTO() {
 		super();

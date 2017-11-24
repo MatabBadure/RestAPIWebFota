@@ -11,6 +11,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.envers.AuditJoinTable;
@@ -62,6 +63,19 @@ public class UserExtension extends User implements Serializable {
 
 	@Column(name = "is_deleted", nullable = false)
 	private boolean deleted = false;
+	
+	//adding column for user deactivation reason
+	@Size(max=255)
+	@Column(name="deactivation_reason", length=255)
+	private String deactivationReason;
+
+	public String getDeactivationReason() {
+		return deactivationReason;
+	}
+
+	public void setDeactivationReason(String deactivationReason) {
+		this.deactivationReason = deactivationReason;
+	}
 
 	public String getSpeciality() {
 		return speciality;
@@ -153,11 +167,10 @@ public class UserExtension extends User implements Serializable {
 
 	@Override
 	public String toString() {
-		return "UserExtension [speciality=" + speciality + ", credentials="
-				+ credentials + ", primaryPhone=" + primaryPhone
-				+ ", mobilePhone=" + mobilePhone + ", faxNumber=" + faxNumber
-				+ ", address=" + address + ", city=" + city + ", state="
-				+ state + ", npiNumber=" + npiNumber + "]";
+		return "UserExtension [speciality=" + speciality + ", credentials=" + credentials + ", primaryPhone="
+				+ primaryPhone + ", mobilePhone=" + mobilePhone + ", faxNumber=" + faxNumber + ", address=" + address
+				+ ", city=" + city + ", state=" + state + ", npiNumber=" + npiNumber + ", clinics=" + clinics
+				+ ", deleted=" + deleted + ", deactivationReason=" + deactivationReason + "]";
 	}
 
 }

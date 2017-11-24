@@ -1,6 +1,6 @@
 package com.hillrom.vest.service;
 
-import static com.hillrom.vest.config.Constants.MMddyyyyHHmmss;
+import static com.hillrom.vest.config.Constants.MMddyyyy;
 import static com.hillrom.vest.config.Constants.XAXIS_TYPE_DATE;
 import static com.hillrom.vest.config.Constants.FVC_P;
 import static com.hillrom.vest.config.Constants.FEV1_P;
@@ -51,7 +51,7 @@ public class TestResultsGraphService extends AbstractGraphService {
 		Graph patientTestResultsGraph = GraphUtils
 				.buildGraphObectWithXAxisType(XAXIS_TYPE_DATE);
 		List<PatientTestResult> patientTestResultList = (List<PatientTestResult>) data;
-		String datePattern = MMddyyyyHHmmss;
+		String datePattern = MMddyyyy;
 		for (PatientTestResult patientTestResult : patientTestResultList) {
 			patientTestResultsGraph
 					.getxAxis()
@@ -82,13 +82,14 @@ public class TestResultsGraphService extends AbstractGraphService {
 	private GraphDataVO createSeriesData(Filter filter,
 			PatientTestResult patientTestResult, String seriesName) {
 		GraphDataVO point;
+		System.out.println("patientTestResult.getTestResultDate() ::"+patientTestResult.getTestResultDate());
 		if(seriesName.equalsIgnoreCase("FVC_P")){
 			point = new GraphDataVO(DateUtil.formatDate(
-				patientTestResult.getTestResultDate(), MMddyyyyHHmmss),
+				patientTestResult.getTestResultDate(), MMddyyyy),
 				patientTestResult.getFVC_P());
 		}else{
 			 point = new GraphDataVO(DateUtil.formatDate(
-					patientTestResult.getTestResultDate(), MMddyyyyHHmmss),
+					patientTestResult.getTestResultDate(), MMddyyyy),
 					patientTestResult.getFEV1_P());
 		}		
 		return point;

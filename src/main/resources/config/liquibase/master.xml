@@ -105,7 +105,7 @@
 	<include file="classpath:/config/liquibase/changelog/20161117181730_add_column_clinic_inMessage.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20161124181730_add_column_modifiedAdhSettingDate_clinic_table.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20161116181730_updated_value_for_reset_justification_others.xml" relativeToChangelogFile="false"/>
-  <include file="classpath:/config/liquibase/changelog/20161215021522_add_csa_role.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20161215021522_add_csa_role.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20161117182532_add_typeCode_announcement_diagnosis_type.xml" relativeToChangelogFile="false"/>	
 	<include file="classpath:/config/liquibase/changelog/20161117182531_add_typeCode_announcement_patient_type.xml" relativeToChangelogFile="false"/>	
 	<include file="classpath:/config/liquibase/changelog/20161117182530_add_typeCode_announcement_send_to.xml" relativeToChangelogFile="false"/>
@@ -125,7 +125,7 @@
 	<include file="classpath:/config/liquibase/changelog/20170224160200_add_column_VEST_DEVICE_DATA_MONARCH.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20170227143200_add_column_PATIENT_VEST_DEVICE_RAW_LOGS_MONARCH.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20170316014700_add_column_PATIENT_DEVICES_ASSOC.xml" relativeToChangelogFile="false"/>	
-  <include file="classpath:/config/liquibase/changelog/20172803114330_add_extra_columns_to_PATIENT_DEVICES_ASSOC.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20172803114330_add_extra_columns_to_PATIENT_DEVICES_ASSOC.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20170329161200_add_column_hmr_vest_PATIENT_COMPLIANCE_MONARCH.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20170330160400_add_columns_PATIENT_DEVICES_ASSOC.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20170329194000_alter_datatype_notification_type_in_Notification.xml" relativeToChangelogFile="false"/>
@@ -150,4 +150,6 @@
 	<include file="classpath:/config/liquibase/changelog/20171107055300_upload_canada_zip_codes.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20171114160100_upload_patient_diagnostic_codes.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20171116020900_create_city_state_zip_map_index.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20171121044430_update_reason_for_user_deactivation.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20171121052530_add_extra_colum_deactivation_reason_to_User.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

@@ -19,18 +19,20 @@ public class HandleHolder {
 	private DateTime downloadEndDateTime;
 	int chunkSize = 0;
 	private String handleId;
-	
-	private Boolean initialReq;
-	
+	private boolean sendChunkReq;
 	
 	
-	
-	public Boolean getInitialReq() {
-		return initialReq;
+
+	public boolean getSendChunkReq() {
+		return sendChunkReq;
 	}
-	public void setInitialReq(Boolean initialReq) {
-		this.initialReq = initialReq;
+
+
+	public void setSendChunkReq(boolean sendChunkReq) {
+		this.sendChunkReq = sendChunkReq;
 	}
+
+
 	public String getHandleId() {
 		return handleId;
 	}

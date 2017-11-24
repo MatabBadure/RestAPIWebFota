@@ -1072,6 +1072,36 @@ public class UserExtensionResource {
     }
     
     /**
+     * PUT  /user/:id/resetPassword -> reset password for the "id" user.
+     */
+    @RequestMapping(value = "/user/{id}/resetPassword",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    //hill-1845
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CUSTOMER_SERVICES, AuthoritiesConstants.FOTA_ADMIN, AuthoritiesConstants.FOTA_APPROVER})
+    //hill-1845,
+    public ResponseEntity<JSONObject> resetPassword(@PathVariable Long id, HttpServletRequest request) {
+        log.debug("REST request to reset password to User : {}", id);
+        //hill-2178
+         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+        JSONObject jsonObject = new JSONObject();
+		try {
+			//hill-2178
+			jsonObject = userService.resetPassword(id,baseUrl);
+			 if (jsonObject.containsKey("ERROR")) {
+		        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.FORBIDDEN);
+		        } else {
+		        	jsonObject.put("message", MessageConstants.HR_316);
+		            return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);		            
+		        }
+		} catch (HillromException e) {
+			jsonObject.put("ERROR", e.getMessage());
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.FORBIDDEN);
+		}
+       
+    }
+    
+    /**
      * PUT  /user/:id/reactivation -> reactivation of user, updates activation key and time.
      */
     @RequestMapping(value = "/user/{id}/reactivation",

@@ -295,8 +295,7 @@ public class AdherenceCalculationService {
 				Long userId = compliance.getPatientUser().getId();
 				PatientInfo patientInfo = compliance.getPatient();
 				
-				if(vestOnlyDevicesPatientsMap.containsKey(patientInfo.getId())){					
-						
+				if(vestOnlyDevicesPatientsMap.containsKey(patientInfo.getId())){
 					Integer adherenceSettingDay = getAdherenceSettingForPatient(patientInfo);
 					
 					PatientNoEvent noEvent = userIdNoEventMap.get(compliance.getPatientUser().getId());

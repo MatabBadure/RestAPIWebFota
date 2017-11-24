@@ -108,4 +108,6 @@ public class MessageConstants {
     public static final String HR_314 = "Adherence score recalculated successfully for patients.";
     public static final String HR_315 = "Adherence window updated successfully. No patients associated.";
     
+    public static final String HR_316 = "User Password Reset Email, sent successfully.";
+    
 }

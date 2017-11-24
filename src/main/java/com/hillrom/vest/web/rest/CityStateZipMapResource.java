@@ -1,5 +1,7 @@
 package com.hillrom.vest.web.rest;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -7,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.service.CityStateZipMapService;
+import com.hillrom.vest.web.rest.dto.CountryStateDTO;
 
 import net.minidev.json.JSONObject;
 
@@ -73,6 +77,32 @@ public class CityStateZipMapResource {
 	public ResponseEntity<?> getCityByState(@RequestParam(required = true, value = "state") String state) {
 		try {
 			return new ResponseEntity<>(cityStateZipMapService.getAvailableCities(state), HttpStatus.OK);
+		} catch (HillromException e) {
+			JSONObject json = new JSONObject();
+			json.put("ERROR", e.getMessage());
+			return new ResponseEntity<>(json, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	// To get the state list along with cities
+	@RequestMapping(value = "/cityByCountryAndState", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> getCityByCountryAndState(@RequestBody CountryStateDTO countryStateDTO){
+		try {
+			return new ResponseEntity<>(cityStateZipMapService.getAvailableCitiesAdv(countryStateDTO),HttpStatus.OK);
+		} catch (Exception e) {
+			JSONObject json = new JSONObject();
+			json.put("ERROR", e.getMessage());
+			return new ResponseEntity<>(json, HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	//To get unique states from country code
+	@RequestMapping(value = "/stateByCountryCode", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+
+	public ResponseEntity<?> getStateValuesByCountryCode(
+			@RequestParam(required = true, value = "country") String country) {
+		try {
+			return new ResponseEntity<>(cityStateZipMapService.getStateVOByCountryCode(country), HttpStatus.OK);
 		} catch (HillromException e) {
 			JSONObject json = new JSONObject();
 			json.put("ERROR", e.getMessage());

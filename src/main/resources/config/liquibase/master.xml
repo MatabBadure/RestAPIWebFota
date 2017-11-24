@@ -146,4 +146,8 @@
 	<include file="classpath:/config/liquibase/changelog/20170807064000_FOTA_dataTables.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20170814021114_add_fota_role.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20171013203400_swapped_columns_PATIENT_DEVICES_ASSOC.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20171031100100_altered_datatype_zipcode.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20171107055300_upload_canada_zip_codes.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20171114160100_upload_patient_diagnostic_codes.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20171116020900_create_city_state_zip_map_index.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

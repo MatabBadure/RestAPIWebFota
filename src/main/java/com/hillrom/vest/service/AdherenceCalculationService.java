@@ -2476,6 +2476,7 @@ public class AdherenceCalculationService {
 		
 		// Getting the therapy details of the shell patient
 		/*
+		List<TherapySession> therapySessionList = therapySessionRepository.findByPatientUserId(userOld.getId());
 		List<TherapySession> therapySessionMonarchListExist = therapySessionRepository.findByPatientUserId(user.getId());
 		
 		SortedMap<LocalDate,List<TherapySession>> sortedExistTherapy = null;

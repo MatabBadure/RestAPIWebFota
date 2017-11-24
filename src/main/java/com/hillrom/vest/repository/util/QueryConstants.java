@@ -722,7 +722,7 @@ public class QueryConstants {
 					+ "patientId,patient_user_id,pemail,pfirstName,plastName, "
 	                + "isDeleted,pzipcode,paddress,pcity,pdob,pgender,ptitle, "
 	                + "phillrom_id,createdAt,isActivated, state , "
-	                + "adherence,last_date,mrnid,hName,clinicName,isExpired, "
+	                + "adherence,last_date,mrnid,null as hName,clinicName,isExpired, "
 	                + "isHMRNonCompliant, isSettingsDeviated, isMissedTherapy, "
 	                + "adherencesetting,devType,pcountry,diag1,diag2,diag3,diag4,deviceActiveInactive,deviceSerialNumber, "
 	                + "hmr,activeDeviceAddedDate, "
@@ -755,19 +755,7 @@ public class QueryConstants {
 		                 + " pvdhm.last_modified_date as activeDeviceAddedDate, "
 		                 + " pnem.first_transmission_date as transmissionRecorded, "
 		                 + " adresm.reset_date as adherenceReset "
-						
-						/*+ "select patInfo.id as patientId,user.first_name as pfirstName,user.last_name as  plastName, "
-								+ "user.is_deleted as isDeleted, user.zipcode as pzipcode,patInfo.address paddress,patInfo.city  as pcity, "
-								+ "user.dob as pdob, user.gender as pgender,user.title as ptitle, "
-								+ "user.hillrom_id as phillrom_id, user.created_date as createdAt, user.activated as isActivated, "
-								+ "patInfo.state as state ,  user_clinic.mrn_id as mrnid, clinic.id as pclinicid,  GROUP_CONCAT(clinic.name) as clinicName, "
-								+ "user.expired as isExpired, pc.compliance_score as adherence, max(pc.last_therapy_session_date) as last_date, "
-								+ "pc.is_hmr_compliant as isHMRNonCompliant, pc.is_settings_deviated as isSettingsDeviated, pc.missed_therapy_count as isMissedTherapy, "
-								+ "clinic.adherence_setting as adherencesetting, patient_dev_assoc.device_type as devType, cszm.country as pcountry, "
-								+ "patient_dev_assoc.diagnosis1 as diag1,patient_dev_assoc.diagnosis2 as diag2,patient_dev_assoc.diagnosis3 as diag3, "
-								+ "patient_dev_assoc.diagnosis4  as diag4,patient_dev_assoc.is_active as deviceActiveInactive, "
-								+ "patient_dev_assoc.serial_number as deviceSerialNumber, pvdhm.hmr as hmr, pvdhm.last_modified_date as activeDeviceAddedDate, "
-								+ "pnem.first_transmission_date as transmissionRecorded, adresm.reset_date as adherenceReset "*/			                                
+								                                
 						+ "from "
 						+ "USER user " 
 		                + "left outer join " 
@@ -792,8 +780,8 @@ public class QueryConstants {
 		                        + "PATIENT_COMPLIANCE_MONARCH pc on user.id = pc.user_id  AND pc.date=IF(pc.date <> curdate(),subdate(curdate(),1),curdate()) " 
 		                + "left outer join  "
 		                        + "CLINIC clinic on user_clinic.clinic_id = clinic.id and  user_clinic.patient_id = patInfo.id "
-		                + "where ((patient_dev_assoc.device_type = 'MONARCH' AND patient_dev_assoc.patient_type='SD')) group by patInfo.id) as associated_patient " 
-		                + "left outer join   "
+		                + "where ((patient_dev_assoc.device_type = 'MONARCH' AND patient_dev_assoc.patient_type='SD')) group by patInfo.id) as associated_patient "; 
+/*		                + "left outer join   "
 			                    + "(SELECT GROUP_CONCAT(huser.last_name ,' ',huser.first_name ) as hName,  clinic.id as hclinicid " 
 			                    	+ "from USER huser  "
 			                        + "left outer join " 
@@ -804,12 +792,12 @@ public class QueryConstants {
 			                                + "CLINIC clinic on user_clinic.clinics_id = clinic.id and user_clinic.users_id = huser.id "
 			                        + "left outer join  "
 			                                + "PATIENT_COMPLIANCE_MONARCH pc on huser.id = pc.user_id  AND pc.date=IF(pc.date <> curdate(),subdate(curdate(),1),curdate()) " 
-			                        + "group by clinic.id) as associated_hcp  on associated_patient.pclinicid = associated_hcp.hclinicid ";
+			                        + "group by clinic.id) as associated_hcp  on associated_patient.pclinicid = associated_hcp.hclinicid ";*/
 			                                
 			             //                   UNION 
 	public static String QUERY_ADVANCED_PATIENT_SEARCH_FOR_ALL_DEVICETYPE_HILLROM_LOGIN_2 =			                                
 							"select patientId,patient_user_id,pemail,pfirstName,plastName, isDeleted,pzipcode,paddress,pcity,pdob,pgender, "
-										+ "ptitle, phillrom_id,createdAt,isActivated,state,adherence,last_date,mrnid,hName,clinicName,isExpired, "
+										+ "ptitle, phillrom_id,createdAt,isActivated,state,adherence,last_date,mrnid,null as hName,clinicName,isExpired, "
 										+ "isHMRNonCompliant,isSettingsDeviated, isMissedTherapy,adherencesetting,devType,pcountry,diag1,diag2,diag3,diag4, "
 										+ "deviceActiveInactive,deviceSerialNumber,hmr,activeDeviceAddedDate,transmissionRecorded,adherenceReset "
 							+ "from   "
@@ -857,8 +845,8 @@ public class QueryConstants {
 			                        + "left outer join "  
 			                                + " CLINIC clinic on user_clinic.clinic_id = clinic.id and  user_clinic.patient_id = patInfo.id " 
 			                        + " where ((patient_dev_assoc.device_type = 'VEST' AND patient_dev_assoc.patient_type='SD')) "
-			                        + "group by patInfo.id) as associated_patient "
-			                        + "left outer join "
+			                        + "group by patInfo.id) as associated_patient ";
+/*			                        + "left outer join "
 			                        		+ "	(SELECT GROUP_CONCAT(huser.last_name ,' ',huser.first_name ) as hName,  clinic.id as hclinicid " 
 			                        		+ " from USER huser "
 			                        		+ " left outer join "
@@ -871,7 +859,7 @@ public class QueryConstants {
 			                        		+ "left outer join "
 			                        				+ " PATIENT_COMPLIANCE pc on huser.id = pc.user_id AND "
 			                        				+ " pc.date=IF(pc.date <> curdate(),subdate(curdate(),1),curdate()) "
-			                        		+ " group by clinic.id) as associated_hcp on associated_patient.pclinicid = associated_hcp.hclinicid ";
+			                        		+ " group by clinic.id) as associated_hcp on associated_patient.pclinicid = associated_hcp.hclinicid ";*/
 															
 															
 															// UNION
@@ -879,7 +867,7 @@ public class QueryConstants {
 							" select "
 									+ " patientId,patient_user_id,pemail,pfirstName,plastName, isDeleted,pzipcode,paddress,pcity, "
 			                        + " pdob,pgender,ptitle, phillrom_id,createdAt,isActivated, state,adherence,last_date, mrnid, "
-			                        + " hName,clinicName,isExpired,isHMRNonCompliant,isSettingsDeviated, isMissedTherapy,adherencesetting, "
+			                        + " null as hName,clinicName,isExpired,isHMRNonCompliant,isSettingsDeviated, isMissedTherapy,adherencesetting, "
 			                        + "devType,pcountry,diag1,diag2,diag3,diag4,deviceActiveInactive,deviceSerialNumber,hmr, "
 			                        + "activeDeviceAddedDate,transmissionRecorded,adherenceReset "
 			                 + "from "
@@ -937,8 +925,8 @@ public class QueryConstants {
 			                 							+ " CLINIC clinic on user_clinic.clinic_id = clinic.id and "
 			                 										+ " user_clinic.patient_id = patInfo.id "
 			                 				+ " where ((patient_dev_assoc.device_type = 'VEST' OR patient_dev_assoc.device_type = 'MONARCH') "
-			                 				+ " AND (patient_dev_assoc.patient_type='CD')) group by patInfo.id) as associated_patient "
-			                 				+ " left outer join "
+			                 				+ " AND (patient_dev_assoc.patient_type='CD')) group by patInfo.id) as associated_patient ";
+/*			                 				+ " left outer join "
 			                 						+ " (SELECT GROUP_CONCAT(huser.last_name ,' ',huser.first_name ) as hName,  clinic.id as hclinicid "
 			                 								+ " from USER huser "
 			                 							+ "left outer join "
@@ -951,12 +939,12 @@ public class QueryConstants {
 			                 							+ "left outer join "
 			                 								+ " PATIENT_COMPLIANCE_MONARCH pc on huser.id = pc.user_id AND "
 			                 												+ " pc.date=IF(pc.date <> curdate(),subdate(curdate(),1),curdate()) "
-			                 							+ "group by clinic.id) as associated_hcp on associated_patient.pclinicid = associated_hcp.hclinicid ";
+			                 							+ "group by clinic.id) as associated_hcp on associated_patient.pclinicid = associated_hcp.hclinicid ";*/
 															
 											// UNION
 	public static String QUERY_ADVANCED_PATIENT_SEARCH_FOR_ALL_DEVICETYPE_HILLROM_LOGIN_4 =
 						"select patientId,patient_user_id,pemail,pfirstName,plastName, isDeleted,pzipcode,paddress,pcity,pdob,pgender,ptitle, "
-								+ "phillrom_id,createdAt,isActivated, state,adherence,last_date,mrnid,hName,clinicName,isExpired,isHMRNonCompliant, "
+								+ "phillrom_id,createdAt,isActivated, state,adherence,last_date,mrnid,null as hName,clinicName,isExpired,isHMRNonCompliant, "
 								+ "isSettingsDeviated, isMissedTherapy,adherencesetting,devType,pcountry,diag1,diag2,diag3,diag4, deviceActiveInactive, "
 								+ "deviceSerialNumber, hmr,activeDeviceAddedDate, transmissionRecorded,adherenceReset "
 						+ "from "
@@ -1005,8 +993,8 @@ public class QueryConstants {
 			                       	+ " PATIENT_COMPLIANCE_MONARCH pc on user.id = pc.user_id AND  pc.date=IF(pc.date <> curdate(),subdate(curdate(),1),curdate()) "
 			                    + "left outer join   "
 			                    	+ " CLINIC clinic on user_clinic.clinic_id = clinic.id and  user_clinic.patient_id = patInfo.id " 
-			                    + "where patient_dev_assoc.device_type is null group by patInfo.id) as associated_patient  "
-			                    + " left outer join "
+			                    + "where patient_dev_assoc.device_type is null group by patInfo.id) as associated_patient  ";
+	/*		                    + " left outer join "
 			                    	+ " (SELECT GROUP_CONCAT(huser.last_name ,' ',huser.first_name ) as hName,  clinic.id as hclinicid "
 			                    			+ "from USER huser "
 			                    			+ " left outer join "
@@ -1018,33 +1006,20 @@ public class QueryConstants {
 			                    				+ " CLINIC clinic on user_clinic.clinics_id = clinic.id and user_clinic.users_id = huser.id "
 			                    			+ "left outer join     "
 			                    				+ " PATIENT_COMPLIANCE_MONARCH pc on huser.id = pc.user_id AND pc.date=IF(pc.date <> curdate(),subdate(curdate(),1),curdate()) "           
-			                                + " group by clinic.id) as associated_hcp on associated_patient.pclinicid = associated_hcp.hclinicid ";								
+			                                + " group by clinic.id) as associated_hcp on associated_patient.pclinicid = associated_hcp.hclinicid ";*/								
 	
 	public static String QUERY_ADVANCED_PATIENT_SEARCH_FOR_ALL_DEVICETYPE_HILLROM_LOGIN_UNIONS = " select * FROM ( "
-									/*+ "select patientId,patient_user_id,pemail,pfirstName,plastName, "
-									+ " isDeleted,pzipcode,paddress,pcity,pdob,pgender,ptitle, "
-									+ " phillrom_id,createdAt,isActivated, state , adherence,last_date,mrnid,hName,clinicName,isExpired, "
-									+ " isHMRNonCompliant, isSettingsDeviated, isMissedTherapy, adherencesetting,devType,pcountry,diag1, "
-									+ " diag2,diag3,diag4,deviceActiveInactive,deviceSerialNumber, hmr, activeDeviceAddedDate, "
-									+ "transmissionRecorded, adherenceReset from ( "*/
 									+ QUERY_ADVANCED_PATIENT_SEARCH_FOR_ALL_DEVICETYPE_HILLROM_LOGIN_1+" UNION "
 									+ QUERY_ADVANCED_PATIENT_SEARCH_FOR_ALL_DEVICETYPE_HILLROM_LOGIN_2+" UNION "
 									+ QUERY_ADVANCED_PATIENT_SEARCH_FOR_ALL_DEVICETYPE_HILLROM_LOGIN_3+" UNION "
 									+ QUERY_ADVANCED_PATIENT_SEARCH_FOR_ALL_DEVICETYPE_HILLROM_LOGIN_4
 									+ ")kt";
 	
-									//+ " activeDeviceAddedDate, transmissionRecorded, adherenceReset from ( ";
-											//+ QUERY_ADVANCED_PATIENT_SEARCH_FOR_ALL_DEVICETYPE_HILLROM_LOGIN_1
-											//+ QUERY_ADVANCED_PATIENT_SEARCH_FOR_ALL_DEVICETYPE_HILLROM_LOGIN_2
-											//+ QUERY_ADVANCED_PATIENT_SEARCH_FOR_ALL_DEVICETYPE_HILLROM_LOGIN_3
-											//+ QUERY_ADVANCED_PATIENT_SEARCH_FOR_ALL_DEVICETYPE_HILLROM_LOGIN_4
-											//+")kt";
-											//;
-	                //(*/
-	//QUERY_ADVANCED_PATIENT_SEARCH_FOR_ALL_DEVICETYPE_HILLROM_LOGIN_UNIONS =	                
+            
 	                
 	
-		//	)kt
+
+
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------//
 	public static String QUERY_ADVANCED_HCP_SEARCH_FOR_ALL_DEVICETYPE_HILLROM_LOGIN= ""
 			+ "Select * from ("
@@ -1069,4 +1044,5 @@ public class QueryConstants {
 			+ "left outer join "
 			+ " CITY_STATE_ZIP_MAP cszm on user.zipcode = cszm.zip "
 			+ ") kt";
+
 }

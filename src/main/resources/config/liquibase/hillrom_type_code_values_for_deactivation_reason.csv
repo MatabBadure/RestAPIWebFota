@@ -1,0 +1,6 @@
+id,type,type_code,type_code_value
+72025,user_deactivation_reason_codes,Deceased,Deceased
+72026,user_deactivation_reason_codes,Opt-out,Opt-out
+72027,user_deactivation_reason_codes,18yr HIPAA,18yr HIPAA
+72028,user_deactivation_reason_codes,Test Account,Test-Account
+72029,user_deactivation_reason_codes,other,other

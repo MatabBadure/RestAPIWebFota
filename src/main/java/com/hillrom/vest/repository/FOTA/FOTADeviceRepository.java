@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 import com.hillrom.vest.domain.FOTA.FOTADeviceFWareUpdate;
 
 public interface FOTADeviceRepository extends JpaRepository<FOTADeviceFWareUpdate, Long> {
-	@Query(nativeQuery=true,value= "SELECT * from FOTA_DEVICE_FWARE_UPDATE_LOG where device_serial_number =:deviceSerialNumber")
+	@Query(nativeQuery=true,value= "SELECT * FROM FOTA_DEVICE_FWARE_UPDATE_LOG where device_serial_number =:deviceSerialNumber AND downloaded_status =:inprogressList")
 	FOTADeviceFWareUpdate getFOTADeviceFWwareDetailsByDevSN(
-			@Param("deviceSerialNumber") String deviceSerialNumber);
+			@Param("deviceSerialNumber") String deviceSerialNumber, @Param("inprogressList") String inprogressList);
 }

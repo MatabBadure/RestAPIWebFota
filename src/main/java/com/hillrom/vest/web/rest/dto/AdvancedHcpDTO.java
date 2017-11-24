@@ -1,5 +1,7 @@
 package com.hillrom.vest.web.rest.dto;
 
+import java.util.List;
+
 public class AdvancedHcpDTO {
 
 	private String name;
@@ -10,11 +12,11 @@ public class AdvancedHcpDTO {
 	
 	private String country;
 	
-	private String city;
+	private List<String> city;
 	
-	private String state;
+	private List<String> state;
 	
-	private Integer zipcode;
+	private String zipcode;
 	
 	private String status;
 
@@ -24,7 +26,7 @@ public class AdvancedHcpDTO {
 	}
 
 	public AdvancedHcpDTO(String name, String specialty, String credentials,
-			String country, String city, String state, Integer zipcode,
+			String country, List<String> city, List<String> state, String zipcode,
 			String status) {
 		super();
 		this.name = name;
@@ -69,27 +71,27 @@ public class AdvancedHcpDTO {
 		this.country = country;
 	}
 
-	public String getCity() {
+	public List<String> getCity() {
 		return city;
 	}
 
-	public void setCity(String city) {
+	public void setCity(List<String> city) {
 		this.city = city;
 	}
 
-	public String getState() {
+	public List<String> getState() {
 		return state;
 	}
 
-	public void setState(String state) {
+	public void setState(List<String> state) {
 		this.state = state;
 	}
 
-	public Integer getZipcode() {
+	public String getZipcode() {
 		return zipcode;
 	}
 
-	public void setZipcode(Integer zipcode) {
+	public void setZipcode(String zipcode) {
 		this.zipcode = zipcode;
 	}
 

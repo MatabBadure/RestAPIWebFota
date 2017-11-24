@@ -351,9 +351,9 @@ public class FOTAServiceUtil {
 								handleId = getHandleNumber();
 								/*//Save device details to DB
 								saveInprogressDeviceDetails(holder);*/
+								holder.setHandleId(handleId);
+								handleHolderBin.put(handleId, holder);
 							}
-							holder.setHandleId(handleId);
-							handleHolderBin.put(handleId, holder);
 							log.debug("New handleId="+handleId+": Same SoftwareVersion="+fotaInfo.getSoftVersion()+":same chunksize="+partNoHolder.getChunkSize());
 						} else {
 							//Send email notification for CRC validation failed
@@ -382,9 +382,10 @@ public class FOTAServiceUtil {
 								handleId = getHandleNumber();
 								/*//Save device details to DB
 								saveInprogressDeviceDetails(holder);*/
+								holder.setHandleId(handleId);
+								handleHolderBin.put(handleId, holder);
 							}
-							holder.setHandleId(handleId);
-							handleHolderBin.put(handleId, holder);
+							
 							//To capture chunk size
 							log.debug("New handleId="+handleId+":New software version="+fotaInfo.getSoftVersion()+":New chunksize="+partNoHolder.getChunkSize());
 						} else {

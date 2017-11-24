@@ -19,8 +19,7 @@ public class HandleHolder {
 	private DateTime downloadEndDateTime;
 	int chunkSize = 0;
 	private String handleId;
-	private boolean sendChunkReq;
-	
+	private boolean sendChunkReq = false;
 	
 
 	public boolean getSendChunkReq() {

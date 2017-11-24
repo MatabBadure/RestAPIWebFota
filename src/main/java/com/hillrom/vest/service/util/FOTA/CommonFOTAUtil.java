@@ -685,8 +685,6 @@ public class CommonFOTAUtil {
 	    return handleId;
 	}
 	
-	
-
 	//FOTA CR
 	public String getChunkWithChunkNumber(String rawMessage, String handleId, Map<String, HandleHolder> handleHolderBin, Map<String, PartNoHolder> partNosBin) {
 		

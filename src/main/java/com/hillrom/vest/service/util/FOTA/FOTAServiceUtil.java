@@ -101,6 +101,7 @@ public class FOTAServiceUtil {
 
 	public void saveInprogressDeviceDetails(HandleHolder holder) {
 		try {
+			
 			FOTADeviceFWareUpdate fotaDeviceFWareUpdate = new FOTADeviceFWareUpdate();
 			fotaDeviceFWareUpdate.setFotaInfoId(holder.getFotaInfoId());
 			fotaDeviceFWareUpdate.setDeviceSerialNumber(holder
@@ -115,6 +116,8 @@ public class FOTAServiceUtil {
 					.getCheckupdateDateTime());
 			fotaDeviceFWareUpdate.setConnectionType(holder.getConnectionType());
 			fotaDeviceFWareUpdate.setDownloadStatus("In progress");
+			fotaDeviceFWareUpdate.setDownloadStartDateTime(holder.getDownloadStartDateTime());
+			
 			fotaDeviceRepository.save(fotaDeviceFWareUpdate);
 
 		} catch (Exception ex) {
@@ -346,8 +349,8 @@ public class FOTAServiceUtil {
 									.get(DEVICE_SN));
 							if(handleId == null){
 								handleId = getHandleNumber();
-								//Save device details to DB
-								saveInprogressDeviceDetails(holder);
+								/*//Save device details to DB
+								saveInprogressDeviceDetails(holder);*/
 							}
 							holder.setHandleId(handleId);
 							handleHolderBin.put(handleId, holder);
@@ -377,8 +380,8 @@ public class FOTAServiceUtil {
 									.get(DEVICE_SN));
 							if(handleId == null){
 								handleId = getHandleNumber();
-								//Save device details to DB
-								saveInprogressDeviceDetails(holder);
+								/*//Save device details to DB
+								saveInprogressDeviceDetails(holder);*/
 							}
 							holder.setHandleId(handleId);
 							handleHolderBin.put(handleId, holder);

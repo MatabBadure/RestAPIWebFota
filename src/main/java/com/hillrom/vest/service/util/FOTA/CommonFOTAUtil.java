@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang.StringUtils;
@@ -47,6 +48,10 @@ public class CommonFOTAUtil {
 
 	private static final Logger log = LoggerFactory
 			.getLogger(CommonFOTAUtil.class);
+	
+	
+	@Inject
+	private FOTAServiceUtil utilService;
 
 	public boolean validateCRC(String rawMessage) {
 
@@ -725,6 +730,8 @@ public class CommonFOTAUtil {
 				//Start time for only when 0th chunk number
 				if(chunkNumber == 0){
 					holder.setDownloadStartDateTime(new DateTime());
+					//Save device details to DB
+					utilService.saveInprogressDeviceDetails(holder);
 					handleHolderBin.put(handleId, holder);
 				}
 				log.debug("Send  Chunk with chunk number Handle Id ="+handleId);
@@ -860,5 +867,6 @@ public class CommonFOTAUtil {
 		holder.setSoftwareVersion(fotaInfo.getSoftVersion());
 		return holder;
 	}
+	
 	
 }

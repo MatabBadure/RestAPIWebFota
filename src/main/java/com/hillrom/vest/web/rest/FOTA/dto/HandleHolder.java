@@ -20,7 +20,17 @@ public class HandleHolder {
 	int chunkSize = 0;
 	private String handleId;
 	
+	private Boolean initialReq;
 	
+	
+	
+	
+	public Boolean getInitialReq() {
+		return initialReq;
+	}
+	public void setInitialReq(Boolean initialReq) {
+		this.initialReq = initialReq;
+	}
 	public String getHandleId() {
 		return handleId;
 	}

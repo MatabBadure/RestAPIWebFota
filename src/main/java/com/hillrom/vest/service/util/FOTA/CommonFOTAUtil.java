@@ -728,10 +728,11 @@ public class CommonFOTAUtil {
 				//Get the particular chunk from the based chunk count
 				String zeroChunk = partNoHolder.getFileChunks().get(chunkNumber);
 				//Start time for only when 0th chunk number
-				if(chunkNumber == 0){
+				if(chunkNumber == 0 && (holder.getInitialReq() == true)){
 					holder.setDownloadStartDateTime(new DateTime());
 					//Save device details to DB
 					utilService.saveInprogressDeviceDetails(holder);
+					holder.setInitialReq(false);
 					handleHolderBin.put(handleId, holder);
 				}
 				log.debug("Send  Chunk with chunk number Handle Id ="+handleId);
@@ -837,6 +838,8 @@ public class CommonFOTAUtil {
 		holder.setPreviousChunkTransStatus("CheckUpdate");
 		//added new stmt
 		holder.setSoftwareVersion(fotaInfo.getSoftVersion());
+		holder.setInitialReq(true);
+		
 		return holder;
 	}
 
@@ -865,6 +868,7 @@ public class CommonFOTAUtil {
 		holder.setPreviousChunkTransStatus("CheckUpdate");
 		//added new stmt
 		holder.setSoftwareVersion(fotaInfo.getSoftVersion());
+		holder.setInitialReq(true);
 		return holder;
 	}
 	

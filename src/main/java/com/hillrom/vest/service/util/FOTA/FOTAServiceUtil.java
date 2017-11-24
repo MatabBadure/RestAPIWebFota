@@ -513,8 +513,13 @@ public class FOTAServiceUtil {
 			fwareDtoObj.setProductType((String)fwareObj[12]);
 			fwareDtoObj.setDevicePartNumber(Long.valueOf((String)fwareObj[11]));
 			//Calculate Download Time
-			String totalDownloadTime = coUtil.getDownLoadTime(new DateTime(fwareObj[9]),new DateTime(fwareObj[8]));
-			fwareDtoObj.setDownloadTime(totalDownloadTime);
+			if(Objects.nonNull(fwareObj[8]) && Objects.nonNull(fwareObj[9])){
+				String totalDownloadTime = coUtil.getDownLoadTime(new DateTime(fwareObj[9]),new DateTime(fwareObj[8]));
+				fwareDtoObj.setDownloadTime(totalDownloadTime);
+			}else{
+				fwareDtoObj.setDownloadTime("");
+			}
+			
 			FOTADeviceDtoList.add(fwareDtoObj);
 		}
 		return FOTADeviceDtoList;

@@ -150,4 +150,6 @@
 	<include file="classpath:/config/liquibase/changelog/20171107055300_upload_canada_zip_codes.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20171114160100_upload_patient_diagnostic_codes.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20171116020900_create_city_state_zip_map_index.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20171121044430_update_reason_for_user_deactivation.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20171121052530_add_extra_colum_deactivation_reason_to_User.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

@@ -1349,9 +1349,10 @@ public class UserService {
 		return jsonObject;
 	}
 
-	public JSONObject deleteUser(Long id,  String baseUrl) throws HillromException {
+	public JSONObject deleteUser(Long id,  String baseUrl,String reason ) throws HillromException {
     	JSONObject jsonObject = new JSONObject();
     	UserExtension existingUser = userExtensionRepository.findOne(id);
+    	existingUser.setDeactivationReason(reason);
     	List<Authority> authorities  = authorityRepository.findAll();
     	Map<String,Authority> authorityMap = new HashMap<>();
     	authorities.stream().forEach(authority -> {
@@ -1676,7 +1677,9 @@ public class UserService {
 				}
 			}
 		}
-
+		UserExtension userExtn = userExtensionRepository.findOne(id);
+		user.setDeactivationReason(userExtn.getDeactivationReason());
+		
 		if (Objects.nonNull(user)) {
 			return user;
 		} else {

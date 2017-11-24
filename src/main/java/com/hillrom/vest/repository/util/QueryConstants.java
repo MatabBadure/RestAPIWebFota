@@ -1045,5 +1045,28 @@ public class QueryConstants {
 	                
 	
 		//	)kt
-	
+	//------------------------------------------------------------------------------------------------------------------------------------------------------------//
+	public static String QUERY_ADVANCED_HCP_SEARCH_FOR_ALL_DEVICETYPE_HILLROM_LOGIN= ""
+			+ "Select * from ("
+			+ "select"
+			+ " user.id as user_id,user.email as email,user.first_name as firstName,user.last_name as lastName, "
+			+ " user.is_deleted	as isDeleted, user.zipcode as zipcode,userExt.address as address, "
+			+ " userExt.city as hcity,userExt.credentials as credentials,userExt.fax_number,userExt.primary_phone, "
+			+ " userExt.mobile_phone, userExt.speciality as speciality,userExt.state as hstate,clinic.id as clinicId, "
+			+ " clinic.name as clinicName, user.created_date as createdAt, user.activated isActivated, "
+			+ " userExt.npi_number as npiNumber,cszm.country as country "
+			+ "FROM "
+			+ " USER user "
+			+ "join "
+			+ " USER_EXTENSION userExt on user.id = userExt.user_id "
+			+ "join "
+			+ " USER_AUTHORITY user_authority on user_authority.user_id = user.id "
+			+ " and user_authority.authority_name = 'HCP' "
+			+ "left outer join "
+			+ " CLINIC_USER_ASSOC user_clinic on user_clinic.users_id = user.id "
+			+ "left outer join "
+			+ " CLINIC clinic on user_clinic.clinics_id = clinic.id and user_clinic.users_id = user.id "
+			+ "left outer join "
+			+ " CITY_STATE_ZIP_MAP cszm on user.zipcode = cszm.zip "
+			+ ") kt";
 }

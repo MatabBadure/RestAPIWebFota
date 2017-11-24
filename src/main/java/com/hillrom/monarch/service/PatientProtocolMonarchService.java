@@ -331,7 +331,7 @@ public class PatientProtocolMonarchService {
 		return userIdProtocolConstant;
 	}
 
-	private Map<Long, List<PatientProtocolDataMonarch>> prepareUserIdProtocolMap(
+	public Map<Long, List<PatientProtocolDataMonarch>> prepareUserIdProtocolMap(
 			List<PatientProtocolDataMonarch> protocolData) {
 		Map<Long, List<PatientProtocolDataMonarch>> userIdProtocolMap = new HashMap<>();
 		for(PatientProtocolDataMonarch protocol : protocolData){

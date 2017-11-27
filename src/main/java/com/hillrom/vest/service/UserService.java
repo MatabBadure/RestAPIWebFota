@@ -2376,16 +2376,5 @@ public class UserService {
             return;
      }
    
-     public Map<String,String> getTimeZones(){
-    	 try {
-			Map<String,String> timezones = new HashMap<String,String>();
-			 timezones =  DateUtil.getTimeZoneList();
-			 return timezones;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-     }
-
 }
 

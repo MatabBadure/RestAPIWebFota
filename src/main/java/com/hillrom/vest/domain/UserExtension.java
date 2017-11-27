@@ -54,6 +54,9 @@ public class UserExtension extends User implements Serializable {
 
 	@Column(name = "npi_number")
 	private String npiNumber;
+	
+	@Column(name = "time_zone")
+	private String timeZone;
 
 	@ManyToMany
 	@JoinTable(name = "CLINIC_USER_ASSOC", joinColumns = { @JoinColumn(name = "users_id", referencedColumnName = "user_id") }, inverseJoinColumns = { @JoinColumn(name = "clinics_id", referencedColumnName = "id") })
@@ -157,7 +160,8 @@ public class UserExtension extends User implements Serializable {
 				+ credentials + ", primaryPhone=" + primaryPhone
 				+ ", mobilePhone=" + mobilePhone + ", faxNumber=" + faxNumber
 				+ ", address=" + address + ", city=" + city + ", state="
-				+ state + ", npiNumber=" + npiNumber + "]";
+				+ state + ", npiNumber=" + npiNumber + ", timeZone=" + timeZone
+				+ "]";
 	}
 
 }

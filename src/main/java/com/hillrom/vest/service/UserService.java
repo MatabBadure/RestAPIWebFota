@@ -72,6 +72,7 @@ import com.hillrom.vest.repository.UserSearchRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.security.OnCredentialsChangeEvent;
 import com.hillrom.vest.security.SecurityUtils;
+import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.service.util.RequestUtil;
 import com.hillrom.vest.util.ExceptionConstants;
@@ -2375,7 +2376,16 @@ public class UserService {
             return;
      }
    
-     
-     
+     public Map<String,String> getTimeZones(){
+    	 try {
+			Map<String,String> timezones = new HashMap<String,String>();
+			 timezones =  DateUtil.getTimeZoneList();
+			 return timezones;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+     }
+
 }
 

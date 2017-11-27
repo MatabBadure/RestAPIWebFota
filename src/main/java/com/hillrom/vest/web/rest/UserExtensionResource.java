@@ -4,6 +4,7 @@ import static com.hillrom.vest.config.Constants.VEST;
 import static com.hillrom.vest.config.Constants.MONARCH;
 
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -1124,4 +1125,27 @@ public class UserExtensionResource {
 		}
        
     }
+    
+    @RequestMapping(value = "/user/timezone",
+    		method = RequestMethod.GET,
+    		produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<JSONObject> getTimeZones() throws HillromException {
+    	log.debug("REST request to get timezones : ");
+    	JSONObject jsonObject = new JSONObject();
+    	Map<String,String> map = new HashMap<String, String>();
+		
+    	try {
+			map = userService.getTimeZones();
+			if(map.size() > 0){
+				jsonObject.put("message","Time zones fetched succesfully");
+				jsonObject.put("timezones",map);
+			}
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+
+    }
+    
 }

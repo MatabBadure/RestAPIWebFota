@@ -5,6 +5,7 @@ import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calcula
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -310,14 +311,8 @@ public class PatientProtocolService {
 		return userIdProtocolConstantsMap;
 	}
 	
-	/*public Map<Long,ProtocolConstantsMonarch> getMonarchMergedProtocolByPatientUserIds(
-			List<Long> patientUserIds) throws Exception{
-		return null;
-		
-	}*/
 	// Averaged Protocol of VEST and MONARCH for BOTH Device patient Users
-	public Map<Long,ProtocolConstants> getMergedProtocolByPatientUserIds(
-			List<Long> patientUserIds) throws Exception{
+	public Map<Long,ProtocolConstants> getMergedProtocolByPatientUserIds(List<Long> patientUserIds) throws Exception{
 		List<PatientProtocolData> protocolData =  findByPatientUserIds(patientUserIds);		
 		List<PatientProtocolDataMonarch> protocolDataMonarch =  patientProtocolMonarchService.findByPatientUserIds(patientUserIds);
 		
@@ -326,52 +321,140 @@ public class PatientProtocolService {
 		
 		Map<Long,ProtocolConstants> userIdProtocolConstantsMap = new HashMap<>();
 		for(Long patientUserId : patientUserIds){
+			ProtocolConstants protocolValue;
+			
 			List<PatientProtocolData> protocol = userIdProtocolMap.get(patientUserId);
 			List<PatientProtocolDataMonarch> protocolMonarch = userIdProtocolMapMonarch.get(patientUserId);
 			
-			if(Objects.nonNull(protocol) && !protocol.isEmpty()){
-				if(Objects.nonNull(protocolMonarch) && !protocolMonarch.isEmpty()){
-					
-					String protocolType = protocol.get(0).getType();
-					String protocolTypeMonarch = protocolMonarch.get(0).getType();
-										
-					if(Constants.NORMAL_PROTOCOL.equalsIgnoreCase(protocolType)){
-						if(Constants.NORMAL_PROTOCOL.equalsIgnoreCase(protocolTypeMonarch)){							
-							userIdProtocolConstantsMap.put(patientUserId,getProtocolConstantFromNormalProtocolBoth(protocol,protocolMonarch));
-						}else{
-							userIdProtocolConstantsMap.put(patientUserId,getProtocolConstantFromNormalVestAndCustomMonarch(protocol,protocolMonarch));
-						}
-					}else{
-						if(Constants.NORMAL_PROTOCOL.equalsIgnoreCase(protocolTypeMonarch)){
-							userIdProtocolConstantsMap.put(patientUserId,getProtocolConstantFromCustomVestAndNormalMonarch(protocol,protocolMonarch));
-						}else{
-							userIdProtocolConstantsMap.put(patientUserId,getProtocolConstantFromCustomProtocolBoth(protocol,protocolMonarch));
-						}
-					}
-				}else{
-					String protocolType = protocol.get(0).getType();
-					if(Constants.NORMAL_PROTOCOL.equalsIgnoreCase(protocolType)){
-						userIdProtocolConstantsMap.put(patientUserId,getProtocolConstantFromNormalVestDefaultMonarch(protocol));						
-					}else{
-						userIdProtocolConstantsMap.put(patientUserId,getProtocolConstantFromCustomVestDefaultMonarch(protocol));
-					}
-				}
-			}else{
-				if(Objects.nonNull(protocolMonarch) && !protocolMonarch.isEmpty()){
-					String protocolTypeMonarch = protocolMonarch.get(0).getType();
-					if(Constants.NORMAL_PROTOCOL.equalsIgnoreCase(protocolTypeMonarch)){
-						userIdProtocolConstantsMap.put(patientUserId,getProtocolConstantFromNormalMonarchDefaultVest(protocolMonarch));
-					}else{
-						userIdProtocolConstantsMap.put(patientUserId,getProtocolConstantFromCustomMonarchDefaultVest(protocolMonarch));
-					}
-				}else{
-					userIdProtocolConstantsMap.put(patientUserId,getProtocolConstantFromDefaultVestDefaultMonarch());	
-				}
-			}
+			// Passing Vest and Monarch protocol to get the merged protocol for both device patient
+			protocolValue = getMergedProtocolForPatientUser(protocol, protocolMonarch);
+		
+			userIdProtocolConstantsMap.put(patientUserId,protocolValue);
 		}
 		return userIdProtocolConstantsMap;
 	}
 	
+	// Getting Vest protocol for vest only device patient
+	public ProtocolConstants getVestProtocolForPatientUser(List<PatientProtocolData> protocol){
+		
+		ProtocolConstants protocolConstant;
+		if(Objects.nonNull(protocol) && !protocol.isEmpty()){
+			String protocolType = protocol.get(0).getType();
+			if(Constants.NORMAL_PROTOCOL.equalsIgnoreCase(protocolType)){
+				protocolConstant = getProtocolConstantFromNormalProtocol(protocol);
+			}else{
+				protocolConstant = getProtocolConstantFromCustomProtocol(protocol);
+			}
+		}else{
+			protocolConstant = protocolConstantsRepository.findOne(1L);
+		}
+		
+		return protocolConstant;
+	}
+	
+	// Getting merged protocol for each patient
+	public ProtocolConstants getMergedProtocolForPatientUser(List<PatientProtocolData> protocol, 
+																List<PatientProtocolDataMonarch> protocolMonarch){
+		ProtocolConstants protocolConstant;
+		
+		if(Objects.nonNull(protocol) && !protocol.isEmpty()){
+			if(Objects.nonNull(protocolMonarch) && !protocolMonarch.isEmpty()){
+				
+				// To get Merged protocol for Both Vest and Monarch having protocols
+				protocolConstant = getProtocolForBothVestAndMonarch(protocol, protocolMonarch);
+				
+			}else{
+				
+				// To get Merged protocol for Vest having and Default Monarch Protocols
+				protocolConstant = getProtocolWithVestAndDefaultMonarch(protocol);
+			}
+		}else{
+			if(Objects.nonNull(protocolMonarch) && !protocolMonarch.isEmpty()){
+				
+				// To get Merged protocol for Monarch having and Default Vest Protocols
+				protocolConstant = getProtocolWithMonarchAndDefaultVest(protocolMonarch);
+			}else{
+				
+				// To get Merged protocol for Both Vest and Monarch Default Protocols
+				protocolConstant = getProtocolConstantFromDefaultVestDefaultMonarch();
+			}
+		}
+		return protocolConstant;
+	}
+
+	// Getting Merged protocol for Both Vest and Monarch having protocols
+	public ProtocolConstants getProtocolForBothVestAndMonarch(List<PatientProtocolData> protocol, 
+			List<PatientProtocolDataMonarch> protocolMonarch){
+		
+		// Defining the return variable
+		ProtocolConstants protocolConstant;
+		
+		// Getting protocol types from each device
+		String protocolType = protocol.get(0).getType();
+		String protocolTypeMonarch = protocolMonarch.get(0).getType();
+		
+		if(Constants.NORMAL_PROTOCOL.equalsIgnoreCase(protocolType)){
+			if(Constants.NORMAL_PROTOCOL.equalsIgnoreCase(protocolTypeMonarch)){
+				// To get Merged Protocol for Normal Vest and Monarch protocol 
+				protocolConstant = getProtocolConstantFromNormalProtocolBoth(protocol,protocolMonarch);
+			}else{
+				// To get Merged Protocol for Normal Vest and Custom Monarch protocol
+				protocolConstant = getProtocolConstantFromNormalVestAndCustomMonarch(protocol,protocolMonarch);
+			}
+		}else{
+			if(Constants.NORMAL_PROTOCOL.equalsIgnoreCase(protocolTypeMonarch)){
+				// To get Merged Protocol for Custom Vest and Normal Monarch protocol 
+				protocolConstant = getProtocolConstantFromCustomVestAndNormalMonarch(protocol,protocolMonarch);
+			}else{
+				// To get Merged Protocol for Custom Vest and Monarch protocol
+				protocolConstant = getProtocolConstantFromCustomProtocolBoth(protocol,protocolMonarch);
+			}
+		}
+		return protocolConstant;
+	}
+	
+	// Getting Merged protocol for Vest having and default Monarch protocols
+	public ProtocolConstants getProtocolWithVestAndDefaultMonarch(List<PatientProtocolData> protocol){
+
+		// Defining the return variable
+		ProtocolConstants protocolConstant;
+		
+		// Getting protocol types the device
+		String protocolType = protocol.get(0).getType();				
+		
+		if(Constants.NORMAL_PROTOCOL.equalsIgnoreCase(protocolType)){
+			
+			// To get Merged Protocol for Normal Vest and Default Monarch protocol
+			protocolConstant = getProtocolConstantFromNormalVestDefaultMonarch(protocol);						
+		}else{
+			
+			// To get Merged Protocol for Custom Vest and Default Monarch protocol
+			protocolConstant = getProtocolConstantFromCustomVestDefaultMonarch(protocol);
+		}
+		
+		return protocolConstant;
+	}
+	
+	// Getting Merged protocol for Vest having and default Monarch protocols
+	public ProtocolConstants getProtocolWithMonarchAndDefaultVest(List<PatientProtocolDataMonarch> protocolMonarch){
+		
+		// Defining the return variable
+		ProtocolConstants protocolConstant;	
+		
+		// Getting protocol types the device
+		String protocolTypeMonarch = protocolMonarch.get(0).getType();
+		
+		if(Constants.NORMAL_PROTOCOL.equalsIgnoreCase(protocolTypeMonarch)){
+			
+			// To get Merged Protocol for Normal Monarch and Default Vest protocol
+			protocolConstant = getProtocolConstantFromNormalMonarchDefaultVest(protocolMonarch);
+		}else{
+			// To get Merged Protocol for Custom Monarch and Default Vest protocol
+			protocolConstant = getProtocolConstantFromCustomMonarchDefaultVest(protocolMonarch);
+		}
+		
+		return protocolConstant;
+	}
 	
 	/**
 	 * Get Protocol Constants by loading Protocol data for user Id
@@ -411,20 +494,6 @@ public class PatientProtocolService {
 		return userIdProtocolMap;
 	}
 
-	private Map<Long, List<PatientProtocolData>> prepareUserIdProtocolMapBoth(
-			List<PatientProtocolData> protocolData, List<PatientProtocolDataMonarch> protocolDataMonarch) {
-		Map<Long, List<PatientProtocolData>> userIdProtocolMap = new HashMap<>();
-		for(PatientProtocolData protocol : protocolData){
-			List<PatientProtocolData> protocolForUserId = userIdProtocolMap.get(protocol.getPatientUser().getId());
-			if(Objects.isNull(protocolForUserId)){
-				protocolForUserId = new LinkedList<>();
-			}
-			protocolForUserId.add(protocol);
-			userIdProtocolMap.put(protocol.getPatientUser().getId(), protocolForUserId);
-		}
-		return userIdProtocolMap;
-	}
-	
 	private ProtocolConstants getProtocolConstantFromNormalProtocol(
 			List<PatientProtocolData> protocolData) {
 		int maxFrequency,minFrequency,minPressure,maxPressure,minDuration,treatmentsPerDay;
@@ -438,19 +507,7 @@ public class PatientProtocolService {
 		return new ProtocolConstants(maxFrequency,minFrequency,maxPressure,minPressure,treatmentsPerDay,minDuration);
 	}
 
-	private ProtocolConstants getProtocolConstantFromNormalProtocolMonarch(
-			List<PatientProtocolDataMonarch> protocolDataMonarch) {
-		int maxFrequency,minFrequency,minIntensity,maxIntensity,minDuration,treatmentsPerDay;
-		PatientProtocolDataMonarch protocol = protocolDataMonarch.get(0); 
-		maxFrequency = protocol.getMaxFrequency();
-		minFrequency = protocol.getMinFrequency();
-		maxIntensity = protocol.getMaxIntensity();
-		minIntensity = protocol.getMinIntensity();
-		treatmentsPerDay = protocol.getTreatmentsPerDay();
-		minDuration = protocol.getMinMinutesPerTreatment() * protocol.getTreatmentsPerDay();
-		return new ProtocolConstants(maxFrequency,minFrequency,maxIntensity,minIntensity,treatmentsPerDay,minDuration);
-	}
-	
+	// Getting merged protocol for normal vest and monarch
 	private ProtocolConstants getProtocolConstantFromNormalProtocolBoth(
 			List<PatientProtocolData> protocolData, List<PatientProtocolDataMonarch> protocolDataMonarch) {
 		int maxFrequency;
@@ -474,6 +531,7 @@ public class PatientProtocolService {
 		return new ProtocolConstants(maxFrequency,minFrequency,maxPressure,minPressure,treatmentsPerDay,minDuration);
 	}
 	
+	// Getting merged protocol for normal vest and default monarch
 	private ProtocolConstants getProtocolConstantFromNormalVestDefaultMonarch(
 			List<PatientProtocolData> protocolData) {
 		int maxFrequency;
@@ -489,7 +547,7 @@ public class PatientProtocolService {
 		maxFrequency = (int) Math.round(protocol.getMaxFrequency() + protocolMonarch.getMaxFrequency()) / 2;
 		minFrequency = (int) Math.round(protocol.getMinFrequency() + protocolMonarch.getMinFrequency()) / 2;
 		maxPressure = (int) Math.round(protocol.getMaxPressure() + protocolMonarch.getMaxIntensity()) / 2;
-		minPressure = (int) Math.round(protocol.getMinPressure() + protocol.getMinPressure())/2;
+		minPressure = (int) Math.round(protocol.getMinPressure() + protocolMonarch.getMinIntensity())/2;
 		treatmentsPerDay = (int) Math.round(protocol.getTreatmentsPerDay() + protocol.getTreatmentsPerDay()) / 2;
 		
 		minDuration = protocol.getMinMinutesPerTreatment() * protocol.getTreatmentsPerDay();		
@@ -498,7 +556,7 @@ public class PatientProtocolService {
 		return new ProtocolConstants(maxFrequency,minFrequency,maxPressure,minPressure,treatmentsPerDay,minDuration);
 	}	
 	
-	
+	// Getting merged protocol for custom vest and default monarch
 	private ProtocolConstants getProtocolConstantFromCustomVestDefaultMonarch(
 			List<PatientProtocolData> protocolData) {		
 		
@@ -534,6 +592,7 @@ public class PatientProtocolService {
 		return new ProtocolConstants(maxFrequency,minFrequency,maxPressure,minPressure,treatmentsPerDay,minDuration);
 	}
 	
+	// Getting to get the merged Protocol for Normal Monarch and Default Vest protocol
 	private ProtocolConstants getProtocolConstantFromNormalMonarchDefaultVest(List<PatientProtocolDataMonarch> protocolDataMonarch) {
 		int maxFrequency;
 		int minFrequency;
@@ -547,8 +606,8 @@ public class PatientProtocolService {
 		maxFrequency = (int) Math.round(protocol.getMaxFrequency() + protocolMonarch.getMaxFrequency()) / 2;
 		minFrequency = (int) Math.round(protocol.getMinFrequency() + protocolMonarch.getMinFrequency()) / 2;
 		maxPressure = (int) Math.round(protocol.getMaxPressure() + protocolMonarch.getMaxIntensity()) / 2;
-		minPressure = (int) Math.round(protocol.getMinPressure() + protocol.getMinPressure())/2;
-		treatmentsPerDay = (int) Math.round(protocol.getTreatmentsPerDay() + protocol.getTreatmentsPerDay()) / 2;
+		minPressure = (int) Math.round(protocol.getMinPressure() + protocolMonarch.getMinIntensity())/2;
+		treatmentsPerDay = (int) Math.round(protocol.getTreatmentsPerDay() + protocolMonarch.getTreatmentsPerDay()) / 2;
 		
 		minDuration = protocol.getMinMinutesPerTreatment() * protocol.getTreatmentsPerDay();		
 		minDuration = (int) Math.round( minDuration + (protocolMonarch.getMinMinutesPerTreatment() * protocolMonarch.getTreatmentsPerDay() )) / 2;
@@ -556,6 +615,7 @@ public class PatientProtocolService {
 		return new ProtocolConstants(maxFrequency,minFrequency,maxPressure,minPressure,treatmentsPerDay,minDuration);
 	}	
 	
+	// Getting merged Protocol for Custom Monarch and Default Vest protocol
 	private ProtocolConstants getProtocolConstantFromCustomMonarchDefaultVest(List<PatientProtocolDataMonarch> protocolDataMonarch) {
 		int maxFrequency;
 		int minFrequency;
@@ -589,12 +649,13 @@ public class PatientProtocolService {
 		maxFrequency = (int) Math.round((maxFrequency+(minFrequency*UPPER_BOUND_VALUE))/2);
 		minPressure = Math.round((minPressure+weightedAvgIntensity)/2);
 		maxPressure = (int) Math.round((maxPressure+(minPressure*UPPER_BOUND_VALUE))/2);
-		minDuration = (int)(((totalDuration*treatmentsPerDayMonarch)+treatmentsPerDay)/2);
+		minDuration = (int)(((totalDuration*treatmentsPerDayMonarch)+minDuration)/2);
 		int avgTreatmentPerDay = (treatmentsPerDay+treatmentsPerDayMonarch)/2;
 		
 		return new ProtocolConstants(maxFrequency,minFrequency,maxPressure,minPressure,avgTreatmentPerDay,minDuration);		
 	}
 	
+	// Getting Merged protocol for Both Vest and Monarch default protocols
 	private ProtocolConstants getProtocolConstantFromDefaultVestDefaultMonarch() {
 		int maxFrequency;
 		int minFrequency;
@@ -609,8 +670,8 @@ public class PatientProtocolService {
 		maxFrequency = (int) Math.round(protocol.getMaxFrequency() + protocolMonarch.getMaxFrequency()) / 2;
 		minFrequency = (int) Math.round(protocol.getMinFrequency() + protocolMonarch.getMinFrequency()) / 2;
 		maxPressure = (int) Math.round(protocol.getMaxPressure() + protocolMonarch.getMaxIntensity()) / 2;
-		minPressure = (int) Math.round(protocol.getMinPressure() + protocol.getMinPressure())/2;
-		treatmentsPerDay = (int) Math.round(protocol.getTreatmentsPerDay() + protocol.getTreatmentsPerDay()) / 2;
+		minPressure = (int) Math.round(protocol.getMinPressure() + protocolMonarch.getMinIntensity())/2;
+		treatmentsPerDay = (int) Math.round(protocol.getTreatmentsPerDay() + protocolMonarch.getTreatmentsPerDay()) / 2;
 		
 		minDuration = protocol.getMinMinutesPerTreatment() * protocol.getTreatmentsPerDay();		
 		minDuration = (int) Math.round( minDuration + (protocolMonarch.getMinMinutesPerTreatment() * protocolMonarch.getTreatmentsPerDay() )) / 2;
@@ -618,6 +679,7 @@ public class PatientProtocolService {
 		return new ProtocolConstants(maxFrequency,minFrequency,maxPressure,minPressure,treatmentsPerDay,minDuration);
 	}
 	
+	// Getting merged protocol for normal vest and custom monarch
 	private ProtocolConstants getProtocolConstantFromNormalVestAndCustomMonarch(
 			List<PatientProtocolData> protocolData, List<PatientProtocolDataMonarch> protocolDataMonarch) {
 		int maxFrequency;
@@ -652,14 +714,13 @@ public class PatientProtocolService {
 		maxFrequency = (int) Math.round((maxFrequency+(minFrequency*UPPER_BOUND_VALUE))/2);
 		minPressure = Math.round((minPressure+weightedAvgIntensity)/2);
 		maxPressure = (int) Math.round((maxPressure+(minPressure*UPPER_BOUND_VALUE))/2);
-		minDuration = (int)(((totalDuration*treatmentsPerDayMonarch)+treatmentsPerDay)/2);
+		minDuration = (int)(((totalDuration*treatmentsPerDayMonarch)+minDuration)/2);
 		int avgTreatmentPerDay = (treatmentsPerDay+treatmentsPerDayMonarch)/2;
 		
 		return new ProtocolConstants(maxFrequency,minFrequency,maxPressure,minPressure,avgTreatmentPerDay,minDuration);		
 	}
 	
-	
-	
+	// Getting merged protocol for custom vest and normal monarch
 	private ProtocolConstants getProtocolConstantFromCustomVestAndNormalMonarch(
 			List<PatientProtocolData> protocolData, List<PatientProtocolDataMonarch> protocolDataMonarch) {
 		
@@ -684,8 +745,6 @@ public class PatientProtocolService {
 		maxPressure = (int) Math.round(minPressure*UPPER_BOUND_VALUE);
 		minDuration = (int)(totalDuration*treatmentsPerDay);
 		
-		
-		
 		PatientProtocolDataMonarch protocolMonarch = protocolDataMonarch.get(0); 
 		maxFrequency = (int) Math.round((maxFrequency + protocolMonarch.getMaxFrequency()) / 2);
 		minFrequency = (int) Math.round((minFrequency + protocolMonarch.getMinFrequency()) / 2);
@@ -693,18 +752,11 @@ public class PatientProtocolService {
 		minPressure = (int) Math.round((minPressure + protocolMonarch.getMinIntensity()) / 2);
 		treatmentsPerDay = (int) Math.round(treatmentsPerDay+protocolMonarch.getTreatmentsPerDay())/2;
 		minDuration = (int) Math.round(minDuration+(protocolMonarch.getMinMinutesPerTreatment() * protocolMonarch.getTreatmentsPerDay()));
-		//return new ProtocolConstants(maxFrequency,minFrequency,maxIntensity,minIntensity,treatmentsPerDay,minDuration);
-		
-		
-		
-		
 		
 		return new ProtocolConstants(maxFrequency,minFrequency,maxPressure,minPressure,treatmentsPerDay,minDuration);
-		
-				
 	}
 	
-	
+	// Getting merged protocol for both custom vest and monarch
 	private ProtocolConstants getProtocolConstantFromCustomProtocolBoth(
 			List<PatientProtocolData> protocolData, List<PatientProtocolDataMonarch> protocolDataMonarch) {
 		int maxFrequency;
@@ -759,24 +811,6 @@ public class PatientProtocolService {
 		return new ProtocolConstants(maxFrequency,minFrequency,maxPressure,minPressure,treatmentsPerDay,minDuration);
 	}
 	
-	private ProtocolConstants getProtocolConstantFromCustomProtocolMonarch(
-			List<PatientProtocolDataMonarch> protocolDataMonarch) {
-		int maxFrequency,minFrequency,minIntensity,maxIntensity,minDuration,treatmentsPerDay;
-		float weightedAvgFrequency = 0,weightedAvgIntensity = 0;
-		double totalDuration = protocolDataMonarch.stream().collect(Collectors.summingDouble(PatientProtocolDataMonarch :: getMinMinutesPerTreatment));
-		for(PatientProtocolDataMonarch protocol : protocolDataMonarch){
-			weightedAvgFrequency += calculateWeightedAvg(totalDuration, protocol.getMinMinutesPerTreatment(), protocol.getMinFrequency());
-			weightedAvgIntensity += calculateWeightedAvg(totalDuration, protocol.getMinMinutesPerTreatment(), protocol.getMinIntensity());
-		}
-		treatmentsPerDay = protocolDataMonarch.get(0).getTreatmentsPerDay();
-		minFrequency = Math.round(weightedAvgFrequency);
-		maxFrequency = (int) Math.round(minFrequency*UPPER_BOUND_VALUE);
-		minIntensity = Math.round(weightedAvgIntensity);
-		maxIntensity = (int) Math.round(minIntensity*UPPER_BOUND_VALUE);
-		minDuration = (int)(totalDuration*treatmentsPerDay);
-		return new ProtocolConstants(maxFrequency,minFrequency,maxIntensity,minIntensity,treatmentsPerDay,minDuration);
-	}
-	
 	public List<PatientProtocolData> getAllProtocolsAssociatedWithPatient(Long patientUserId) throws HillromException {
     	User patientUser = userRepository.findOne(patientUserId);
     	if(patientUser != null) {
@@ -824,6 +858,10 @@ public class PatientProtocolService {
 		patientProtocolAssoc.setLastModifiedDate(DateTime.now().plusSeconds(1));
 		patientProtocolRepository.saveAndFlush(patientProtocolAssoc);
 		protocolList.add(patientProtocolAssoc);
+	}
+	
+	public void saveAll(Collection<PatientProtocolData> patientProtocolList){
+		patientProtocolRepository.save(patientProtocolList);
 	}
 }
 

@@ -78,6 +78,8 @@ import com.hillrom.vest.domain.PatientDevicesAssoc;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.PatientNoEventMonarch;
+import com.hillrom.vest.domain.PatientProtocolData;
+import com.hillrom.vest.domain.PatientProtocolDataMonarch;
 import com.hillrom.vest.domain.PatientVestDeviceHistoryMonarch;
 import com.hillrom.vest.domain.PatientVestDevicePK;
 import com.hillrom.vest.domain.ProtocolConstants;
@@ -93,6 +95,7 @@ import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.PatientDevicesAssocRepository;
 import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.PatientNoEventsRepository;
+import com.hillrom.vest.repository.PatientProtocolRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.service.AdherenceCalculationService;
 import com.hillrom.vest.service.ClinicPatientService;
@@ -116,6 +119,7 @@ import com.hillrom.monarch.repository.NotificationMonarchRepository;
 import com.hillrom.monarch.repository.PatientComplianceMonarchRepository;
 import com.hillrom.monarch.repository.PatientMonarchDeviceRepository;
 import com.hillrom.monarch.repository.PatientNoEventsMonarchRepository;
+import com.hillrom.monarch.repository.PatientProtocolMonarchRepository;
 import com.hillrom.monarch.repository.TherapySessionMonarchRepository;
 //hill-1956
 import com.hillrom.vest.domain.AdherenceReset;
@@ -226,6 +230,12 @@ public class AdherenceCalculationServiceMonarch{
 	
 	@Inject
     private PatientNoEventService noEventService;
+	
+	@Inject
+    private PatientProtocolMonarchRepository patientProtocolMonarchRepository;
+	
+	@Inject
+    private PatientProtocolRepository patientProtocolRepository;
 	
 	private final Logger log = LoggerFactory.getLogger(AdherenceCalculationServiceMonarch.class);
 	
@@ -835,7 +845,13 @@ public class AdherenceCalculationServiceMonarch{
 			List<PatientComplianceMonarch> complianceListToStore = new LinkedList<>();
 			
 			// Getting the protocol constants for the user
-			ProtocolConstantsMonarch userProtocolConstant = protocolMonarchService.getProtocolForPatientUserId(oldUserId);
+			//ProtocolConstantsMonarch userProtocolConstant = protocolMonarchService.getProtocolForPatientUserId(oldUserId);
+			
+			// Merged Protocol for the both device patients
+			ProtocolConstants userProtocolConstantVest = adherenceCalculationService.getProtocolByPatientUserId(userId);
+			// Convert Merged protocol with Vest object to monarch object
+			ProtocolConstantsMonarch userProtocolConstant = therapySessionMonarchService.convertVestToMonarchProtocol(userProtocolConstantVest);
+
 			
 			// Getting all the sessions of user from the repository 
 			List<TherapySessionMonarch> therapySessionData = therapySessionMonarchRepository.findByPatientUserId(oldUserId);
@@ -847,7 +863,7 @@ public class AdherenceCalculationServiceMonarch{
 			
 			
 			// Getting the protocol constants for the user for vest
-			ProtocolConstants userProtocolConstantVest = protocolVestService.getProtocolForPatientUserId(userId);
+			//ProtocolConstants userProtocolConstantVest = protocolVestService.getProtocolForPatientUserId(userId);
 			
 			// Getting all the sessions of user from the repository for vest 
 			List<TherapySession> therapySessionDataVest = therapySessionRepository.findByPatientUserId(userId);
@@ -2880,6 +2896,21 @@ public class AdherenceCalculationServiceMonarch{
 				notificationMonarchService.saveAll(notificationListToSave);
 				
 				if(flag == 2){
+					
+					List<PatientProtocolDataMonarch> oldProtocolList = patientProtocolMonarchRepository.findByPatientId(patDevice.getOldPatientId());
+					
+					List<PatientProtocolDataMonarch> newProtocolList = new LinkedList<>();
+					for(PatientProtocolDataMonarch oldProtocol : oldProtocolList){
+						
+						PatientProtocolDataMonarch newProtocol = new PatientProtocolDataMonarch(oldProtocol.getType(), patientInfo, user,
+								oldProtocol.getTreatmentsPerDay(), oldProtocol.getMinMinutesPerTreatment(), oldProtocol.getTreatmentLabel(),
+								oldProtocol.getMinFrequency(), oldProtocol.getMaxFrequency(), oldProtocol.getMinIntensity(),
+								oldProtocol.getMaxIntensity());						
+							
+						newProtocolList.add(newProtocol);
+					}
+					protocolMonarchService.saveAll(newProtocolList);							
+					
 					List<TherapySessionMonarch> therapySessionMonarchList = therapySessionMonarchRepository.findByPatientUserId(userOld.getId());
 					
 					List <TherapySessionMonarch> therapySessionListToSave = new LinkedList<>();
@@ -2919,6 +2950,22 @@ public class AdherenceCalculationServiceMonarch{
 			}else if( Objects.nonNull(vestCreatedDate) && Objects.nonNull(monarchCreatedDate) && (vestCreatedDate.isAfter(monarchCreatedDate) 
 													|| (vestCreatedDate.isEqual(monarchCreatedDate) && Constants.VEST.equals(patDevice.getDeviceType())) )){
 				if(flag == 2){
+					
+					List<PatientProtocolData> oldProtocolList = patientProtocolRepository.findByPatientId(patDevice.getOldPatientId());
+					
+					List<PatientProtocolData> newProtocolList = new LinkedList<>();
+					for(PatientProtocolData oldProtocol : oldProtocolList){
+						
+						PatientProtocolData newProtocol = new PatientProtocolData(oldProtocol.getType(), patientInfo, user,
+								oldProtocol.getTreatmentsPerDay(), oldProtocol.getMinMinutesPerTreatment(), oldProtocol.getTreatmentLabel(),
+								oldProtocol.getMinFrequency(), oldProtocol.getMaxFrequency(), oldProtocol.getMinPressure(),
+								oldProtocol.getMaxPressure());
+							
+						newProtocolList.add(newProtocol);
+					}
+					protocolVestService.saveAll(newProtocolList);
+					
+					
 					List<TherapySession> therapySessionList = therapySessionRepository.findByPatientUserId(userOld.getId());
 					
 					List <TherapySession> therapySessionListToSave = new LinkedList<>();

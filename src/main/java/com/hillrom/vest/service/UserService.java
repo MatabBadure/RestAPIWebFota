@@ -1162,6 +1162,8 @@ public class UserService {
 			newUser.setGender(userExtensionDTO.getGender());
 		if(Objects.nonNull(userExtensionDTO.getHillromId()))
 			newUser.setHillromId(userExtensionDTO.getHillromId());
+		if(Objects.nonNull(userExtensionDTO.getTimeZone()))
+			newUser.setTimeZone(userExtensionDTO.getTimeZone());
 		newUser.setLangKey(userExtensionDTO.getLangKey());
 	}
 

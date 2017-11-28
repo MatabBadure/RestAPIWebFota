@@ -1679,6 +1679,7 @@ public class UserService {
 		}
 		UserExtension userExtn = userExtensionRepository.findOne(id);
 		user.setDeactivationReason(userExtn.getDeactivationReason());
+		user.setUserPreferenceTimezone(userExtn.getTimeZone());		
 		
 		if (Objects.nonNull(user)) {
 			return user;

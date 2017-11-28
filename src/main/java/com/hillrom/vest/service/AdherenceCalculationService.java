@@ -271,7 +271,7 @@ public class AdherenceCalculationService {
 				.stream().collect(
 						Collectors.groupingBy(PatientDevicesAssoc::getPatientId));
 	}
-
+	
 	/**
 	 * Runs every midnight deducts the compliance score by 5 if therapy hasn't been done for adherence setting day(s)
 	 */
@@ -288,7 +288,6 @@ public class AdherenceCalculationService {
 			Map<Long,Notification> notificationMap = new HashMap<>();
 			Map<Long,PatientNoEvent> userIdNoEventMap = noEventService.findAllGroupByPatientUserId();
 			
-
 			Map<String, List<PatientDevicesAssoc>> vestOnlyDevicesPatientsMap = getVestOnlyDevicePatientsMap();
 			
 			for(PatientCompliance compliance : mstPatientComplianceList){

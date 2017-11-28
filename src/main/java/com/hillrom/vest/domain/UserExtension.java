@@ -68,6 +68,10 @@ public class UserExtension extends User implements Serializable {
 	@Size(max=255)
 	@Column(name="deactivation_reason", length=255)
 	private String deactivationReason;
+	
+	@Size(max=255)
+	@Column(name="time_zone", length=255)
+	private String timeZone;
 
 	public String getDeactivationReason() {
 		return deactivationReason;
@@ -165,12 +169,20 @@ public class UserExtension extends User implements Serializable {
 		this.clinics = clinics;
 	}
 
+	public String getTimeZone() {
+		return timeZone;
+	}
+
+	public void setTimeZone(String timeZone) {
+		this.timeZone = timeZone;
+	}
+
 	@Override
 	public String toString() {
 		return "UserExtension [speciality=" + speciality + ", credentials=" + credentials + ", primaryPhone="
 				+ primaryPhone + ", mobilePhone=" + mobilePhone + ", faxNumber=" + faxNumber + ", address=" + address
 				+ ", city=" + city + ", state=" + state + ", npiNumber=" + npiNumber + ", clinics=" + clinics
-				+ ", deleted=" + deleted + ", deactivationReason=" + deactivationReason + "]";
+				+ ", deleted=" + deleted + ", deactivationReason=" + deactivationReason + ", timeZone=" + timeZone + "]";
 	}
 
 }

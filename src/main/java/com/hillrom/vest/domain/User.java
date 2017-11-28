@@ -205,6 +205,11 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @JsonDeserialize
     private String deactivationReason;
     
+    @Transient
+    @JsonSerialize
+    @JsonDeserialize
+    private String userPreferenceTimezone;
+    
 	public User() {
 		super();
 	}
@@ -529,7 +534,22 @@ public class User extends AbstractAuditingEntity implements Serializable {
         return true;
     }
 
-    @Override
+	
+    /**
+	 * @return the userPreferenceTimezone
+	 */
+	public String getUserPreferenceTimezone() {
+		return userPreferenceTimezone;
+	}
+
+	/**
+	 * @param userPreferenceTimezone the userPreferenceTimezone to set
+	 */
+	public void setUserPreferenceTimezone(String userPreferenceTimezone) {
+		this.userPreferenceTimezone = userPreferenceTimezone;
+	}
+
+	@Override
     public int hashCode() {
         if(email != null) return email.hashCode();
         else {
@@ -537,6 +557,9 @@ public class User extends AbstractAuditingEntity implements Serializable {
         }
     }
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", password=" + password + ", title=" + title + ", firstName=" + firstName
@@ -552,7 +575,8 @@ public class User extends AbstractAuditingEntity implements Serializable {
 				+ ", expired=" + expired + ", expirationDate=" + expirationDate + ", vestGarmentColor="
 				+ vestGarmentColor + ", vestGarmentSize=" + vestGarmentSize + ", vestGarmentType=" + vestGarmentType
 				+ ", monarchGarmentColor=" + monarchGarmentColor + ", monarchGarmentSize=" + monarchGarmentSize
-				+ ", monarchGarmentType=" + monarchGarmentType + ", deactivationReason=" + deactivationReason + "]";
+				+ ", monarchGarmentType=" + monarchGarmentType + ", deactivationReason=" + deactivationReason
+				+ ", userPreferenceTimezone=" + userPreferenceTimezone + "]";
 	}
 
 }

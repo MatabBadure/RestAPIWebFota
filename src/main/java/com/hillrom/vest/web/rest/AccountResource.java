@@ -72,7 +72,7 @@ public class AccountResource {
     @Inject
     private PatientVestDeviceService patientVestDeviceService;
 
-    @Lazy
+
     @Inject
     private UserExtensionRepository userExtensionRepository;
     

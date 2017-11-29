@@ -14,8 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.AdvancedSearchRepository;
 import com.hillrom.vest.web.rest.dto.AdvancedClinicDTO;
+import com.hillrom.vest.web.rest.dto.AdvancedHcpDTO;
 import com.hillrom.vest.web.rest.dto.AdvancedPatientDTO;
 import com.hillrom.vest.web.rest.dto.ClinicVO;
+import com.hillrom.vest.web.rest.dto.HcpVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 
 @Service
@@ -38,4 +40,8 @@ public class AdvancedSearchService {
     	return page;
 	}
 	
+	public Page<HcpVO> advancedSearchHcps(AdvancedHcpDTO advancedHcpDTO, Pageable pageable,Map<String, Boolean> sortOrder) throws HillromException {
+		Page<HcpVO> page = advancedSearchRepository.advancedSearchHcps(advancedHcpDTO, pageable,sortOrder);
+    	return page;
+	}
 }

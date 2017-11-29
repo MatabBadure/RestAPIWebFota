@@ -1,6 +1,8 @@
 package com.hillrom.vest.web.rest;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -75,5 +77,31 @@ public class UtilResource {
         	jsonObject.put("typeCode", typeCodeList);
         }
 		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+    }
+    
+    /**
+     * GET /user/timezone -> get all the generic time zones list 
+     * @return
+     * @throws HillromException
+     */
+    @RequestMapping(value = "/user/timezone",
+    		method = RequestMethod.GET,
+    		produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<JSONObject> genericTimeZonesList() throws HillromException {
+    	log.debug("REST request to get timezones : ");
+    	JSONObject jsonObject = new JSONObject();
+    	Map<String,String> map = new HashMap<String, String>();
+		
+    	try {
+			map = hillromTypeCodeFormatService.getGenericTimeZonesList();
+			if(map.size() > 0){
+				jsonObject.put("message","Time zones fetched succesfully");
+				jsonObject.put("timezones",map);
+			}
+			return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
     }
 }

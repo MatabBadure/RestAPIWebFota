@@ -318,7 +318,7 @@ public class PatientVestDeviceService {
 	
 	public void updateHMR(User patientUser,PatientInfo patient)throws Exception{
 		Optional<PatientVestDeviceHistory>  deviceHistoryFromDB = 
-				patientVestDeviceRepository.findOneByPatientIdAndSerialNumber(patient.getId(),patient.getSerialNumber());
+				patientVestDeviceRepository.findOneByPatientIdAndSerialNumberAndStatusActive(patient.getId(),patient.getSerialNumber());
 		if(deviceHistoryFromDB.isPresent()){
 			PatientVestDeviceHistory history = deviceHistoryFromDB.get();
 			history.setHmr(getLatestHMR(patientUser.getId(),patient.getSerialNumber()));			

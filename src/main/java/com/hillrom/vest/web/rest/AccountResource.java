@@ -16,6 +16,7 @@ import net.minidev.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -71,6 +72,7 @@ public class AccountResource {
     @Inject
     private PatientVestDeviceService patientVestDeviceService;
 
+    @Lazy
     @Inject
     private UserExtensionRepository userExtensionRepository;
     

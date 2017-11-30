@@ -3,6 +3,7 @@ package com.hillrom.vest.service.util;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceHistory;
 import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.User;
+import com.hillrom.vest.web.rest.dto.PatientVestDeviceDataExcelDTO;
 
 public class PatientVestDeviceTherapyUtil {
 
@@ -271,6 +273,38 @@ public class PatientVestDeviceTherapyUtil {
 		return therapySession;
 	}
 	
+	public static Map<Long,List<PatientVestDeviceDataExcelDTO>> assignTherapyMatricsExcel(
+			List<PatientVestDeviceData> groupEntries) {
+		
+		Map<Long,List<PatientVestDeviceDataExcelDTO>> eventMap = new LinkedHashMap<>();
+		long therapyCounter = 0;
+		List<PatientVestDeviceDataExcelDTO> therapy = new LinkedList<>();
+		
+		for(int i = 0;i < groupEntries.size(); i ++){
+			
+			PatientVestDeviceData deviceEventRecord = groupEntries.get(i);
+			PatientVestDeviceDataExcelDTO eventDetail = new PatientVestDeviceDataExcelDTO();
+			eventDetail.setTimestamp(deviceEventRecord.getTimestamp());
+			eventDetail.setSequenceNumber(deviceEventRecord.getSequenceNumber());
+			eventDetail.setEventId(deviceEventRecord.getEventId());
+			eventDetail.setPatientId(deviceEventRecord.getPatient().getId());
+			eventDetail.setSerialNumber(deviceEventRecord.getSerialNumber());
+			eventDetail.setBluetoothId(deviceEventRecord.getBluetoothId());
+			eventDetail.setHubId(deviceEventRecord.getHubId());
+			eventDetail.setHmr(deviceEventRecord.getHmrInHours());
+			eventDetail.setFrequency(deviceEventRecord.getFrequency());
+			eventDetail.setPressure(deviceEventRecord.getPressure());
+			eventDetail.setDuration(deviceEventRecord.getDuration());
+			eventDetail.setChecksum(deviceEventRecord.getChecksum());
+			eventDetail.setUserId(deviceEventRecord.getPatientUser().getId());
+			eventDetail.setDate(deviceEventRecord.getDate());
+			therapy.add(eventDetail);
+		}
+		eventMap.put(therapyCounter++,therapy);
+		
+		return eventMap;
+	}
+	
 	public static List<TherapySession> groupTherapySessionsByDay(List<TherapySession> therapySessions)
 			throws Exception{
 		List<TherapySession> updatedTherapySessions = new LinkedList<>();
@@ -419,4 +453,83 @@ public class PatientVestDeviceTherapyUtil {
 		}
 		return eventString;
 	}
-}
+	//New prepareTherapySessionFromDeviceDataForExcel
+	public static Map<DateTime,Map<Integer,Map<Long,List<PatientVestDeviceDataExcelDTO>>>> prepareTherapySessionFromDeviceDataForExcel(List<PatientVestDeviceData> deviceData) throws Exception{
+		
+		Map<DateTime,Map<Integer,Map<Long,List<PatientVestDeviceDataExcelDTO>>>> therapySessions = groupEventsToPrepareTherapySessionForExcel(deviceData);
+		//return groupTherapySessionsByDay(therapySessions);
+		return therapySessions;
+	}
+	
+	//New groupEventsToPrepareTherapySessionForExcel
+	public static Map<DateTime,Map<Integer,Map<Long,List<PatientVestDeviceDataExcelDTO>>>> groupEventsToPrepareTherapySessionForExcel(
+			List<PatientVestDeviceData> deviceData) throws CloneNotSupportedException {
+		//vestTherapyDataMap
+		Map<DateTime,Map<Integer,Map<Long,List<PatientVestDeviceDataExcelDTO>>>> vestTherapyData = new LinkedHashMap<>();
+		
+		//Session Map
+		Map<Integer,Map<Long,List<PatientVestDeviceDataExcelDTO>>> outputForExcel = new LinkedHashMap<>();
+		
+		//Event Map
+		//Map<Long,PatientVestDeviceDataExcelDTO> therapySessionForDay = new LinkedHashMap<>();
+		Map<Long,List<PatientVestDeviceDataExcelDTO>> therapySessionForDay = new LinkedHashMap<>();
+		
+		List<TherapySession> therapySessions = new LinkedList<TherapySession>();
+		// This List will hold un-finished session events , will be discarded to get delta on next transmission 
+		List<PatientVestDeviceData> eventsToBeDiscarded = new LinkedList<>();
+		int conter = 0;
+		for(int i = 0;i < deviceData.size() ; i++){
+			PatientVestDeviceData vestDeviceData = deviceData.get(i);
+			String eventCode = vestDeviceData.getEventId().split(EVENT_CODE_DELIMITER)[0];
+			List<PatientVestDeviceData> groupEntries = new LinkedList<>();
+			if(isStartEventForTherapySession(eventCode)){
+				groupEntries.add(vestDeviceData);
+				for(int j = i+1; j < deviceData.size() ; j++){
+					PatientVestDeviceData nextEventEntry = deviceData.get(j);
+					String nextEventCode = nextEventEntry.getEventId().split(EVENT_CODE_DELIMITER)[0];
+						// Group entry if the nextEvent is not a start event
+						if(!isStartEventForTherapySession(nextEventCode))
+							groupEntries.add(nextEventEntry);
+					if(isCompleteOrInCompleteEventForTherapySession(nextEventCode)
+						|| isStartEventForTherapySession(nextEventCode)	){
+						// subsequent start events indicate therapy is incomplete due to unexpected reason
+						if(isStartEventForTherapySession(nextEventCode)){
+							PatientVestDeviceData inCompleteEvent = (PatientVestDeviceData) groupEntries.get(groupEntries.size()-1).clone();
+							if(groupEntries.get(0).getEventId().contains(SESSION_TYPE_PROGRAM))
+								inCompleteEvent.setEventId(getEventStringByEventCode(Integer.parseInt(EVENT_CODE_PROGRAM_INCOMPLETE)));
+							else
+								inCompleteEvent.setEventId(getEventStringByEventCode(Integer.parseInt(EVENT_CODE_NORMAL_INCOMPLETE)));
+							inCompleteEvent.setDuration(0);// DO NOT CHANGE: This is the indication, dummy event has been added for making session
+							inCompleteEvent.setFrequency(0);
+							inCompleteEvent.setPressure(0);
+							groupEntries.add(inCompleteEvent);// Add dummy incomplete event to finish the session
+							deviceData.add(j, inCompleteEvent);
+						}
+						//TherapySession therapySession = assignTherapyMatricsExcel(groupEntries);
+						therapySessionForDay = assignTherapyMatricsExcel(groupEntries);
+						outputForExcel.put(conter++, therapySessionForDay);
+						//applyGlobalHMR(therapySession,latestInActiveDeviceHistory); commented Matab
+						//therapySessions.add(therapySession);
+						i=j; // to skip the events iterated, shouldn't be removed in any case
+						break;
+					}else if(j == deviceData.size()-1){
+						//will be discarded to get delta on next transmission
+						log.debug("Discarding the events to make session with delta on next transmission");
+						log.debug("Events List"+groupEntries);
+						eventsToBeDiscarded.addAll(groupEntries);
+						i=j; // to skip the events iterated, shouldn't be removed in any case
+						break;
+					}
+				}
+					vestTherapyData.put(vestDeviceData.getDate(), outputForExcel);
+			}
+				
+		}
+		// Discarding these events to make session from delta
+		if(eventsToBeDiscarded.size() > 0){
+			deviceData.removeAll(eventsToBeDiscarded);
+		}
+		return vestTherapyData;
+	}
+
+	}

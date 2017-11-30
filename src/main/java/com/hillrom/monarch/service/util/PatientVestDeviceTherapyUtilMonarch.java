@@ -3,6 +3,7 @@ package com.hillrom.monarch.service.util;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -446,6 +447,118 @@ public class PatientVestDeviceTherapyUtilMonarch {
 			deviceDataMonarch.removeAll(eventsToBeDiscardedMonarch);
 		}
 		return therapySessions;
+	}
+
+	/**
+	 * //new Excel method for Monarch
+	 * @param deviceEventsList
+	 * @return
+	 * @throws CloneNotSupportedException
+	 */
+	
+	public static Map<DateTime, Map<Integer, Map<Long, List<PatientVestDeviceDataMonarch>>>> prepareTherapySessionFromDeviceMonarchDataForExcel(
+			List<PatientVestDeviceDataMonarch> deviceEventsList) throws CloneNotSupportedException {
+		Map<DateTime,Map<Integer,Map<Long,List<PatientVestDeviceDataMonarch>>>> therapySessions = groupEventsToPrepareTherapySessionForMonarchExcel(deviceEventsList);
+		return therapySessions;
+	}
+	/**
+	 * new groupEventsToPrepareTherapySessionForMonarchExcel
+	 * @param deviceDataMonarch
+	 * @return
+	 * @throws CloneNotSupportedException
+	 */
+	private static Map<DateTime, Map<Integer, Map<Long, List<PatientVestDeviceDataMonarch>>>> groupEventsToPrepareTherapySessionForMonarchExcel(
+			List<PatientVestDeviceDataMonarch> deviceDataMonarch) throws CloneNotSupportedException {
+		
+		//vestTherapyDataMap
+		Map<DateTime,Map<Integer,Map<Long,List<PatientVestDeviceDataMonarch>>>> monarchTherapyData = new LinkedHashMap<>();
+		
+		//Session Map
+		Map<Integer,Map<Long,List<PatientVestDeviceDataMonarch>>> outputForExcel = new LinkedHashMap<>();
+		
+		//Event Map
+		Map<Long,List<PatientVestDeviceDataMonarch>> therapySessionForDay = new LinkedHashMap<>();
+		
+		// This List will hold un-finished session events , will be discarded to get delta on next transmission 
+		List<PatientVestDeviceDataMonarch> eventsToBeDiscardedMonarch = new LinkedList<>();
+		int conter = 0;
+		for(int i = 0;i < deviceDataMonarch.size() ; i++){
+			PatientVestDeviceDataMonarch vestDeviceDataMonarch = deviceDataMonarch.get(i);
+			//String eventCode = vestDeviceData.getEventCode().split(EVENT_CODE_DELIMITER)[0];
+			String eventCodeMonarch = vestDeviceDataMonarch.getEventCode();
+			List<PatientVestDeviceDataMonarch> groupEntriesMonarch = new LinkedList<>();
+			if(isStartEventForTherapySessionMonarch(eventCodeMonarch)){
+				groupEntriesMonarch.add(vestDeviceDataMonarch);
+				for(int j = i+1; j < deviceDataMonarch.size() ; j++){
+					PatientVestDeviceDataMonarch nextEventEntryMonarch = deviceDataMonarch.get(j);
+					String nextEventCodeMonarch = nextEventEntryMonarch.getEventCode();
+						// Group entry if the nextEvent is not a start event
+						if(!isStartEventForTherapySessionMonarch(nextEventCodeMonarch))
+							groupEntriesMonarch.add(nextEventEntryMonarch);
+					if(isCompleteOrInCompleteEventForTherapySessionMonarch(nextEventCodeMonarch)
+						|| ( isErrorEventForTherapySessionMonarch(nextEventCodeMonarch) && (j == (deviceDataMonarch.size()-1)) )
+						|| isStartEventForTherapySessionMonarch(nextEventCodeMonarch)	){
+						// subsequent start events indicate therapy is incomplete due to unexpected reason
+						if(isStartEventForTherapySessionMonarch(nextEventCodeMonarch)){
+							PatientVestDeviceDataMonarch inCompleteEventMonarch = (PatientVestDeviceDataMonarch) groupEntriesMonarch.get(groupEntriesMonarch.size()-1).clone();
+							if(groupEntriesMonarch.get(0).getEventCode().equals(EVENT_CODE_PROGRAM_COMPLETE_MONARCH))
+								inCompleteEventMonarch.setEventCode(getEventStringByEventCode(Integer.parseInt(EVENT_CODE_PROGRAM_INCOMPLETE_MONARCH)));
+							else
+								inCompleteEventMonarch.setEventCode(getEventStringByEventCode(Integer.parseInt(EVENT_CODE_NORMAL_INCOMPLETE_MONARCH)));
+							inCompleteEventMonarch.setDuration(0);// DO NOT CHANGE: This is the indication, dummy event has been added for making session
+							inCompleteEventMonarch.setFrequency(0);
+							inCompleteEventMonarch.setIntensity(0);
+							groupEntriesMonarch.add(inCompleteEventMonarch);// Add dummy incomplete event to finish the session
+							deviceDataMonarch.add(j, inCompleteEventMonarch);
+						}
+						/*TherapySessionMonarch therapySession = assignTherapyMatricsMonarch(groupEntriesMonarch);
+						applyGlobalHMRMonarch(therapySession,latestInActiveDeviceHistory);
+						therapySessions.add(therapySession);*/
+						therapySessionForDay = assignTherapyMatricsMonarchExcel(groupEntriesMonarch);
+						outputForExcel.put(conter++, therapySessionForDay);
+						
+						i=j; // to skip the events iterated, shouldn't be removed in any case
+						break;
+					}else if(j == deviceDataMonarch.size()-1){
+						//will be discarded to get delta on next transmission
+						log.debug("Discarding the events to make session with delta on next transmission");
+						log.debug("Events List"+groupEntriesMonarch);
+						eventsToBeDiscardedMonarch.addAll(groupEntriesMonarch);
+						i=j; // to skip the events iterated, shouldn't be removed in any case
+						break;
+					}
+				}
+				monarchTherapyData.put(vestDeviceDataMonarch.getDate(), outputForExcel);
+			}
+		}
+		// Discarding these events to make session from delta
+		if (eventsToBeDiscardedMonarch.size() > 0) {
+			deviceDataMonarch.removeAll(eventsToBeDiscardedMonarch);
+		}
+		return monarchTherapyData;
+	}
+
+	
+	
+	/**
+	 * New excel format Implementation
+	 * assignTherapyMatricsMonarchExcel
+	 * @param groupEntriesMonarch
+	 * @return
+	 */
+	private static Map<Long, List<PatientVestDeviceDataMonarch>> assignTherapyMatricsMonarchExcel(
+			List<PatientVestDeviceDataMonarch> groupEntriesMonarch) {
+		
+		Map<Long,List<PatientVestDeviceDataMonarch>> eventMap = new LinkedHashMap<>();
+		long therapyCounter = 0;
+		List<PatientVestDeviceDataMonarch> therapy = new LinkedList<>();
+		
+		for(int i = 0;i < groupEntriesMonarch.size(); i ++){
+			PatientVestDeviceDataMonarch deviceEventRecord = groupEntriesMonarch.get(i);
+			therapy.add(deviceEventRecord);
+		}
+		eventMap.put(therapyCounter++,therapy);
+		return eventMap;
 	}
 
 	private static void applyGlobalHMR(TherapySessionMonarch therapySession,

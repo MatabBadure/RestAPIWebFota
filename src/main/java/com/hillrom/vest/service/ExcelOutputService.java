@@ -99,6 +99,9 @@ public class ExcelOutputService {
         
         for(PatientVestDeviceData vestData : deviceEventsList ){
         	//Report Date as current date in mm/dd/YYYY
+        	
+        	log.debug("deviceEventsList"+vestData.getEventId());
+        	
         	String ReportDate = getReportDate();
             
         	String[] header = { vestData.getPatient().getId(),vestData.getPatient().getFirstName(),vestData.getPatient().getLastName()," ",
@@ -114,7 +117,7 @@ public class ExcelOutputService {
 	        setExcelHeader_Row3(excelSheet,header);
 	        setExcelRows_3(workBook, excelSheet, deviceEventsList,therapySessions);
 			
-			log.debug("TherapySession"+therapySessions.get(0)); 
+			log.debug("deviceEventsList"+deviceEventsList.size()); 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -352,12 +355,12 @@ public class ExcelOutputService {
 		
 		for (PatientVestDeviceData deviceEvent : deviceEventsList) {
 			
-				Map<Integer, Map<Long, List<PatientVestDeviceDataExcelDTO>>>	therapySessionsForTheDay = new LinkedHashMap<>();
-				log.debug("deviceEvent.getDate() :" + deviceEvent.getDate());
-				therapySessionsForTheDay = therapySessions.get(deviceEvent.getDate());
-				log.debug("therapySessionsForTheDay :" + therapySessionsForTheDay);
+			Map<Integer, Map<Long, List<PatientVestDeviceDataExcelDTO>>>	therapySessionsForTheDay = new LinkedHashMap<>();
+			log.debug("deviceEvent.getDate() :" + deviceEvent.getDate());
+			therapySessionsForTheDay = therapySessions.get(deviceEvent.getDate());
+			log.debug("therapySessionsForTheDay :" + therapySessionsForTheDay);
 				
-			if(Objects.nonNull(therapySessionsForTheDay)){
+			//if(Objects.nonNull(therapySessionsForTheDay)){
 				
 			Set<Map.Entry<Integer, Map<Long, List<PatientVestDeviceDataExcelDTO>>>> sessionForDay = therapySessionsForTheDay.entrySet();
 			log.debug("therapySessionSet:" + sessionForDay);
@@ -432,8 +435,6 @@ public class ExcelOutputService {
 										dateCell2.setCellValue(duration);
 										dateCell2.setCellStyle(style);
 									
-									 //excelRow.createCell(2).setCellValue("THERAPY SESSION TOTAL");
-									// excelRow.createCell(8).setCellValue(duration);
 								}
 
 							}
@@ -441,7 +442,7 @@ public class ExcelOutputService {
 						} 
 				}
 			}
-		}
+	//}
 	}
 	
 	

@@ -5,6 +5,7 @@ import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calcula
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -331,7 +332,7 @@ public class PatientProtocolMonarchService {
 		return userIdProtocolConstant;
 	}
 
-	private Map<Long, List<PatientProtocolDataMonarch>> prepareUserIdProtocolMap(
+	public Map<Long, List<PatientProtocolDataMonarch>> prepareUserIdProtocolMap(
 			List<PatientProtocolDataMonarch> protocolData) {
 		Map<Long, List<PatientProtocolDataMonarch>> userIdProtocolMap = new HashMap<>();
 		for(PatientProtocolDataMonarch protocol : protocolData){
@@ -423,6 +424,10 @@ public class PatientProtocolMonarchService {
 		patientProtocolAssoc.setLastModifiedDate(DateTime.now().plusSeconds(1));
 		patientProtocolMonarchRepository.saveAndFlush(patientProtocolAssoc);
 		protocolList.add(patientProtocolAssoc);
+	}
+	
+	public void saveAll(Collection<PatientProtocolDataMonarch> patientProtocolMonarchList){
+		patientProtocolMonarchRepository.save(patientProtocolMonarchList);
 	}
 }
 

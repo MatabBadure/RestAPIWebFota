@@ -377,6 +377,7 @@ public class FOTAServiceUtil {
 							HandleHolder holder = coUtil.getHandleHolderValuesForNewPartNo(chunkSize,fotaJsonData,fotaInfo,reqDev,reqReleaseDate);
 					
 							handleId = getHandleNumber();
+							holder.setHandleId(handleId);
 							handleHolderBin.put(handleId, holder);
 							
 							//To capture chunk size

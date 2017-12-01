@@ -147,12 +147,12 @@ public class FOTAServiceUtil {
 			if (fotaJsonData.get(PREV_REQ_STATUS).equals(INIT)) 
 			{
 				//Get current chunk count from handle holder object
-				int chunkCount = Integer.parseInt(holder.getCurrentChunk());
+				int chunkCount = 0;
 				
 				//Get the particular chunk from the based chunk count
 				String zeroChunk = partNoHolder.getFileChunks().get(chunkCount);
 				
-				holder.setCurrentChunk(holder.getCurrentChunk());
+				holder.setCurrentChunk(String.valueOf(chunkCount));
 				holder.setPreviousChunkTransStatus(INIT);
 				holder.setDownloadStartDateTime(new DateTime());
 
@@ -376,16 +376,22 @@ public class FOTAServiceUtil {
 							log.debug("New Part Number Key for different chunk Size="+storePartNoKey);
 							// Initially
 							HandleHolder holder = coUtil.getHandleHolderValuesForNewPartNo(chunkSize,fotaJsonData,fotaInfo,reqDev,reqReleaseDate);
+											
 							//Get Old Handle Id
-							handleId = coUtil.getOldHandle(handleHolderBin,fotaJsonData
+							/*handleId = coUtil.getOldHandle(handleHolderBin,fotaJsonData
 									.get(DEVICE_SN));
 							if(handleId == null){
 								handleId = getHandleNumber();
-								/*//Save device details to DB
-								saveInprogressDeviceDetails(holder);*/
+								//Save device details to DB
+								saveInprogressDeviceDetails(holder);
 								holder.setHandleId(handleId);
 								handleHolderBin.put(handleId, holder);
 							}
+							*/
+							
+							handleId = getHandleNumber();
+							holder.setHandleId(handleId);
+							handleHolderBin.put(handleId, holder);
 							
 							//To capture chunk size
 							log.debug("New handleId="+handleId+":New software version="+fotaInfo.getSoftVersion()+":New chunksize="+partNoHolder.getChunkSize());

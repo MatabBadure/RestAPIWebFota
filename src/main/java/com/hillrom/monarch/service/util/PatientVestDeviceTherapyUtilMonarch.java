@@ -73,6 +73,7 @@ public class PatientVestDeviceTherapyUtilMonarch {
 	private static final String EVENT_CODE_PROGRAM_STEP8_START_MONARCH = "14";	
 	private static final String EVENT_CODE_PROGRAM_COMPLETE_MONARCH = "15";	
 	private static final String EVENT_CODE_PROGRAM_INCOMPLETE_MONARCH = "16";
+	private static final String EVENT_CODE_PROGRAM_INCOMPLETE_MONARCH_EXCEL = "10";
 	private static final String EVENT_CODE_PROGRAM_PAUSE_MONARCH = "17";
 	private static final String EVENT_CODE_PROGRAM_RESUME_MONARCH = "18";
 	private static final String EVENT_CODE_PROGRAM_DATA_CHANGE_MONARCH = "19";	
@@ -496,7 +497,6 @@ public class PatientVestDeviceTherapyUtilMonarch {
 						if(!isStartEventForTherapySessionMonarch(nextEventCodeMonarch))
 							groupEntriesMonarch.add(nextEventEntryMonarch);
 					if(isCompleteOrInCompleteEventForTherapySessionMonarch(nextEventCodeMonarch)
-						|| ( isErrorEventForTherapySessionMonarch(nextEventCodeMonarch) && (j == (deviceDataMonarch.size()-1)) )
 						|| isStartEventForTherapySessionMonarch(nextEventCodeMonarch)	){
 						// subsequent start events indicate therapy is incomplete due to unexpected reason
 						if(isStartEventForTherapySessionMonarch(nextEventCodeMonarch)){
@@ -515,7 +515,6 @@ public class PatientVestDeviceTherapyUtilMonarch {
 						applyGlobalHMRMonarch(therapySession,latestInActiveDeviceHistory);
 						therapySessions.add(therapySession);*/
 						therapySessionForDay = assignTherapyMatricsMonarchExcel(groupEntriesMonarch);
-						outputForExcel.put(conter++, therapySessionForDay);
 						
 						i=j; // to skip the events iterated, shouldn't be removed in any case
 						break;
@@ -528,13 +527,17 @@ public class PatientVestDeviceTherapyUtilMonarch {
 						break;
 					}
 				}
-				monarchTherapyData.put(vestDeviceDataMonarch.getDate(), outputForExcel);
+				outputForExcel.put(conter++, therapySessionForDay);
+				log.debug("No. of Sessions for the Day : "+outputForExcel.size());
 			}
 		}
 		// Discarding these events to make session from delta
 		if (eventsToBeDiscardedMonarch.size() > 0) {
 			deviceDataMonarch.removeAll(eventsToBeDiscardedMonarch);
 		}
+		monarchTherapyData.put(new DateTime(), outputForExcel);
+		log.debug("No. of Session for Data Range : "+monarchTherapyData.size());
+		
 		return monarchTherapyData;
 	}
 
@@ -585,6 +588,14 @@ public class PatientVestDeviceTherapyUtilMonarch {
 				EVENT_CODE_PROGRAM_COMPLETE_MONARCH.equals(nextEventCode) ||
 				EVENT_CODE_NORMAL_INCOMPLETE_MONARCH.equals(nextEventCode) ||
 				EVENT_CODE_PROGRAM_INCOMPLETE_MONARCH.equals(nextEventCode);
+	}
+	
+	private static boolean isCompleteOrInCompleteEventForTherapySessionMonarchExcel(
+			String nextEventCode) {
+		return EVENT_CODE_NORMAL_COMPLETE_MONARCH.equals(nextEventCode) ||
+				EVENT_CODE_PROGRAM_COMPLETE_MONARCH.equals(nextEventCode) ||
+				EVENT_CODE_NORMAL_INCOMPLETE_MONARCH.equals(nextEventCode) ||
+				EVENT_CODE_PROGRAM_INCOMPLETE_MONARCH_EXCEL.equals(nextEventCode);
 	}
 	
 	private static boolean isErrorEventForTherapySessionMonarch(

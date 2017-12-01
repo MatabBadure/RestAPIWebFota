@@ -1,6 +1,7 @@
 package com.hillrom.vest.service;
 
 import static com.hillrom.vest.config.Constants.DATE;
+import static com.hillrom.vest.config.Constants.DATE_RANGE_REPORT;
 import static com.hillrom.vest.config.Constants.DEVICE_ADDRESS;
 import static com.hillrom.vest.config.Constants.DURATION;
 import static com.hillrom.vest.config.Constants.EVENT;
@@ -12,6 +13,7 @@ import static com.hillrom.vest.config.Constants.INTENSITY;
 import static com.hillrom.vest.config.Constants.PATIENT_ID;
 import static com.hillrom.vest.config.Constants.PRESSURE;
 import static com.hillrom.vest.config.Constants.SERIAL_NO;
+import static com.hillrom.vest.config.Constants.THERAPY_SESSION_TOTAL;
 import static com.hillrom.vest.config.Constants.TIME;
 import static com.hillrom.vest.config.Constants.WIFIorLTE_SERIAL_NO;
 
@@ -25,6 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -43,6 +46,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.hillrom.monarch.service.util.PatientVestDeviceTherapyUtilMonarch;
+import com.hillrom.vest.domain.HillromTypeCodeFormat;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceDataMonarch;
 import com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil;
@@ -53,6 +57,10 @@ import com.hillrom.vest.web.rest.dto.PatientVestDeviceDataExcelDTO;
 public class ExcelOutputService {
 
 	private static final Logger log = LoggerFactory.getLogger(ExcelOutputService.class);
+	
+	@Inject
+    private HillromTypeCodeFormatService hillromTypeCodeFormatService;
+	
 	/**
 	 * Old Method
 	 * @param response
@@ -104,12 +112,11 @@ public class ExcelOutputService {
         	
         	String ReportDate = getReportDate();
             
-        	String[] header = { vestData.getPatient().getId(),vestData.getPatient().getFirstName(),vestData.getPatient().getLastName()," ",
-        			deviceType," "," ",vestData.getSerialNumber()," ",ReportDate,dateRangeReport};
+        	String[] header = { vestData.getPatient().getHillromId(),vestData.getPatient().getFirstName(),vestData.getPatient().getLastName()," ",
+        			"VEST"," "," ",vestData.getSerialNumber()," ",ReportDate,DATE_RANGE_REPORT,dateRangeReport};
             setExcelHeader(excelSheet,header);
         }
         
-
 		try {
 			Map<DateTime,Map<Integer,Map<Long,List<PatientVestDeviceDataExcelDTO>>>> therapySessions = PatientVestDeviceTherapyUtil.prepareTherapySessionFromDeviceDataForExcel(deviceEventsList);
 			
@@ -121,7 +128,7 @@ public class ExcelOutputService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-        autoSizeColumns(excelSheet,11);
+        autoSizeColumns(excelSheet,13);
         
         workBook.write(response.getOutputStream());
         response.getOutputStream().flush();
@@ -177,7 +184,7 @@ public class ExcelOutputService {
         	String ReportDate = getReportDate();
             
         	String[] header = { monarchData.getPatient().getHillromId(),monarchData.getPatient().getFirstName(),monarchData.getPatient().getLastName()," ",
-        			deviceType," "," ",monarchData.getSerialNumber()," ",ReportDate,dateRangeReport};
+        			"MONARCH"," "," ",monarchData.getSerialNumber()," ",ReportDate,DATE_RANGE_REPORT,dateRangeReport};
             setExcelHeader(excelSheet,header);
         }
         
@@ -192,7 +199,7 @@ public class ExcelOutputService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		autoSizeColumns(excelSheet,11);
+		autoSizeColumns(excelSheet,13);
         workBook.write(response.getOutputStream());
         response.getOutputStream().flush();
 	}
@@ -207,33 +214,34 @@ public class ExcelOutputService {
 		HSSFCellStyle dateStyle = createCellStyle(workBook,"m/d/yy");
 		HSSFCellStyle timeStyle = createCellStyle(workBook,"h:mm AM/PM");
 		
-		for (PatientVestDeviceDataMonarch deviceEvent : deviceEventsList) {
-			
-				Map<Integer, Map<Long, List<PatientVestDeviceDataMonarch>>>	therapySessionsForTheDay = new LinkedHashMap<>();
-				therapySessionsForTheDay = therapySessions.get(deviceEvent.getDate());
-				
-			Set<Map.Entry<Integer, Map<Long, List<PatientVestDeviceDataMonarch>>>> sessionForDay = therapySessionsForTheDay.entrySet();
-			log.debug("therapySessionSet:" + sessionForDay);
-			
-			for(Map.Entry<Integer, Map<Long, List<PatientVestDeviceDataMonarch>>> therapySession : sessionForDay){
-				
-				Map<Long, List<PatientVestDeviceDataMonarch>> therapySessionForTheDay = new LinkedHashMap<>();
-				therapySessionForTheDay =  therapySession.getValue();
-				log.debug("TherapySessionForTheDay:"+therapySessionForTheDay.size());
-				
-					for(Map.Entry<Long, List<PatientVestDeviceDataMonarch>> session : therapySessionForTheDay.entrySet()){
+		log.debug("Total therapySessions for Date Range :"+therapySessions.size());
+		for (Map<Integer, Map<Long, List<PatientVestDeviceDataMonarch>>> therapySessionsForTheDay : therapySessions.values()) {
+			log.debug("Total therapySessions for day :"+therapySessionsForTheDay.size());
+				for (Map<Long, List<PatientVestDeviceDataMonarch>> therapySessionForTheDay: therapySessionsForTheDay.values()) {
+					log.debug("Therapy Session  :"+therapySessionForTheDay.size());
+					for (List<PatientVestDeviceDataMonarch> eventDetailsList : therapySessionForTheDay.values()) {
+						log.debug("Therapy eventDetailsList :"+therapySessionForTheDay.size());
+						
+						 String searchString = "%monarch_e%";
+						 List<HillromTypeCodeFormat> typeCodeList = hillromTypeCodeFormatService.findCodeValuesListForExcel(searchString);
 						 
-						 List<PatientVestDeviceDataMonarch> eventDetailsList = new LinkedList<>();
-						 
-						 eventDetailsList = session.getValue();
+						 Map<String,String> typeCodeMap = new LinkedHashMap<>();
+						 for(HillromTypeCodeFormat typCode : typeCodeList){
+							 typeCodeMap.put(typCode.getType_code(), typCode.getType_code_value());
+						 }
 						 
 						 int duration = 0; int i = 0; int j = 0;
 						 for(PatientVestDeviceDataMonarch eventDetails : eventDetailsList){
 							 
-
+							 	String deviceEventCode = "0x"+eventDetails.getEventCode();
+							 	String deviceEventCodeStr = "";
+							 	
+							 	if(typeCodeMap.containsKey(deviceEventCode)){
+							 		deviceEventCodeStr = typeCodeMap.get(deviceEventCode);
+							 	}
+							 	
 								HSSFRow excelRow = excelSheet.createRow(record++);
-								//excelRow.createCell(0).setCellValue(eventDetails.getPatient().getHillromId());
-								if(++i==1){
+								if(++i == 1){
 									HSSFCell dateCell = excelRow.createCell(0);
 									dateCell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
 									dateCell.setCellValue(eventDetails.getDate().toDate());
@@ -242,8 +250,8 @@ public class ExcelOutputService {
 								HSSFCell timeCell = excelRow.createCell(1);
 								timeCell.setCellValue(eventDetails.getDate().toDate());
 								timeCell.setCellStyle(timeStyle);
-								
-								excelRow.createCell(2).setCellValue(eventDetails.getEventCode());
+								//Printing event string for Monarch
+								excelRow.createCell(2).setCellValue(deviceEventCodeStr);
 								excelRow.createCell(3).setCellValue(eventDetails.getSerialNumber());
 								if(Objects.nonNull(eventDetails.getDevWifi()) && Objects.nonNull(eventDetails.getDevLte())){
 								excelRow.createCell(4).setCellValue(eventDetails.getDevWifi());
@@ -261,7 +269,7 @@ public class ExcelOutputService {
 								duration = duration + eventDetails.getDuration();
 
 								log.debug("total duration in loop[" + record + "]  :"+duration);
-								if(++j==eventDetailsList.size()){
+								if(++j == eventDetailsList.size()){
 									log.debug("Inside total : " + j);
 										//excelRow = excelSheet.createRow(record++);
 										
@@ -269,7 +277,6 @@ public class ExcelOutputService {
 										style1.setFillBackgroundColor(HSSFColor.GREY_25_PERCENT.index);
 										excelRow = excelSheet.createRow(record++);
 										excelRow.setRowStyle(style1);
-										
 									
 										HSSFCellStyle style = workBook.createCellStyle();
 										Font font = workBook.createFont();//Create font
@@ -277,7 +284,7 @@ public class ExcelOutputService {
 									    
 									    style.setFont(font);//set it to bold
 										HSSFCell dateCell = excelRow.createCell(2);
-										dateCell.setCellValue("THERAPY SESSION TOTAL");
+										dateCell.setCellValue(THERAPY_SESSION_TOTAL);
 										dateCell.setCellStyle(style);
 										
 										HSSFCell dateCell2 = excelRow.createCell(7);
@@ -353,35 +360,40 @@ public class ExcelOutputService {
 		HSSFCellStyle dateStyle = createCellStyle(workBook,"m/d/yy");
 		HSSFCellStyle timeStyle = createCellStyle(workBook,"h:mm AM/PM");
 		
-		for (PatientVestDeviceData deviceEvent : deviceEventsList) {
+		/*for (PatientVestDeviceData deviceEvent : deviceEventsList) {
 			
 			Map<Integer, Map<Long, List<PatientVestDeviceDataExcelDTO>>>	therapySessionsForTheDay = new LinkedHashMap<>();
 			log.debug("deviceEvent.getDate() :" + deviceEvent.getDate());
 			therapySessionsForTheDay = therapySessions.get(deviceEvent.getDate());
-			log.debug("therapySessionsForTheDay :" + therapySessionsForTheDay);
-				
-			//if(Objects.nonNull(therapySessionsForTheDay)){
-				
-			Set<Map.Entry<Integer, Map<Long, List<PatientVestDeviceDataExcelDTO>>>> sessionForDay = therapySessionsForTheDay.entrySet();
-			log.debug("therapySessionSet:" + sessionForDay);
+			log.debug("therapySessionsForTheDay :" + therapySessionsForTheDay);*/
+		log.debug("therapySessions :" + therapySessions.size());
+		
+		for (Map<Integer, Map<Long, List<PatientVestDeviceDataExcelDTO>>> therapySessionsForTheDay : therapySessions.values()) {
+		
+		//for(Map.Entry<DateTime, Map<Integer, Map<Long, List<PatientVestDeviceDataExcelDTO>>>> therapySessions1 : therapySessions.entrySet()){
 			
-			for(Map.Entry<Integer, Map<Long, List<PatientVestDeviceDataExcelDTO>>> therapySession : sessionForDay){
+			/*Map<Integer, Map<Long, List<PatientVestDeviceDataExcelDTO>>>	therapySessionsForTheDay = new LinkedHashMap<>();
+			therapySessionsForTheDay = therapySessions1.getValue();*/
+			log.debug("therapySessionsForTheDay:"+therapySessionsForTheDay.size());
+			
+			//for(Map.Entry<Integer, Map<Long, List<PatientVestDeviceDataExcelDTO>>> therapySession : therapySessionsForTheDay.entrySet()){
 				
-				Map<Long, List<PatientVestDeviceDataExcelDTO>> therapySessionForTheDay = new LinkedHashMap<>();
-				therapySessionForTheDay =  therapySession.getValue();
+			for(Map<Long, List<PatientVestDeviceDataExcelDTO>> therapySessionForTheDay : therapySessionsForTheDay.values()){
+				/*Map<Long, List<PatientVestDeviceDataExcelDTO>> therapySessionForTheDay = new LinkedHashMap<>();
+				therapySessionForTheDay =  therapySession.getValue();*/
 				log.debug("TherapySessionForTheDay:"+therapySessionForTheDay.size());
 				
-					for(Map.Entry<Long, List<PatientVestDeviceDataExcelDTO>> session : therapySessionForTheDay.entrySet()){
-						 
-						 List<PatientVestDeviceDataExcelDTO> eventDetailsList = new LinkedList<PatientVestDeviceDataExcelDTO>();
-						 
-						 eventDetailsList = session.getValue();
-						 
+					//for(Map.Entry<Long, List<PatientVestDeviceDataExcelDTO>> session : therapySessionForTheDay.entrySet()){
+						
+				for(List<PatientVestDeviceDataExcelDTO> eventDetailsList : therapySessionForTheDay.values()){
+						 /*List<PatientVestDeviceDataExcelDTO> eventDetailsList = new LinkedList<PatientVestDeviceDataExcelDTO>();
+						 eventDetailsList = session.getValue();*/
+						 log.debug("eventDetailsList:"+eventDetailsList.size());
 						 int duration = 0; int i = 0; int j = 0;
 						 for(PatientVestDeviceDataExcelDTO eventDetails : eventDetailsList){
 
 							 log.debug("eventDetails:"+eventDetails.getTimestamp());
-							 
+							 log.debug("eventDetails:"+eventDetails);
 							 String eventCode = eventDetails.getEventId().split(":")[0];
 							 
 							 String eventCodeStr = getEventStringByEventCode(eventCode);
@@ -389,16 +401,13 @@ public class ExcelOutputService {
 							 HSSFRow excelRow = excelSheet.createRow(record++);
 								//excelRow.createCell(0).setCellValue(deviceEvent.getPatientBlueToothAddress());
 								
-								if(++i==1){
-									log.debug("First Row : ");
+								if(++i == 1){
 									HSSFCell dateCell = excelRow.createCell(0);
 									dateCell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
 									dateCell.setCellValue(eventDetails.getDate().toDate());
 									dateCell.setCellStyle(dateStyle);
 								}
-								
 								HSSFCell timeCell = excelRow.createCell(1);
-
 								timeCell.setCellValue(eventDetails.getDate().toDate());
 								timeCell.setCellStyle(timeStyle);
 								
@@ -413,10 +422,9 @@ public class ExcelOutputService {
 								duration = duration + eventDetails.getDuration();
 
 								log.debug("total duration in loop[" + record + "]  :"+duration);
-								if(++j==eventDetailsList.size()){
+								if(++j == eventDetailsList.size()){
 									log.debug("Inside total : " + j);
 										
-									
 										CellStyle style1 = workBook.createCellStyle();
 										style1.setFillBackgroundColor(HSSFColor.GREY_25_PERCENT.index);
 										excelRow = excelSheet.createRow(record++);
@@ -428,7 +436,7 @@ public class ExcelOutputService {
 									    
 									    style.setFont(font);//set it to bold
 										HSSFCell dateCell = excelRow.createCell(2);
-										dateCell.setCellValue("THERAPY SESSION TOTAL");
+										dateCell.setCellValue(THERAPY_SESSION_TOTAL);
 										dateCell.setCellStyle(style);
 										
 										HSSFCell dateCell2 = excelRow.createCell(8);
@@ -442,7 +450,6 @@ public class ExcelOutputService {
 						} 
 				}
 			}
-	//}
 	}
 	
 	
@@ -678,7 +685,7 @@ public class ExcelOutputService {
         	String ReportDate = getReportDate();
             
         	String[] header = { vestData.getPatient().getId(),vestData.getPatient().getFirstName(),vestData.getPatient().getLastName()," ",
-        			"VEST"," "," ",vestData.getSerialNumber()," ",ReportDate,dateRangeReport};
+        			"VEST"," "," ",vestData.getSerialNumber()," ",ReportDate,DATE_RANGE_REPORT,dateRangeReport};
             setExcelHeader(excelSheet,header);
         }
         
@@ -689,8 +696,6 @@ public class ExcelOutputService {
 			String[] header = {DATE,TIME, EVENT,SERIAL_NO,DEVICE_ADDRESS,HUB_ADDRESS,FREQUENCY,PRESSURE,DURATION,HMR};
 	        setExcelHeader_Row3(excelSheet,header);
 	        setExcelRows_3(workBook, excelSheet, deviceEventsListVest,therapySessions);
-			
-			log.debug("TherapySession"+therapySessions.get(0)); 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -706,7 +711,7 @@ public class ExcelOutputService {
         	String ReportDate = getReportDate();
             
         	String[] header = { monarchData.getPatient().getHillromId(),monarchData.getPatient().getFirstName(),monarchData.getPatient().getLastName()," ",
-        			"MONARCH"," "," ",monarchData.getSerialNumber()," ",ReportDate,dateRangeReport};
+        			"MONARCH"," "," ",monarchData.getSerialNumber()," ",ReportDate,DATE_RANGE_REPORT,dateRangeReport};
             setExcelHeader(excelSheetMonarch,header);
         }
         

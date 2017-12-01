@@ -146,12 +146,12 @@ public class FOTAServiceUtil {
 			if (fotaJsonData.get(PREV_REQ_STATUS).equals(INIT)) 
 			{
 				//Get current chunk count from handle holder object
-				int chunkCount = Integer.parseInt(holder.getCurrentChunk());
+				int chunkCount = 0;
 				
 				//Get the particular chunk from the based chunk count
 				String zeroChunk = partNoHolder.getFileChunks().get(chunkCount);
 				
-				holder.setCurrentChunk(holder.getCurrentChunk());
+				holder.setCurrentChunk(String.valueOf(chunkCount));
 				holder.setPreviousChunkTransStatus(INIT);
 				holder.setDownloadStartDateTime(new DateTime());
 

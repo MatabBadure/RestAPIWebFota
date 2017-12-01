@@ -26,6 +26,11 @@ public class HillromTypeCodeFormatService {
 		return typeCodeList;
 	}
 	
+	public List<HillromTypeCodeFormat> findCodeValuesListForExcel(String searchString) {
+		List<HillromTypeCodeFormat> typeCodeList = hillromTypeCodeFormatRepository.findCodeValuesListForExcel(searchString);
+		return typeCodeList;
+	}
+	
 	public List<HillromTypeCodeFormat> getDiagnosisTypeCode(String searchString) {
 			List<HillromTypeCodeFormat> typeCodeList = hillromTypeCodeFormatRepository.findDiagnosisTypeCode(searchString);
 			return typeCodeList;

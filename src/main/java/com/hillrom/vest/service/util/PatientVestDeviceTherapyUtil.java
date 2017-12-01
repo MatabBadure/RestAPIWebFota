@@ -300,7 +300,8 @@ public class PatientVestDeviceTherapyUtil {
 			eventDetail.setDate(deviceEventRecord.getDate());
 			therapy.add(eventDetail);
 		}
-		eventMap.put(therapyCounter++,therapy);
+		log.debug("Therapy Size : "+therapy.size());
+		eventMap.put(therapyCounter,therapy);
 		
 		return eventMap;
 	}
@@ -471,10 +472,8 @@ public class PatientVestDeviceTherapyUtil {
 		Map<Integer,Map<Long,List<PatientVestDeviceDataExcelDTO>>> outputForExcel = new LinkedHashMap<>();
 		
 		//Event Map
-		//Map<Long,PatientVestDeviceDataExcelDTO> therapySessionForDay = new LinkedHashMap<>();
 		Map<Long,List<PatientVestDeviceDataExcelDTO>> therapySessionForDay = new LinkedHashMap<>();
 		
-		List<TherapySession> therapySessions = new LinkedList<TherapySession>();
 		// This List will hold un-finished session events , will be discarded to get delta on next transmission 
 		List<PatientVestDeviceData> eventsToBeDiscarded = new LinkedList<>();
 		int conter = 0;
@@ -507,7 +506,8 @@ public class PatientVestDeviceTherapyUtil {
 						}
 						//TherapySession therapySession = assignTherapyMatricsExcel(groupEntries);
 						therapySessionForDay = assignTherapyMatricsExcel(groupEntries);
-						outputForExcel.put(conter++, therapySessionForDay);
+						
+						
 						//applyGlobalHMR(therapySession,latestInActiveDeviceHistory); commented Matab
 						//therapySessions.add(therapySession);
 						i=j; // to skip the events iterated, shouldn't be removed in any case
@@ -520,16 +520,23 @@ public class PatientVestDeviceTherapyUtil {
 						i=j; // to skip the events iterated, shouldn't be removed in any case
 						break;
 					}
+					
 				}
-					vestTherapyData.put(vestDeviceData.getDate(), outputForExcel);
+				log.debug("therapySessionForDay Size : "+therapySessionForDay.size());
+				outputForExcel.put(conter++, therapySessionForDay);
 			}
 				
 		}
+		
+		
 		// Discarding these events to make session from delta
 		if(eventsToBeDiscarded.size() > 0){
 			deviceData.removeAll(eventsToBeDiscarded);
 		}
+		
+		log.debug("No. of Session for Date Range"+outputForExcel.size());
+		vestTherapyData.put(new DateTime(), outputForExcel);
 		return vestTherapyData;
 	}
 
-	}
+}

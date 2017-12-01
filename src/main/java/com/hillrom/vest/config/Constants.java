@@ -354,4 +354,7 @@ public final class Constants {
 	
 	public static final String LOG_DIRECTORY = "/usr/tomcat/apache-tomcat-8.0.28/TIMS/logs/";
 	public static final String MATCH_STRING = "Executed Successfully";
+	
+	public static final String THERAPY_SESSION_TOTAL = "THERAPY SESSION TOTAL";
+	public static final String DATE_RANGE_REPORT = "Date Range of Report";
 }

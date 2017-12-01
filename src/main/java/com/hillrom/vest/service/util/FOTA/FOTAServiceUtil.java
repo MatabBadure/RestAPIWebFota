@@ -346,15 +346,17 @@ public class FOTAServiceUtil {
 							HandleHolder holder = coUtil.getHandleHolderValuesFromPartNo(partNoHolder,fotaJsonData,fotaInfo,reqDev,reqReleaseDate);
 							
 							//Get Old Handle Id
-							handleId = coUtil.getOldHandle(handleHolderBin,fotaJsonData
+							/*handleId = coUtil.getOldHandle(handleHolderBin,fotaJsonData
 									.get(DEVICE_SN));
 							if(handleId == null){
 								handleId = getHandleNumber();
-								/*//Save device details to DB
-								saveInprogressDeviceDetails(holder);*/
-								holder.setHandleId(handleId);
-								handleHolderBin.put(handleId, holder);
-							}
+								/*Save device details to DB
+								saveInprogressDeviceDetails(holder);
+								//holder.setHandleId(handleId);
+							//	handleHolderBin.put(handleId, holder);
+							}*/
+							handleId = getHandleNumber();
+							handleHolderBin.put(handleId, holder);
 							log.debug("New handleId="+handleId+": Same SoftwareVersion="+fotaInfo.getSoftVersion()+":same chunksize="+partNoHolder.getChunkSize());
 						} else {
 							//Send email notification for CRC validation failed
@@ -390,7 +392,7 @@ public class FOTAServiceUtil {
 							*/
 							
 							handleId = getHandleNumber();
-							holder.setHandleId(handleId);
+							//holder.setHandleId(handleId);
 							handleHolderBin.put(handleId, holder);
 							
 							//To capture chunk size

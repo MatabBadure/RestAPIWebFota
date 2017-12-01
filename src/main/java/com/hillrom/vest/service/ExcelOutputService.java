@@ -16,16 +16,16 @@ import static com.hillrom.vest.config.Constants.SERIAL_NO;
 import static com.hillrom.vest.config.Constants.THERAPY_SESSION_TOTAL;
 import static com.hillrom.vest.config.Constants.TIME;
 import static com.hillrom.vest.config.Constants.WIFIorLTE_SERIAL_NO;
+import static com.hillrom.vest.config.Constants.MONARCH_EVENT_CODES;
+import static com.hillrom.vest.config.Constants.MONARCH_ERROR_CODES;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
@@ -46,9 +46,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.hillrom.monarch.service.util.PatientVestDeviceTherapyUtilMonarch;
-import com.hillrom.vest.domain.HillromTypeCodeFormat;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceDataMonarch;
+import com.hillrom.vest.repository.HillromTypeCodeFormatForExcel;
 import com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil;
 import com.hillrom.vest.web.rest.dto.PatientVestDeviceDataExcelDTO;
 
@@ -59,7 +59,7 @@ public class ExcelOutputService {
 	private static final Logger log = LoggerFactory.getLogger(ExcelOutputService.class);
 	
 	@Inject
-    private HillromTypeCodeFormatService hillromTypeCodeFormatService;
+    private HillromTypeCodeFormatForExcel hillromTypeCodeFormatForExcel;
 	
 	/**
 	 * Old Method
@@ -191,7 +191,7 @@ public class ExcelOutputService {
 		try {
 			Map<DateTime,Map<Integer,Map<Long,List<PatientVestDeviceDataMonarch>>>> therapySessions = PatientVestDeviceTherapyUtilMonarch.prepareTherapySessionFromDeviceMonarchDataForExcel(deviceEventsList);
 			
-			String[] header = {DATE,TIME, EVENT,SERIAL_NO,WIFIorLTE_SERIAL_NO,FREQUENCY,PRESSURE,DURATION,HMR};
+			String[] header = {DATE,TIME, EVENT,SERIAL_NO,WIFIorLTE_SERIAL_NO,FREQUENCY,INTENSITY,DURATION,HMR};
 	        setExcelHeader_Row3(excelSheet,header);
 	        setExcelRows_3_ForMonarch(workBook, excelSheet, deviceEventsList,therapySessions);
 			
@@ -214,6 +214,19 @@ public class ExcelOutputService {
 		HSSFCellStyle dateStyle = createCellStyle(workBook,"m/d/yy");
 		HSSFCellStyle timeStyle = createCellStyle(workBook,"h:mm AM/PM");
 		
+		
+		Map<String,String> monarchEventCodes = new LinkedHashMap<>();
+		List<Object[]> resultEventList = hillromTypeCodeFormatForExcel.findCodeValuesListForExcel(MONARCH_EVENT_CODES);
+		for (Object[] result : resultEventList) {
+			monarchEventCodes.put((String)result[0], (String)result[1]);
+		}
+		
+		Map<String,String> monarchErrorCodes = new LinkedHashMap<>();
+		List<Object[]> resultErroList = hillromTypeCodeFormatForExcel.findCodeValuesListForExcel(MONARCH_ERROR_CODES);
+		for (Object[] result : resultErroList) {
+			monarchErrorCodes.put((String)result[0], (String)result[1]);
+		}
+		
 		log.debug("Total therapySessions for Date Range :"+therapySessions.size());
 		for (Map<Integer, Map<Long, List<PatientVestDeviceDataMonarch>>> therapySessionsForTheDay : therapySessions.values()) {
 			log.debug("Total therapySessions for day :"+therapySessionsForTheDay.size());
@@ -222,23 +235,17 @@ public class ExcelOutputService {
 					for (List<PatientVestDeviceDataMonarch> eventDetailsList : therapySessionForTheDay.values()) {
 						log.debug("Therapy eventDetailsList :"+therapySessionForTheDay.size());
 						
-						 String searchString = "%monarch_e%";
-						 List<HillromTypeCodeFormat> typeCodeList = hillromTypeCodeFormatService.findCodeValuesListForExcel(searchString);
-						 
-						 Map<String,String> typeCodeMap = new LinkedHashMap<>();
-						 for(HillromTypeCodeFormat typCode : typeCodeList){
-							 typeCodeMap.put(typCode.getType_code(), typCode.getType_code_value());
-						 }
-						 
 						 int duration = 0; int i = 0; int j = 0;
 						 for(PatientVestDeviceDataMonarch eventDetails : eventDetailsList){
 							 
-							 	String deviceEventCode = "0x"+eventDetails.getEventCode();
 							 	String deviceEventCodeStr = "";
-							 	
-							 	if(typeCodeMap.containsKey(deviceEventCode)){
-							 		deviceEventCodeStr = typeCodeMap.get(deviceEventCode);
-							 	}
+							 	if(eventDetails.getEventCode() != "22"){
+									deviceEventCodeStr = monarchEventCodes.get(eventDetails.getEventCode());
+									log.debug("MonarchEventCodes map str: "+deviceEventCodeStr);
+								}else{
+									deviceEventCodeStr = monarchErrorCodes.get(eventDetails.getIntensity());
+									log.debug("MonarchErrorCodes map str: "+deviceEventCodeStr);
+								}
 							 	
 								HSSFRow excelRow = excelSheet.createRow(record++);
 								if(++i == 1){

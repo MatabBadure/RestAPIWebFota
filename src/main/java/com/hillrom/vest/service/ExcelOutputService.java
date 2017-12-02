@@ -10,6 +10,8 @@ import static com.hillrom.vest.config.Constants.HILLROM_ID;
 import static com.hillrom.vest.config.Constants.HMR;
 import static com.hillrom.vest.config.Constants.HUB_ADDRESS;
 import static com.hillrom.vest.config.Constants.INTENSITY;
+import static com.hillrom.vest.config.Constants.MONARCH_ERROR_CODES;
+import static com.hillrom.vest.config.Constants.MONARCH_EVENT_CODES;
 import static com.hillrom.vest.config.Constants.PATIENT_ID;
 import static com.hillrom.vest.config.Constants.PRESSURE;
 import static com.hillrom.vest.config.Constants.SERIAL_NO;
@@ -21,11 +23,9 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
@@ -35,10 +35,10 @@ import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
@@ -46,9 +46,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.hillrom.monarch.service.util.PatientVestDeviceTherapyUtilMonarch;
-import com.hillrom.vest.domain.HillromTypeCodeFormat;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceDataMonarch;
+import com.hillrom.vest.repository.HillromTypeCodeFormatForExcel;
 import com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil;
 import com.hillrom.vest.web.rest.dto.PatientVestDeviceDataExcelDTO;
 
@@ -59,7 +59,7 @@ public class ExcelOutputService {
 	private static final Logger log = LoggerFactory.getLogger(ExcelOutputService.class);
 	
 	@Inject
-    private HillromTypeCodeFormatService hillromTypeCodeFormatService;
+    private HillromTypeCodeFormatForExcel hillromTypeCodeFormatForExcel;
 	
 	/**
 	 * Old Method
@@ -116,7 +116,7 @@ public class ExcelOutputService {
         			"VEST"," "," ",vestData.getSerialNumber()," ",ReportDate,DATE_RANGE_REPORT,dateRangeReport};
             setExcelHeader(excelSheet,header);
         }
-        
+        setExcelRowGrayColor(workBook,excelSheet);
 		try {
 			Map<DateTime,Map<Integer,Map<Long,List<PatientVestDeviceDataExcelDTO>>>> therapySessions = PatientVestDeviceTherapyUtil.prepareTherapySessionFromDeviceDataForExcel(deviceEventsList);
 			
@@ -184,14 +184,15 @@ public class ExcelOutputService {
         	String ReportDate = getReportDate();
             
         	String[] header = { monarchData.getPatient().getHillromId(),monarchData.getPatient().getFirstName(),monarchData.getPatient().getLastName()," ",
-        			"MONARCH"," "," ",monarchData.getSerialNumber()," ",ReportDate,DATE_RANGE_REPORT,dateRangeReport};
+        			"MONARCH"," ",monarchData.getSerialNumber()," ",ReportDate,DATE_RANGE_REPORT,dateRangeReport};
             setExcelHeader(excelSheet,header);
         }
+        setExcelRowGrayColor(workBook,excelSheet);
         
 		try {
 			Map<DateTime,Map<Integer,Map<Long,List<PatientVestDeviceDataMonarch>>>> therapySessions = PatientVestDeviceTherapyUtilMonarch.prepareTherapySessionFromDeviceMonarchDataForExcel(deviceEventsList);
 			
-			String[] header = {DATE,TIME, EVENT,SERIAL_NO,WIFIorLTE_SERIAL_NO,FREQUENCY,PRESSURE,DURATION,HMR};
+			String[] header = {DATE,TIME, EVENT,SERIAL_NO,WIFIorLTE_SERIAL_NO,FREQUENCY,INTENSITY,DURATION,HMR};
 	        setExcelHeader_Row3(excelSheet,header);
 	        setExcelRows_3_ForMonarch(workBook, excelSheet, deviceEventsList,therapySessions);
 			
@@ -204,6 +205,15 @@ public class ExcelOutputService {
         response.getOutputStream().flush();
 	}
 
+	private void setExcelRowGrayColor(HSSFWorkbook workBook, HSSFSheet excelSheet) {
+		HSSFRow excelRow = excelSheet.createRow(1);
+		HSSFCellStyle style = workBook.createCellStyle();
+	    style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+	    style.setFillPattern(CellStyle.SOLID_FOREGROUND);
+		for(int cellCount = 0; cellCount<=11;cellCount++ ){
+			excelRow.createCell(cellCount).setCellStyle(style);
+		}
+	}
 	private void setExcelRows_3_ForMonarch(
 			HSSFWorkbook workBook,
 			HSSFSheet excelSheet,
@@ -214,6 +224,19 @@ public class ExcelOutputService {
 		HSSFCellStyle dateStyle = createCellStyle(workBook,"m/d/yy");
 		HSSFCellStyle timeStyle = createCellStyle(workBook,"h:mm AM/PM");
 		
+		
+		Map<String,String> monarchEventCodes = new LinkedHashMap<>();
+		List<Object[]> resultEventList = hillromTypeCodeFormatForExcel.findCodeValuesListForExcel(MONARCH_EVENT_CODES);
+		for (Object[] result : resultEventList) {
+			monarchEventCodes.put((String)result[0], (String)result[1]);
+		}
+		
+		Map<String,String> monarchErrorCodes = new LinkedHashMap<>();
+		List<Object[]> resultErroList = hillromTypeCodeFormatForExcel.findCodeValuesListForExcel(MONARCH_ERROR_CODES);
+		for (Object[] result : resultErroList) {
+			monarchErrorCodes.put((String)result[0], (String)result[1]);
+		}
+		
 		log.debug("Total therapySessions for Date Range :"+therapySessions.size());
 		for (Map<Integer, Map<Long, List<PatientVestDeviceDataMonarch>>> therapySessionsForTheDay : therapySessions.values()) {
 			log.debug("Total therapySessions for day :"+therapySessionsForTheDay.size());
@@ -222,23 +245,17 @@ public class ExcelOutputService {
 					for (List<PatientVestDeviceDataMonarch> eventDetailsList : therapySessionForTheDay.values()) {
 						log.debug("Therapy eventDetailsList :"+therapySessionForTheDay.size());
 						
-						 String searchString = "%monarch_e%";
-						 List<HillromTypeCodeFormat> typeCodeList = hillromTypeCodeFormatService.findCodeValuesListForExcel(searchString);
-						 
-						 Map<String,String> typeCodeMap = new LinkedHashMap<>();
-						 for(HillromTypeCodeFormat typCode : typeCodeList){
-							 typeCodeMap.put(typCode.getType_code(), typCode.getType_code_value());
-						 }
-						 
 						 int duration = 0; int i = 0; int j = 0;
 						 for(PatientVestDeviceDataMonarch eventDetails : eventDetailsList){
 							 
-							 	String deviceEventCode = "0x"+eventDetails.getEventCode();
 							 	String deviceEventCodeStr = "";
-							 	
-							 	if(typeCodeMap.containsKey(deviceEventCode)){
-							 		deviceEventCodeStr = typeCodeMap.get(deviceEventCode);
-							 	}
+							 	if(eventDetails.getEventCode() != "22"){
+									deviceEventCodeStr = monarchEventCodes.get(eventDetails.getEventCode());
+									log.debug("MonarchEventCodes map str: "+deviceEventCodeStr);
+								}else{
+									deviceEventCodeStr = monarchErrorCodes.get(eventDetails.getIntensity());
+									log.debug("MonarchErrorCodes map str: "+deviceEventCodeStr);
+								}
 							 	
 								HSSFRow excelRow = excelSheet.createRow(record++);
 								if(++i == 1){
@@ -271,25 +288,28 @@ public class ExcelOutputService {
 								log.debug("total duration in loop[" + record + "]  :"+duration);
 								if(++j == eventDetailsList.size()){
 									log.debug("Inside total : " + j);
-										//excelRow = excelSheet.createRow(record++);
-										
-										CellStyle style1 = workBook.createCellStyle();
-										style1.setFillBackgroundColor(HSSFColor.GREY_25_PERCENT.index);
 										excelRow = excelSheet.createRow(record++);
-										excelRow.setRowStyle(style1);
-									
+										
 										HSSFCellStyle style = workBook.createCellStyle();
+									    style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+									    style.setFillPattern(CellStyle.SOLID_FOREGROUND);
 										Font font = workBook.createFont();//Create font
 									    font.setBoldweight(Font.BOLDWEIGHT_BOLD);//Make font bold
-									    
-									    style.setFont(font);//set it to bold
-										HSSFCell dateCell = excelRow.createCell(2);
-										dateCell.setCellValue(THERAPY_SESSION_TOTAL);
-										dateCell.setCellStyle(style);
-										
-										HSSFCell dateCell2 = excelRow.createCell(7);
-										dateCell2.setCellValue(duration);
-										dateCell2.setCellStyle(style);
+									    for(int cellCount = 0; cellCount<=11;cellCount++ ){
+											if(cellCount == 2){
+											    style.setFont(font);//set it to bold
+												HSSFCell dateCell = excelRow.createCell(cellCount);
+												dateCell.setCellValue(THERAPY_SESSION_TOTAL);
+												dateCell.setCellStyle(style);
+											}else if(cellCount == 7){
+												style.setFont(font);
+												HSSFCell dateCell2 = excelRow.createCell(cellCount);
+												dateCell2.setCellValue(duration);
+												dateCell2.setCellStyle(style);
+											}else{
+												excelRow.createCell(cellCount).setCellStyle(style);
+											}
+										}
 								}
 							}
 						} 
@@ -425,31 +445,33 @@ public class ExcelOutputService {
 								if(++j == eventDetailsList.size()){
 									log.debug("Inside total : " + j);
 										
-										CellStyle style1 = workBook.createCellStyle();
-										style1.setFillBackgroundColor(HSSFColor.GREY_25_PERCENT.index);
 										excelRow = excelSheet.createRow(record++);
-										excelRow.setRowStyle(style1);
 										
 										HSSFCellStyle style = workBook.createCellStyle();
-										Font font = workBook.createFont();//Create font
-									    font.setBoldweight(Font.BOLDWEIGHT_BOLD);//Make font bold
-									    
-									    style.setFont(font);//set it to bold
-										HSSFCell dateCell = excelRow.createCell(2);
-										dateCell.setCellValue(THERAPY_SESSION_TOTAL);
-										dateCell.setCellStyle(style);
-										
-										HSSFCell dateCell2 = excelRow.createCell(8);
-										dateCell2.setCellValue(duration);
-										dateCell2.setCellStyle(style);
-									
+									    style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+									    style.setFillPattern(CellStyle.SOLID_FOREGROUND);
+										Font font = workBook.createFont();
+										font.setBoldweight(Font.BOLDWEIGHT_BOLD);//Make font bold
+										for(int cellCount = 0; cellCount<=11;cellCount++ ){
+											if(cellCount == 2){
+											    style.setFont(font);//set it to bold
+												HSSFCell dateCell = excelRow.createCell(cellCount);
+												dateCell.setCellValue(THERAPY_SESSION_TOTAL);
+												dateCell.setCellStyle(style);
+											}else if(cellCount == 8){
+												style.setFont(font);
+												HSSFCell dateCell2 = excelRow.createCell(cellCount);
+												dateCell2.setCellValue(duration);
+												dateCell2.setCellStyle(style);
+											}else{
+												excelRow.createCell(cellCount).setCellStyle(style);
+											}
+										}
 								}
-
 							}
-
 						} 
 				}
-			}
+		}
 	}
 	
 	
@@ -684,11 +706,11 @@ public class ExcelOutputService {
         	//Report Date as current date in mm/dd/YYYY
         	String ReportDate = getReportDate();
             
-        	String[] header = { vestData.getPatient().getId(),vestData.getPatient().getFirstName(),vestData.getPatient().getLastName()," ",
+        	String[] header = { vestData.getPatient().getHillromId(),vestData.getPatient().getFirstName(),vestData.getPatient().getLastName()," ",
         			"VEST"," "," ",vestData.getSerialNumber()," ",ReportDate,DATE_RANGE_REPORT,dateRangeReport};
             setExcelHeader(excelSheet,header);
         }
-        
+        setExcelRowGrayColor(workBook,excelSheet);
 
 		try {
 			Map<DateTime,Map<Integer,Map<Long,List<PatientVestDeviceDataExcelDTO>>>> therapySessions = PatientVestDeviceTherapyUtil.prepareTherapySessionFromDeviceDataForExcel(deviceEventsListVest);
@@ -699,7 +721,7 @@ public class ExcelOutputService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-        autoSizeColumns(excelSheet,11);
+        autoSizeColumns(excelSheet,13);
 
         //HSSFWorkbook workBook = new HSSFWorkbook();
         HSSFSheet excelSheetMonarch = workBook.createSheet("Therapy Report Monarch");
@@ -711,9 +733,11 @@ public class ExcelOutputService {
         	String ReportDate = getReportDate();
             
         	String[] header = { monarchData.getPatient().getHillromId(),monarchData.getPatient().getFirstName(),monarchData.getPatient().getLastName()," ",
-        			"MONARCH"," "," ",monarchData.getSerialNumber()," ",ReportDate,DATE_RANGE_REPORT,dateRangeReport};
+        			"MONARCH"," ",monarchData.getSerialNumber()," ",ReportDate,DATE_RANGE_REPORT,dateRangeReport};
             setExcelHeader(excelSheetMonarch,header);
         }
+        
+        setExcelRowGrayColor(workBook,excelSheetMonarch);
         
 		try {
 			Map<DateTime,Map<Integer,Map<Long,List<PatientVestDeviceDataMonarch>>>> therapySessions = PatientVestDeviceTherapyUtilMonarch.prepareTherapySessionFromDeviceMonarchDataForExcel(deviceEventsListMonarch);
@@ -725,7 +749,7 @@ public class ExcelOutputService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		autoSizeColumns(excelSheetMonarch,11);
+		autoSizeColumns(excelSheetMonarch,13);
 
 		workBook.write(response.getOutputStream());
         response.getOutputStream().flush();

@@ -47,6 +47,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.hillrom.monarch.service.util.PatientVestDeviceTherapyUtilMonarch;
+import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceDataMonarch;
 import com.hillrom.vest.repository.HillromTypeCodeFormatForExcel;
@@ -106,23 +107,22 @@ public class ExcelOutputService {
         /* Freeze top row alone */
         excelSheet.createFreezePane(0,1);
         
-        for(PatientVestDeviceData vestData : deviceEventsList ){
-        	//Report Date as current date in mm/dd/YYYY
         	
-        	log.debug("deviceEventsList"+vestData.getEventId());
-        	
-        	String ReportDate = getReportDate();
-            
-        	String[] header = { vestData.getPatient().getHillromId(),vestData.getPatient().getFirstName(),vestData.getPatient().getLastName()," ",
-        			"VEST"," "," ",vestData.getSerialNumber()," ",ReportDate,DATE_RANGE_REPORT,dateRangeReport};
-            setExcelHeader(excelSheet,header);
-        }
+		String ReportDate = getReportDate();
+
+		String[] header1 = {
+				deviceEventsList.get(0).getPatient().getHillromId(),
+				deviceEventsList.get(0).getPatient().getFirstName(),
+				deviceEventsList.get(0).getPatient().getLastName(), " ", "VEST", " ", " ",
+				deviceEventsList.get(0).getSerialNumber(), " ", ReportDate, DATE_RANGE_REPORT,
+				dateRangeReport };
+        setExcelHeader(excelSheet,header1);
         setExcelRowGrayColor(workBook,excelSheet);
 		try {
 			Map<DateTime,Map<Integer,Map<Long,List<PatientVestDeviceDataExcelDTO>>>> therapySessions = PatientVestDeviceTherapyUtil.prepareTherapySessionFromDeviceDataForExcel(deviceEventsList);
 			
-			String[] header = {DATE,TIME, EVENT,SERIAL_NO,DEVICE_ADDRESS,HUB_ADDRESS,FREQUENCY,PRESSURE,DURATION,HMR};
-	        setExcelHeader_Row3(excelSheet,header);
+			String[] header2 = {DATE,TIME, EVENT,SERIAL_NO,DEVICE_ADDRESS,HUB_ADDRESS,FREQUENCY,PRESSURE,DURATION,HMR};
+	        setExcelHeader_Row3(excelSheet,header2);
 	        setExcelRows_3(workBook, excelSheet, deviceEventsList,therapySessions);
 			
 			log.debug("deviceEventsList"+deviceEventsList.size()); 
@@ -169,7 +169,7 @@ public class ExcelOutputService {
 	public void createExcelOutputNewExcelForMonarch(
 			HttpServletResponse response,
 			List<PatientVestDeviceDataMonarch> deviceEventsList,
-			String deviceType, String dateRangeReport) throws IOException {
+			PatientInfo patientInfo, String deviceType, String dateRangeReport) throws IOException {
 		log.debug("Received Device Data "+deviceEventsList);
 		
 		response.setContentType("application/vnd.ms-excel");
@@ -179,22 +179,21 @@ public class ExcelOutputService {
         HSSFSheet excelSheet = workBook.createSheet("Therapy Report Monarch");
         /* Freeze top row alone */
         excelSheet.createFreezePane(0,1);
-    	
-        for(PatientVestDeviceDataMonarch monarchData : deviceEventsList ){
-        	//Report Date as current date in mm/dd/YYYY
-        	String ReportDate = getReportDate();
-            
-        	String[] header = { monarchData.getPatient().getHillromId(),monarchData.getPatient().getFirstName(),monarchData.getPatient().getLastName()," ",
-        			"MONARCH"," ",monarchData.getSerialNumber()," ",ReportDate,DATE_RANGE_REPORT,dateRangeReport};
-            setExcelHeader(excelSheet,header);
-        }
+        
+      //Report Date as current date in mm/dd/YYYY
+    	String ReportDate = getReportDate();
+        String[] header1 = { patientInfo.getHillromId(),patientInfo.getFirstName(),patientInfo.getLastName()," ",
+    			"MONARCH"," ",deviceEventsList.get(0).getSerialNumber()," ",ReportDate,DATE_RANGE_REPORT,dateRangeReport};
+        
+        setExcelHeader(excelSheet,header1);
+        
         setExcelRowGrayColor_Monarch(workBook,excelSheet);
         
 		try {
 			Map<DateTime,Map<Integer,Map<Long,List<PatientVestDeviceDataMonarch>>>> therapySessions = PatientVestDeviceTherapyUtilMonarch.prepareTherapySessionFromDeviceMonarchDataForExcel(deviceEventsList);
 			
-			String[] header = {DATE,TIME, EVENT,SERIAL_NO,WIFIorLTE_SERIAL_NO,FREQUENCY,INTENSITY,DURATION,HMR};
-	        setExcelHeader_Row3(excelSheet,header);
+			String[] header2 = {DATE,TIME, EVENT,SERIAL_NO,WIFIorLTE_SERIAL_NO,FREQUENCY,INTENSITY,DURATION,HMR};
+	        setExcelHeader_Row3(excelSheet,header2);
 	        setExcelRows_3_ForMonarch(workBook, excelSheet, deviceEventsList,therapySessions);
 			
 			log.debug("TherapySession"+therapySessions.get(0)); 
@@ -704,7 +703,7 @@ public class ExcelOutputService {
 	}
 	public void createExcelOutputNewExcelForAll(HttpServletResponse response,
 			List<PatientVestDeviceData> deviceEventsListVest,
-			List<PatientVestDeviceDataMonarch> deviceEventsListMonarch, String dateRangeReport) throws IOException {
+			List<PatientVestDeviceDataMonarch> deviceEventsListMonarch, PatientInfo patientInfo, String dateRangeReport) throws IOException {
 		
 		log.debug("Received Device Data for Vest :"+deviceEventsListVest+" & Monarch"+deviceEventsListMonarch);
 		
@@ -716,21 +715,22 @@ public class ExcelOutputService {
         /* Freeze top row alone */
         excelSheet.createFreezePane(0,1);
         
-        for(PatientVestDeviceData vestData : deviceEventsListVest ){
-        	//Report Date as current date in mm/dd/YYYY
-        	String ReportDate = getReportDate();
-            
-        	String[] header = { vestData.getPatient().getHillromId(),vestData.getPatient().getFirstName(),vestData.getPatient().getLastName()," ",
-        			"VEST"," "," ",vestData.getSerialNumber()," ",ReportDate,DATE_RANGE_REPORT,dateRangeReport};
-            setExcelHeader(excelSheet,header);
-        }
+		// Report Date as current date in mm/dd/YYYY
+		String ReportDate = getReportDate();
+
+		String[] headerVest1 = { deviceEventsListVest.get(0).getPatient().getHillromId(),
+				deviceEventsListVest.get(0).getPatient().getFirstName(),
+				deviceEventsListVest.get(0).getPatient().getLastName(), " ", "VEST", " ", " ",
+				deviceEventsListVest.get(0).getSerialNumber(), " ", ReportDate, DATE_RANGE_REPORT,
+				dateRangeReport };
+		setExcelHeader(excelSheet, headerVest1);
         setExcelRowGrayColor(workBook,excelSheet);
 
 		try {
 			Map<DateTime,Map<Integer,Map<Long,List<PatientVestDeviceDataExcelDTO>>>> therapySessions = PatientVestDeviceTherapyUtil.prepareTherapySessionFromDeviceDataForExcel(deviceEventsListVest);
 			
-			String[] header = {DATE,TIME, EVENT,SERIAL_NO,DEVICE_ADDRESS,HUB_ADDRESS,FREQUENCY,PRESSURE,DURATION,HMR};
-	        setExcelHeader_Row3(excelSheet,header);
+			String[] headerVest2 = {DATE,TIME, EVENT,SERIAL_NO,DEVICE_ADDRESS,HUB_ADDRESS,FREQUENCY,PRESSURE,DURATION,HMR};
+	        setExcelHeader_Row3(excelSheet,headerVest2);
 	        setExcelRows_3(workBook, excelSheet, deviceEventsListVest,therapySessions);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -741,23 +741,21 @@ public class ExcelOutputService {
         HSSFSheet excelSheetMonarch = workBook.createSheet("Therapy Report Monarch");
         /* Freeze top row alone */
         excelSheetMonarch.createFreezePane(0,1);
-    	
-        for(PatientVestDeviceDataMonarch monarchData : deviceEventsListMonarch ){
-        	//Report Date as current date in mm/dd/YYYY
-        	String ReportDate = getReportDate();
-            
-        	String[] header = { monarchData.getPatient().getHillromId(),monarchData.getPatient().getFirstName(),monarchData.getPatient().getLastName()," ",
-        			"MONARCH"," ",monarchData.getSerialNumber()," ",ReportDate,DATE_RANGE_REPORT,dateRangeReport};
-            setExcelHeader(excelSheetMonarch,header);
-        }
+
+		String[] headerMonarch1 = { patientInfo.getHillromId(),
+				patientInfo.getFirstName(),
+				patientInfo.getLastName(), " ", "MONARCH", " ",
+				deviceEventsListMonarch.get(0).getSerialNumber(), " ", ReportDate,
+				DATE_RANGE_REPORT, dateRangeReport };
+		setExcelHeader(excelSheetMonarch, headerMonarch1);
         
         setExcelRowGrayColor_Monarch(workBook,excelSheetMonarch);
         
 		try {
 			Map<DateTime,Map<Integer,Map<Long,List<PatientVestDeviceDataMonarch>>>> therapySessions = PatientVestDeviceTherapyUtilMonarch.prepareTherapySessionFromDeviceMonarchDataForExcel(deviceEventsListMonarch);
 			
-			String[] header = {DATE,TIME, EVENT,SERIAL_NO,WIFIorLTE_SERIAL_NO,FREQUENCY,INTENSITY,DURATION,HMR};
-	        setExcelHeader_Row3(excelSheetMonarch,header);
+			String[] headerMonarch2 = {DATE,TIME, EVENT,SERIAL_NO,WIFIorLTE_SERIAL_NO,FREQUENCY,INTENSITY,DURATION,HMR};
+	        setExcelHeader_Row3(excelSheetMonarch,headerMonarch2);
 	        setExcelRows_3_ForMonarch(workBook, excelSheetMonarch, deviceEventsListMonarch,therapySessions);
 			
 		} catch (Exception e) {

@@ -280,7 +280,7 @@ public class PatientVestDeviceTherapyUtil {
 		long therapyCounter = 0;
 		List<PatientVestDeviceDataExcelDTO> therapy = new LinkedList<>();
 		
-		for(int i = 0;i < groupEntries.size(); i ++){
+		for(int i = 0;i < groupEntries.size(); i++){
 			
 			PatientVestDeviceData deviceEventRecord = groupEntries.get(i);
 			PatientVestDeviceDataExcelDTO eventDetail = new PatientVestDeviceDataExcelDTO();

@@ -1158,7 +1158,7 @@ public class UserResource {
 
 					//excelOutputService.createExcelOutputExcelForMonarch(response, monarchdeviceData);
 					//New excel format for Monarch
-					excelOutputService.createExcelOutputNewExcelForMonarch(response, monarchdeviceData,deviceType,dateRangeReport.toString());
+					excelOutputService.createExcelOutputNewExcelForMonarch(response, monarchdeviceData,patient,deviceType,dateRangeReport.toString());
 	            	
 	            }else{
 	            	response.setStatus(204);
@@ -1179,12 +1179,12 @@ public class UserResource {
 	            }else if(vestdeviceData.isEmpty() && !monarchdeviceData.isEmpty() ){
 	            	//excelOutputService.createExcelOutputExcelForMonarch(response, monarchdeviceData);
 	            	//New excel format for Monarch
-					excelOutputService.createExcelOutputNewExcelForMonarch(response, monarchdeviceData,deviceType,dateRangeReport.toString());
+					excelOutputService.createExcelOutputNewExcelForMonarch(response, monarchdeviceData,patient,deviceType,dateRangeReport.toString());
 	            }else if(!vestdeviceData.isEmpty() && !monarchdeviceData.isEmpty() ){
 	            	
 	            	//excelOutputService.createExcelOutputExcelForAll(response, vestdeviceData, monarchdeviceData);
 	            	//New excel format for Monarch
-	            	excelOutputService.createExcelOutputNewExcelForAll(response, vestdeviceData, monarchdeviceData,dateRangeReport.toString());
+	            	excelOutputService.createExcelOutputNewExcelForAll(response, vestdeviceData, monarchdeviceData,patient,dateRangeReport.toString());
 	            	
 	            }else{
 	            	response.setStatus(204);

@@ -420,7 +420,7 @@ public class PatientVestDeviceTherapyUtilMonarch {
 							if(groupEntriesMonarch.get(0).getEventCode().equals(EVENT_CODE_PROGRAM_COMPLETE_MONARCH))
 								inCompleteEventMonarch.setEventCode(getEventStringByEventCode(Integer.parseInt(EVENT_CODE_PROGRAM_INCOMPLETE_MONARCH)));
 							else
-								inCompleteEventMonarch.setEventCode(getEventStringByEventCode(Integer.parseInt(EVENT_CODE_NORMAL_INCOMPLETE_MONARCH)));
+							inCompleteEventMonarch.setEventCode(getEventStringByEventCode(Integer.parseInt(EVENT_CODE_NORMAL_INCOMPLETE_MONARCH)));
 							inCompleteEventMonarch.setDuration(0);// DO NOT CHANGE: This is the indication, dummy event has been added for making session
 							inCompleteEventMonarch.setFrequency(0);
 							inCompleteEventMonarch.setIntensity(0);
@@ -558,6 +558,7 @@ public class PatientVestDeviceTherapyUtilMonarch {
 		
 		for(int i = 0;i < groupEntriesMonarch.size(); i ++){
 			PatientVestDeviceDataMonarch deviceEventRecord = groupEntriesMonarch.get(i);
+			log.debug("String Event code from DB:"+deviceEventRecord.getEventCode());
 			therapy.add(deviceEventRecord);
 		}
 		eventMap.put(therapyCounter++,therapy);

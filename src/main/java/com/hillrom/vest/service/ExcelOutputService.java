@@ -18,6 +18,7 @@ import static com.hillrom.vest.config.Constants.SERIAL_NO;
 import static com.hillrom.vest.config.Constants.THERAPY_SESSION_TOTAL;
 import static com.hillrom.vest.config.Constants.TIME;
 import static com.hillrom.vest.config.Constants.WIFIorLTE_SERIAL_NO;
+import static com.hillrom.vest.config.Constants.EVENT_ERROR_CODE;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -187,7 +188,7 @@ public class ExcelOutputService {
         			"MONARCH"," ",monarchData.getSerialNumber()," ",ReportDate,DATE_RANGE_REPORT,dateRangeReport};
             setExcelHeader(excelSheet,header);
         }
-        setExcelRowGrayColor(workBook,excelSheet);
+        setExcelRowGrayColor_Monarch(workBook,excelSheet);
         
 		try {
 			Map<DateTime,Map<Integer,Map<Long,List<PatientVestDeviceDataMonarch>>>> therapySessions = PatientVestDeviceTherapyUtilMonarch.prepareTherapySessionFromDeviceMonarchDataForExcel(deviceEventsList);
@@ -214,6 +215,17 @@ public class ExcelOutputService {
 			excelRow.createCell(cellCount).setCellStyle(style);
 		}
 	}
+	
+	private void setExcelRowGrayColor_Monarch(HSSFWorkbook workBook, HSSFSheet excelSheet) {
+		HSSFRow excelRow = excelSheet.createRow(1);
+		HSSFCellStyle style = workBook.createCellStyle();
+	    style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+	    style.setFillPattern(CellStyle.SOLID_FOREGROUND);
+		for(int cellCount = 0; cellCount<=10;cellCount++ ){
+			excelRow.createCell(cellCount).setCellStyle(style);
+		}
+	}
+	
 	private void setExcelRows_3_ForMonarch(
 			HSSFWorkbook workBook,
 			HSSFSheet excelSheet,
@@ -249,11 +261,13 @@ public class ExcelOutputService {
 						 for(PatientVestDeviceDataMonarch eventDetails : eventDetailsList){
 							 
 							 	String deviceEventCodeStr = "";
-							 	if(eventDetails.getEventCode() != "22"){
+							 	if(eventDetails.getEventCode() != EVENT_ERROR_CODE){
 									deviceEventCodeStr = monarchEventCodes.get(eventDetails.getEventCode());
+									log.debug("MonarchEventCodes : "+eventDetails.getEventCode());
 									log.debug("MonarchEventCodes map str: "+deviceEventCodeStr);
 								}else{
 									deviceEventCodeStr = monarchErrorCodes.get(eventDetails.getIntensity());
+									log.debug("MonarchEventCodes : "+eventDetails.getEventCode());
 									log.debug("MonarchErrorCodes map str: "+deviceEventCodeStr);
 								}
 							 	
@@ -295,7 +309,7 @@ public class ExcelOutputService {
 									    style.setFillPattern(CellStyle.SOLID_FOREGROUND);
 										Font font = workBook.createFont();//Create font
 									    font.setBoldweight(Font.BOLDWEIGHT_BOLD);//Make font bold
-									    for(int cellCount = 0; cellCount<=11;cellCount++ ){
+									    for(int cellCount = 0; cellCount<=10;cellCount++ ){
 											if(cellCount == 2){
 											    style.setFont(font);//set it to bold
 												HSSFCell dateCell = excelRow.createCell(cellCount);
@@ -587,7 +601,7 @@ public class ExcelOutputService {
 			;
 			break;
 		default:
-			eventString = 0 + ":Unknown";
+			eventString = "Unknown";
 			break;
 		}
 		return eventString;
@@ -737,7 +751,7 @@ public class ExcelOutputService {
             setExcelHeader(excelSheetMonarch,header);
         }
         
-        setExcelRowGrayColor(workBook,excelSheetMonarch);
+        setExcelRowGrayColor_Monarch(workBook,excelSheetMonarch);
         
 		try {
 			Map<DateTime,Map<Integer,Map<Long,List<PatientVestDeviceDataMonarch>>>> therapySessions = PatientVestDeviceTherapyUtilMonarch.prepareTherapySessionFromDeviceMonarchDataForExcel(deviceEventsListMonarch);

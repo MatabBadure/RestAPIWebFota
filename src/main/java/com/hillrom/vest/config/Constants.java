@@ -360,5 +360,6 @@ public final class Constants {
 	
 	public static final String MONARCH_EVENT_CODES = "monarch_event_codes";
 	public static final String MONARCH_ERROR_CODES = "monarch_error_codes";
+	public static final String EVENT_ERROR_CODE = "22";
 	
 }

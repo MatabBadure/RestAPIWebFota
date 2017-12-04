@@ -556,7 +556,7 @@ public class PatientVestDeviceTherapyUtilMonarch {
 		long therapyCounter = 0;
 		List<PatientVestDeviceDataMonarch> therapy = new LinkedList<>();
 		
-		for(int i = 0;i < groupEntriesMonarch.size(); i ++){
+		for(int i = 0;i < groupEntriesMonarch.size(); i++){
 			PatientVestDeviceDataMonarch deviceEventRecord = groupEntriesMonarch.get(i);
 			log.debug("String Event code from DB:"+deviceEventRecord.getEventCode());
 			therapy.add(deviceEventRecord);

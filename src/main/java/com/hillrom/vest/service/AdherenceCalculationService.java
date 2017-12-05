@@ -257,7 +257,14 @@ public class AdherenceCalculationService {
 		actualMetrics.put(TOTAL_DURATION, totalDuration);
 		return actualMetrics;
 	}
-
+	
+	public Map<String, List<PatientDevicesAssoc>> getVestOnlyDevicePatientsMap(){
+		List<PatientDevicesAssoc> patientDevicesList = patientDevicesAssocRepository.findAllByDeviceTypeAndPatientType(VEST,"SD");
+		return patientDevicesList
+				.stream().collect(
+						Collectors.groupingBy(PatientDevicesAssoc::getPatientId));
+	}
+	
 	/**
 	 * Runs every midnight deducts the compliance score by 5 if therapy hasn't been done for adherence setting day(s)
 	 */
@@ -274,61 +281,64 @@ public class AdherenceCalculationService {
 			Map<Long,Notification> notificationMap = new HashMap<>();
 			Map<Long,PatientNoEvent> userIdNoEventMap = noEventService.findAllGroupByPatientUserId();
 			
+			Map<String, List<PatientDevicesAssoc>> vestOnlyDevicesPatientsMap = getVestOnlyDevicePatientsMap();
+			
 			for(PatientCompliance compliance : mstPatientComplianceList){
 				Long userId = compliance.getPatientUser().getId();
 				PatientInfo patientInfo = compliance.getPatient();
 				
-				Integer adherenceSettingDay = getAdherenceSettingForPatient(patientInfo);
-				
-				PatientNoEvent noEvent = userIdNoEventMap.get(compliance.getPatientUser().getId());
-				//global counters
-				int globalMissedTherapyCounter = compliance.getGlobalMissedTherapyCounter();
-				int globalHMRNonAdherenceCounter = compliance.getGlobalHMRNonAdherenceCounter();
-				int globalSettingsDeviationCounter = compliance.getGlobalSettingsDeviationCounter();
-				// For No transmission users , compliance shouldn't be updated until transmission happens
-				if(Objects.nonNull(noEvent)&& (Objects.isNull(noEvent.getFirstTransmissionDate()))){
-					PatientCompliance newCompliance = new PatientCompliance(compliance.getScore(), today,
-							compliance.getPatient(), compliance.getPatientUser(),compliance.getHmrRunRate(),true,
-							false,0);
-					newCompliance.setLatestTherapyDate(null);// since no transmission 
-					complianceMap.put(userId, newCompliance);
-					// HMR Compliance shouldn't be checked for Patients for initial adherence setting days of transmission date
-				}else if(Objects.nonNull(noEvent)&& (Objects.nonNull(noEvent.getFirstTransmissionDate()) && 
-						DateUtil.getDaysCountBetweenLocalDates(noEvent.getFirstTransmissionDate(), today) < (adherenceSettingDay-1) &&
-						adherenceSettingDay > 1 )){
-					// For Transmitted users no notification till earlier day of adherence Setting day(s)
-					PatientCompliance newCompliance = new PatientCompliance(today,compliance.getPatient(),compliance.getPatientUser(),
-							compliance.getHmrRunRate(),compliance.getMissedTherapyCount()+1,compliance.getLatestTherapyDate(),
-							Objects.nonNull(compliance.getHmr())? compliance.getHmr():0.0d);
-					newCompliance.setScore(compliance.getScore());
-					updateGlobalCounters(++globalMissedTherapyCounter,
-							globalHMRNonAdherenceCounter,
-							globalSettingsDeviationCounter, newCompliance);
-					complianceMap.put(userId, newCompliance);
-				}else {
-					PatientCompliance newCompliance = new PatientCompliance(
-							today,
-							compliance.getPatient(),
-							compliance.getPatientUser(),
-							compliance.getHmrRunRate(),
-							compliance.getMissedTherapyCount()+1,
-							compliance.getLatestTherapyDate(),
-							Objects.nonNull(compliance.getHmr())? compliance.getHmr():0.0d);
-					newCompliance.setScore(compliance.getScore());
-					newCompliance.setSettingsDeviatedDaysCount(0);
-					// increment global missed therapy counter
-					updateGlobalCounters(++globalMissedTherapyCounter,
-							globalHMRNonAdherenceCounter,
-							globalSettingsDeviationCounter, newCompliance);
-					log.debug("Compliance before calc "+newCompliance);
-					if(newCompliance.getMissedTherapyCount() >= adherenceSettingDay){ // missed Therapy for adherenceSetting day(s) or more than adherenceSetting day(s) days
-						mstNotificationMap.put(compliance.getPatientUser().getId(), newCompliance);
-					}else{ // missed therapy for less than adherence setting day(s) , might fall under hmrNonCompliance
-						hmrNonComplianceMap.put(compliance.getPatientUser().getId(), newCompliance);
+				if(vestOnlyDevicesPatientsMap.containsKey(patientInfo.getId())){
+					Integer adherenceSettingDay = getAdherenceSettingForPatient(patientInfo);
+					
+					PatientNoEvent noEvent = userIdNoEventMap.get(compliance.getPatientUser().getId());
+					//global counters
+					int globalMissedTherapyCounter = compliance.getGlobalMissedTherapyCounter();
+					int globalHMRNonAdherenceCounter = compliance.getGlobalHMRNonAdherenceCounter();
+					int globalSettingsDeviationCounter = compliance.getGlobalSettingsDeviationCounter();
+					// For No transmission users , compliance shouldn't be updated until transmission happens
+					if(Objects.nonNull(noEvent)&& (Objects.isNull(noEvent.getFirstTransmissionDate()))){
+						PatientCompliance newCompliance = new PatientCompliance(compliance.getScore(), today,
+								compliance.getPatient(), compliance.getPatientUser(),compliance.getHmrRunRate(),true,
+								false,0);
+						newCompliance.setLatestTherapyDate(null);// since no transmission 
+						complianceMap.put(userId, newCompliance);
+						// HMR Compliance shouldn't be checked for Patients for initial adherence setting days of transmission date
+					}else if(Objects.nonNull(noEvent)&& (Objects.nonNull(noEvent.getFirstTransmissionDate()) && 
+							DateUtil.getDaysCountBetweenLocalDates(noEvent.getFirstTransmissionDate(), today) < (adherenceSettingDay-1) &&
+							adherenceSettingDay > 1 )){
+						// For Transmitted users no notification till earlier day of adherence Setting day(s)
+						PatientCompliance newCompliance = new PatientCompliance(today,compliance.getPatient(),compliance.getPatientUser(),
+								compliance.getHmrRunRate(),compliance.getMissedTherapyCount()+1,compliance.getLatestTherapyDate(),
+								Objects.nonNull(compliance.getHmr())? compliance.getHmr():0.0d);
+						newCompliance.setScore(compliance.getScore());
+						updateGlobalCounters(++globalMissedTherapyCounter,
+								globalHMRNonAdherenceCounter,
+								globalSettingsDeviationCounter, newCompliance);
+						complianceMap.put(userId, newCompliance);
+					}else {
+						PatientCompliance newCompliance = new PatientCompliance(
+								today,
+								compliance.getPatient(),
+								compliance.getPatientUser(),
+								compliance.getHmrRunRate(),
+								compliance.getMissedTherapyCount()+1,
+								compliance.getLatestTherapyDate(),
+								Objects.nonNull(compliance.getHmr())? compliance.getHmr():0.0d);
+						newCompliance.setScore(compliance.getScore());
+						newCompliance.setSettingsDeviatedDaysCount(0);
+						// increment global missed therapy counter
+						updateGlobalCounters(++globalMissedTherapyCounter,
+								globalHMRNonAdherenceCounter,
+								globalSettingsDeviationCounter, newCompliance);
+						log.debug("Compliance before calc "+newCompliance);
+						if(newCompliance.getMissedTherapyCount() >= adherenceSettingDay){ // missed Therapy for adherenceSetting day(s) or more than adherenceSetting day(s) days
+							mstNotificationMap.put(compliance.getPatientUser().getId(), newCompliance);
+						}else{ // missed therapy for less than adherence setting day(s) , might fall under hmrNonCompliance
+							hmrNonComplianceMap.put(compliance.getPatientUser().getId(), newCompliance);
+						}
 					}
 				}
 			}
-			
 			userProtocolConstantsMap = protocolService.getProtocolByPatientUserIds(new LinkedList<>(hmrNonComplianceMap.keySet()));
 			
 			calculateHMRComplianceForMST(today, hmrNonComplianceMap,
@@ -987,6 +997,9 @@ public class AdherenceCalculationService {
 			}
 			List<PatientCompliance> complianceList = patientComplianceRepository.findByDateBetweenAndPatientUserIdIn(yesterday,
 					yesterday,patientUserIds);
+			
+			Map<String, List<PatientDevicesAssoc>> vestOnlyDevicesPatientsMap = getVestOnlyDevicePatientsMap();
+			
 			Map<User,Integer> complianceMap = new HashMap<>();
 			for(PatientCompliance compliance : complianceList){
 				complianceMap.put(compliance.getPatientUser(), compliance.getMissedTherapyCount());
@@ -998,9 +1011,11 @@ public class AdherenceCalculationService {
 						// integrated Accepting mail notifications
 						String notificationType = notification.getNotificationType();
 						int missedTherapyCount = complianceMap.get(patientUser);
-						if(isPatientUserAcceptNotification(patientUser,
-								notificationType))
-							mailService.sendNotificationMailToPatient(patientUser,notificationType,missedTherapyCount);
+						if(vestOnlyDevicesPatientsMap.containsKey(patientUser.getId())){
+							if(isPatientUserAcceptNotification(patientUser,
+									notificationType))
+								mailService.sendNotificationMailToPatient(patientUser,notificationType,missedTherapyCount);
+						}
 					}
 				});
 			}catch(Exception ex){

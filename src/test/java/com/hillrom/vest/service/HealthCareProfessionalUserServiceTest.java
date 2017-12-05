@@ -79,7 +79,7 @@ public class HealthCareProfessionalUserServiceTest {
 		userExtensionDTO.setEmail(EMAIL);
 		userExtensionDTO.setSpeciality(SPECIALITY);
 		userExtensionDTO.setCredentials(CREDENTIALS);;
-		userExtensionDTO.setZipcode(Integer.parseInt(ZIPCODE));
+		userExtensionDTO.setZipcode(ZIPCODE);
 		userExtensionDTO.setRole(ROLE);
     }
 

@@ -29,7 +29,7 @@ public class HcpClinicsVO implements Serializable{
     
     private String gender;
     
-    private Integer zipcode;
+    private String zipcode;
 
     private boolean activated = false;
 
@@ -176,11 +176,11 @@ public class HcpClinicsVO implements Serializable{
 		this.gender = gender;
 	}
 
-	public Integer getZipcode() {
+	public String getZipcode() {
 		return zipcode;
 	}
 
-	public void setZipcode(Integer zipcode) {
+	public void setZipcode(String zipcode) {
 		this.zipcode = zipcode;
 	}
 

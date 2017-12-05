@@ -1473,8 +1473,10 @@ public class AdherenceCalculationServiceMonarch{
 		LocalDate yesterday = LocalDate.now().minusDays(1);
 		List<NotificationMonarch> notifications = notificationMonarchRepository.findByDate(yesterday);
 		if(notifications.size() > 0){
+			
 			List<Long> patientUserIds = new LinkedList<>();
 			for(NotificationMonarch notification : notifications){
+				
 				patientUserIds.add(notification.getPatientUser().getId());
 			}
 			List<PatientComplianceMonarch> complianceList = patientComplianceMonarchRepository.findByDateBetweenAndPatientUserIdIn(yesterday,
@@ -1506,11 +1508,54 @@ public class AdherenceCalculationServiceMonarch{
 	
 	private boolean isPatientUserAcceptNotification(User patientUser,
 			String notificationType) {
-		return (patientUser.isNonHMRNotification() && HMR_NON_COMPLIANCE.equalsIgnoreCase(notificationType)) || 
+		
+		return isNonHMRNotificationCheck(patientUser, notificationType) ||
+				isSettingDeviationNotificationCheck(patientUser, notificationType) ||
+				(patientUser.isMissedTherapyNotification() && MISSED_THERAPY.equalsIgnoreCase(notificationType)) ||
+				isNonHMRSettingDeviationNotificationCheck(patientUser, notificationType); 
+				
+		
+		/*return (patientUser.isNonHMRNotification() && HMR_NON_COMPLIANCE.equalsIgnoreCase(notificationType)) || 
 				(patientUser.isSettingDeviationNotification() && SETTINGS_DEVIATION.equalsIgnoreCase(notificationType)) ||
 				(patientUser.isMissedTherapyNotification() && MISSED_THERAPY.equalsIgnoreCase(notificationType) ||
 				(HMR_AND_SETTINGS_DEVIATION.equalsIgnoreCase(notificationType) && 
-						(patientUser.isNonHMRNotification() || patientUser.isSettingDeviationNotification())));
+						(patientUser.isNonHMRNotification() || patientUser.isSettingDeviationNotification())));*/
+	}
+	
+	private boolean isNonHMRNotificationCheck(User patientUser,
+			String notificationType){
+		return patientUser.isNonHMRNotification() && 
+					(HMR_NON_COMPLIANCE.equalsIgnoreCase(notificationType) ||
+					HMR_NON_COMPLIANCE_VEST.equalsIgnoreCase(notificationType) ||
+					HMR_NON_COMPLIANCE_MONARCH.equalsIgnoreCase(notificationType)); 
+	}
+	
+	private boolean isSettingDeviationNotificationCheck(User patientUser,
+			String notificationType){
+		return patientUser.isSettingDeviationNotification() && 
+					(SETTINGS_DEVIATION.equalsIgnoreCase(notificationType) ||
+					SETTINGS_DEVIATION_VEST.equalsIgnoreCase(notificationType) ||
+					SETTINGS_DEVIATION_MONARCH.equalsIgnoreCase(notificationType)); 
+	}
+	
+	private boolean isNonHMRSettingDeviationNotificationCheck(User patientUser,
+			String notificationType){
+		return (HMR_AND_SETTINGS_DEVIATION.equalsIgnoreCase(notificationType) ||
+				
+				HMR_AND_SETTINGS_DEVIATION_VEST.equalsIgnoreCase(notificationType) ||
+				HMR_AND_SETTINGS_DEVIATION_MONARCH.equalsIgnoreCase(notificationType) ||
+				
+				HMR_VEST_AND_SETTINGS_DEVIATION.equalsIgnoreCase(notificationType) ||
+				HMR_MONARCH_AND_SETTINGS_DEVIATION.equalsIgnoreCase(notificationType) ||
+				
+				HMR_MONARCH_AND_SETTINGS_DEVIATION_VEST.equalsIgnoreCase(notificationType) ||
+				HMR_VEST_AND_SETTINGS_DEVIATION_VEST.equalsIgnoreCase(notificationType) ||
+				
+				HMR_MONARCH_AND_SETTINGS_DEVIATION_MONARCH.equalsIgnoreCase(notificationType) ||
+				HMR_VEST_AND_SETTINGS_DEVIATION_MONARCH.equalsIgnoreCase(notificationType)  &&
+				
+				(patientUser.isNonHMRNotification() || patientUser.isSettingDeviationNotification()));
+				
 	}
 
 	/**

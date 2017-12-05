@@ -78,7 +78,11 @@ public class ClinicService {
     @Inject
     private EntityUserRepository entityUserRepository;
     
+    @Inject
+    private HCPClinicService hcpClinicService;
     
+    @Inject
+    private ClinicPatientService clinicPatientService;
     
 
     public Clinic createClinic(ClinicDTO clinicDTO) throws HillromException {
@@ -159,24 +163,58 @@ public class ClinicService {
 	    return ClinicVOBuilder.buildWithChildClinics(clinic);
     }
     
-    public String deleteClinic(String id) throws HillromException {
+     public String deleteClinic(String id) throws HillromException {
     	Clinic existingClinic = clinicRepository.findOne(id);
 		if(existingClinic != null) {
-			if(existingClinic.getClinicAdminId() != null) {
-				throw new HillromException(ExceptionConstants.HR_545);//Unable to delete Clinic. Clinic admin exists
-			} else if(existingClinic.getUsers().size() > 0) {
-				throw new HillromException(ExceptionConstants.HR_546);//Unable to delete Clinic. Healthcare Professionals are associated with it
-			} else {
-				if(existingClinic.isParent()) {
-					existingClinic.getChildClinics().forEach(childClinic -> {
-						childClinic.setParentClinic(null);
-					});
-					clinicRepository.save(existingClinic.getChildClinics());
-					existingClinic.setParent(false);
-				}
-				clinicRepository.delete(existingClinic);
-				return MessageConstants.HR_224;
+			
+			//Dissociate Clinic Admins attached to Clinic
+			List<User> userList = getClinicAdmin(existingClinic.getId());
+			Map<String,String> clinicAdminMap = new HashMap<String,String>();
+			if(!userList.isEmpty()){					
+					for(User user : userList){
+						clinicAdminMap.put("id", user.getId().toString());
+						dissociateClinicAdmin(id, clinicAdminMap);
+					}				
 			}
+			
+			//Dissociate HCPS attached to Clinic
+//			Set<UserExtension> userExtList = existingClinic.getUsers();
+			Map<String,String> hm = new HashMap<String,String>();
+			hm.put("id", existingClinic.getId());
+			List<Map<String,String>> clinicList =  new ArrayList<>();
+			clinicList.add(hm);
+			
+			List<String> idList = new ArrayList<>();
+			idList.add(existingClinic.getId());
+			List<Map<String,Object>> hcpUserList = getAssociatedHCPUsers(idList);
+			if(!hcpUserList.isEmpty()){
+				for(Map<String,Object> hcpUser : hcpUserList){
+					UserExtension uExtPatient = (UserExtension) hcpUser.get("hcp");
+					hcpClinicService.dissociateClinicFromHCP(uExtPatient.getId(), clinicList);
+				}
+				
+			}
+			
+			//Dissociate PatientUsers attached to Clinic
+
+			List<Map<String,Object>> patientUserList = getAssociatedPatientUsers(idList);
+			if(!patientUserList.isEmpty()){
+				for(Map<String,Object> patientUser : patientUserList){
+					UserExtension uExtPatient = (UserExtension) patientUser.get("patient");
+					clinicPatientService.dissociateClinicsToPatient(uExtPatient.getId(), clinicList);
+				}
+			}
+
+			if(existingClinic.isParent()) {
+				existingClinic.getChildClinics().forEach(childClinic -> {
+					childClinic.setParentClinic(null);
+				});
+				clinicRepository.save(existingClinic.getChildClinics());
+				existingClinic.setParent(false);
+			}
+			clinicRepository.delete(existingClinic);
+			return MessageConstants.HR_224;
+
 		} else {
 			throw new HillromException(ExceptionConstants.HR_544);
 		}
@@ -292,7 +330,29 @@ public class ClinicService {
 		}
 		return patientUserList;
 	}
-	
+
+	public List<Map<String,Object>> getAssociatedHCPUsers(List<String> idList) throws HillromException {
+		List<Map<String,Object>> hcpUserList = new LinkedList<>();
+		for(String id : idList){
+	    	Clinic clinic = clinicRepository.getOne(id);
+	        if(Objects.isNull(clinic)) {
+	        	throw new HillromException(ExceptionConstants.HR_547);
+	        } else {
+	        	
+	        	clinic.getClinicUserAssoc().forEach(clinicUserAssoc -> {
+
+	        		Map<String, Object> hcpMap = new HashMap<>();
+	        		UserExtension hcpUser = (UserExtension) userExtensionRepository.findOne(clinicUserAssoc.getUser().getId());
+	        		hcpMap.put("hcp", hcpUser);
+	        		hcpUserList.add(hcpMap);
+
+	        	});    	
+	        	
+	        }
+		}
+		return hcpUserList;
+	}
+
 	public List<PatientUserVO> getNotAssociatedPatientUsers(String ClinicId, String searchString, String filter) throws HillromException {
 		List<PatientUserVO> patientUserList = userSearchRepository.findPatientNotAssociatedToClinic(ClinicId,searchString, filter);
 		return patientUserList;

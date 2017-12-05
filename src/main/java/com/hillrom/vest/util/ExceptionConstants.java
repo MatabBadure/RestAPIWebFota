@@ -171,4 +171,8 @@ public class ExceptionConstants {
 	public static final String HR_722 = "The activation remainder link which you are trying to access is no more valid. ";
     
 	public static final String HR_723 = "This monarch device serial number or Wifi/LTE/BT serial number is already linked to patient ";
+	
+	//country code
+    public static final String HR_724 = "Incorrect Country Name/Code";
+
 }

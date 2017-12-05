@@ -31,14 +31,12 @@ import javax.validation.constraints.NotNull;
 public abstract class AbstractAuditingEntity {
 
     @CreatedBy
-    @Column(name = "created_by", nullable = false, length = 50, updatable = false)
-    @JsonIgnore
-    private String createdBy;
+    @Column(name = "created_by", length = 50, updatable = false)
+    private String createdBy = "Visiview App";
 
     @CreatedDate
-    @NotNull
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
-    @Column(name = "created_date", nullable = false)
+    @Column(name = "created_date")
     private DateTime createdDate = DateTime.now();
 
     @LastModifiedBy

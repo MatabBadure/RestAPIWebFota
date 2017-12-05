@@ -18,14 +18,25 @@ public class HandleHolder {
 	private DateTime downloadStartDateTime;
 	private DateTime downloadEndDateTime;
 	int chunkSize = 0;
-	private DateTime spwanedObject;
+	private String handleId;
+	private boolean sendChunkReq = false;
 	
-	
-	public DateTime getSpwanedObject() {
-		return spwanedObject;
+
+	public boolean getSendChunkReq() {
+		return sendChunkReq;
 	}
-	public void setSpwanedObject(DateTime spwanedObject) {
-		this.spwanedObject = spwanedObject;
+
+
+	public void setSendChunkReq(boolean sendChunkReq) {
+		this.sendChunkReq = sendChunkReq;
+	}
+
+
+	public String getHandleId() {
+		return handleId;
+	}
+	public void setHandleId(String handleId) {
+		this.handleId = handleId;
 	}
 	public String getUpdatedSoftVersion() {
 		return updatedSoftVersion;

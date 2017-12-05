@@ -16,9 +16,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang.CharEncoding;
@@ -124,6 +126,29 @@ public class MailService {
         }
     }
     
+    //sending email with CC(which contains all CLINIC_ADMIN  emails as String)
+    @Async
+    public void sendEmail(String[] to, String subject, String content, boolean isMultipart, boolean isHtml, String cc) {
+        log.debug("Send e-mail[multipart '{}' and html '{}'] to '{}' with subject '{}' and content={} and cc{}",
+                isMultipart, isHtml, to, subject, content, cc);
+
+        // Prepare message using a Spring helper
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        try {
+            MimeMessageHelper message = new MimeMessageHelper(mimeMessage, isMultipart, CharEncoding.UTF_8);
+            message.setTo(to);
+            // Adding all the emails by comma separated string
+            message.setCc(InternetAddress.parse(cc));
+            message.setFrom(from);
+            message.setSubject(subject);
+            message.setText(content, isHtml);
+            javaMailSender.send(mimeMessage);
+            log.debug("Sent e-mail to User '{}'", to,cc);
+        } catch (Exception e) {
+            log.warn("E-mail could not be sent to user '{}', exception is: {}", to, e.getMessage());
+        }
+    }
+    
     @Async
     public void sendEmail(String[] to, String subject, String content, boolean isMultipart, boolean isHtml, File attachmentFile) {
         log.debug("Send e-mail[multipart '{}' and html '{}'] to '{}' with subject '{}' and content={}",
@@ -205,6 +230,19 @@ public class MailService {
         context.setVariable("baseUrl", baseUrl);
         String content = templateEngine.process("reactivationEmail", context);
         String subject = messageSource.getMessage("email.reactivation.title", null, locale);
+        sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
+    }
+    
+    // Sending the reset password email to the active user
+    @Async
+    public void sendResetPasswordEmail(User user, String baseUrl) {
+        log.debug("sending Reset password e-mail to '{}'", user.getEmail());
+        Locale locale = getLocale(user);
+        Context context = new Context(locale);
+        context.setVariable("user", userNameFormatting(user));
+        context.setVariable("baseUrl", baseUrl);
+        String content = templateEngine.process("resetPasswordEmail", context);
+        String subject = messageSource.getMessage("email.resetPassword.title", null, locale);
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
     }
 
@@ -473,8 +511,20 @@ public class MailService {
         String subject = messageSource.getMessage("email.deactivation.title", null, locale);
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
     }
-	
 	@Async
+	 //sending deactivation email by including all the CLINI_ADMINs emails in CC by string
+	 public void sendDeactivationEmailWithCC(User user, String baseUrl,String clinicAdminEmails){
+	        log.debug("Sending deactivation e-mail to '{}'", user.getEmail());
+	        Locale locale = getLocale(user);
+	        Context context = new Context(locale);
+	        context.setVariable("user", userNameFormatting(user));
+	        context.setVariable("baseUrl", baseUrl);
+	        String content = templateEngine.process("deactivationEmail", context);
+	        String subject = messageSource.getMessage("email.deactivation.title", null, locale); 
+	        sendEmail(new String[]{user.getEmail()}, subject, content, false, true, clinicAdminEmails);
+	   }
+	
+    @Async
     public void sendSurveyEmailReport(UserSurveyAnswerDTO userSurveyAnswerDTO, String baseUrl) {
 		String recipients = env.getProperty("spring.survey.surveyreportemailids");
 		log.debug("Sending Survey email report '{}'", recipients);
@@ -665,6 +715,5 @@ public class MailService {
 		return userName.substring(0, 1).toUpperCase()
 				+ userName.substring(1).toLowerCase();
 	}
-
-	
 }
+	

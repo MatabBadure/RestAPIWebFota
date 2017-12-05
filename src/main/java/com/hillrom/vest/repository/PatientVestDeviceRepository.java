@@ -30,10 +30,6 @@ public interface PatientVestDeviceRepository extends
 	Optional<PatientVestDeviceHistory> findOneByPatientIdAndSerialNumberAndStatusInActive(
 			String patientId, String serialNumber);
 
-	@Query("from PatientVestDeviceHistory pvd where pvd.patientVestDevicePK.patient.id = ?1 and pvd.patientVestDevicePK.serialNumber = ?2 and pvd.active = true")
-	Optional<PatientVestDeviceHistory> findOneByPatientIdAndSerialNumberAndStatusActive(
-			String patientId, String serialNumber);
-	
 	@Query("from PatientVestDeviceHistory pvd where pvd.patientVestDevicePK.patient.id = ?1 and pvd.active = ?2")
 	Optional<PatientVestDeviceHistory> findOneByPatientIdAndActiveStatus(
 			String patientId, Boolean active);

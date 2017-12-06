@@ -25,12 +25,12 @@ public class HillromTypeCodeFormatService {
 		List<String> typeCodeList = hillromTypeCodeFormatRepository.findCodeValuesList(codeType);
 		return typeCodeList;
 	}
-	
 	public List<HillromTypeCodeFormat> getDiagnosisTypeCode(String searchString) {
 			List<HillromTypeCodeFormat> typeCodeList = hillromTypeCodeFormatRepository.findDiagnosisTypeCode(searchString);
 			return typeCodeList;
 	}
 	
+
 	// fetch the generic time zones from DateUtil 
 	public Map<String,String> getGenericTimeZonesList(){
 		Map<String,String> timeZones = new HashMap<String,String>();
@@ -43,4 +43,5 @@ public class HillromTypeCodeFormatService {
 		}
 		return null;
 	}	
+
 }

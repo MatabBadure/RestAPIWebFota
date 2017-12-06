@@ -478,19 +478,20 @@ public class AdvancedSearchRepository {
 	
 	//----------------------------------------------------------------------------------------------------------------------------------------------
 	
-	public Page<HcpVO> advancedSearchHcps(AdvancedHcpDTO advancedHcpDTO,
+
+	/*public Page<HcpVO> advancedSearchHcps(AdvancedHcpDTO advancedHcpDTO,
+
 			Pageable pageable, Map<String, Boolean> sortOrder) {
 		
 		String baseQuery = QueryConstants.QUERY_ADVANCED_HCP_SEARCH_FOR_ALL_DEVICETYPE_HILLROM_LOGIN;
 		String whereClause = " WHERE ";
 		StringBuilder filter = new StringBuilder();
 		StringBuilder finalQuery = new StringBuilder();
+
 		
 		try{
 		
-			/* Query formation
-			 * filter: used to append the values from AdvancedPatientDTO
-			 */
+
 			 
 			if(!StringUtils.isBlank(advancedHcpDTO.getName())){
 				filter = filter.append("(kt.clinicName like ").append("'%").append(advancedHcpDTO.getName()).append("%'"); 
@@ -617,12 +618,15 @@ public class AdvancedSearchRepository {
 
 			return page;
 			
+
 		}
 		catch(Exception e){
 			e.printStackTrace();
 		}
 		return null;
-	}
+
+	}*/
+
 	//----------------------------------------------------------------------------------------------------------------------------------------------
 
 	private void setPaginationParams(Pageable pageable, Query query) {

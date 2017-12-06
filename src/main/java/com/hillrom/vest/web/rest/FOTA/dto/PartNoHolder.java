@@ -130,8 +130,7 @@ public class PartNoHolder {
 					switch (state) {
 					case 0:
 						data_cnt = 0;
-						//data_size = b;
-						data_size = (int)(b&0xFF);
+						data_size = b;
 						if (data_size > 0) {
 							tempDataBytes = new byte[data_size];
 						}

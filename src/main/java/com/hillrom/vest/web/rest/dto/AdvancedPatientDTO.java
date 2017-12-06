@@ -15,7 +15,7 @@ public class AdvancedPatientDTO {
 
 	    private List<String> age;
 
-	    private List<String> country;
+	    private String country;
 
 	    private List<String> state;
 	    
@@ -62,7 +62,7 @@ public class AdvancedPatientDTO {
 		}
 
 		public AdvancedPatientDTO(String name, String hillromId, String email,
-				String gender, List<String> age, List<String> country, List<String> state,
+				String gender, List<String> age, String country, List<String> state,
 				List<String> city, String zipcode, String clinicLevelStatus,
 				String diagnosis, List<String> adherenceScoreRange,
 				String deviceType, String deviceStatus,
@@ -140,11 +140,11 @@ public class AdvancedPatientDTO {
 			this.age = age;
 		}
 
-		public List<String> getCountry() {
+		public String getCountry() {
 			return country;
 		}
 
-		public void setCountry(List<String> country) {
+		public void setCountry(String country) {
 			this.country = country;
 		}
 

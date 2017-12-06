@@ -1,14 +1,18 @@
 package com.hillrom.vest.web.rest;
 
-import static com.hillrom.vest.config.Constants.MONARCH;
-import static com.hillrom.vest.config.Constants.VEST;
 import static com.hillrom.vest.security.AuthoritiesConstants.CLINIC_ADMIN;
 import static com.hillrom.vest.security.AuthoritiesConstants.HCP;
+import static com.hillrom.vest.config.Constants.VEST;
+import static com.hillrom.vest.config.Constants.MONARCH;
 
+//import static com.hillrom.vest.config.Constants.ALL;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -23,16 +27,15 @@ import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 
-import net.minidev.json.JSONObject;
-
 import org.apache.commons.lang.StringUtils;
-import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.DefaultEvaluationContextProvider;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -43,7 +46,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.CsvBeanWriter;
 import org.supercsv.io.ICsvBeanWriter;
@@ -113,7 +118,8 @@ import com.hillrom.vest.web.rest.dto.StatisticsVO;
 import com.hillrom.vest.web.rest.dto.TherapyDataVO;
 import com.hillrom.vest.web.rest.dto.TreatmentStatisticsVO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
-//import static com.hillrom.vest.config.Constants.ALL;
+
+import net.minidev.json.JSONObject;
 /**
  * REST controller for managing users.
  */
@@ -1144,18 +1150,13 @@ public class UserResource {
 				PatientInfo patientInfoOld = patientInfoRepository.findOneById(patientId);
 				vestdeviceData.addAll(deviceDataRepository.findByPatientIdAndTimestampBetween(patientInfoOld.getId(), fromTimestamp, toTimestamp));
 			}
-			StringBuilder dateRangeReport = new StringBuilder();
-        	//Get Date Range Report
-        	dateRangeReport = excelOutputService.getDateRangeReport(dateRangeReport,from,to);
+			
 			if(deviceType.equals("VEST")){
 				vestdeviceData.addAll(deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp));
 
 				if(!vestdeviceData.isEmpty() ){
 
-	            	//excelOutputService.createExcelOutputExcel(response, vestdeviceData);
-	            	//New excel format for vest
-	            	excelOutputService.createExcelOutputExcel_Vest(response, vestdeviceData,deviceType,dateRangeReport.toString());
-	            	
+	            	excelOutputService.createExcelOutputExcel(response, vestdeviceData);
 	            }else{
 	            	response.setStatus(204);
 	            }
@@ -1165,10 +1166,7 @@ public class UserResource {
 
 				if(!monarchdeviceData.isEmpty() ){
 
-					//excelOutputService.createExcelOutputExcelForMonarch(response, monarchdeviceData);
-					//New excel format for Monarch
-					excelOutputService.createExcelOutputNewExcelForMonarch(response, monarchdeviceData,patient,deviceType,dateRangeReport.toString());
-	            	
+	            	excelOutputService.createExcelOutputExcelForMonarch(response, monarchdeviceData);
 	            }else{
 	            	response.setStatus(204);
 	            }
@@ -1179,22 +1177,11 @@ public class UserResource {
 				vestdeviceData.addAll(deviceDataRepository.findByPatientIdAndTimestampBetween(patient.getId(), fromTimestamp, toTimestamp));
 				
 				if(!vestdeviceData.isEmpty() && monarchdeviceData.isEmpty() ){
-	            	//excelOutputService.createExcelOutputExcel(response, vestdeviceData);
-	            	
-	            	//excelOutputService.createExcelOutputExcel(response, vestdeviceData);
-	            	//New excel format for vest
-	            	excelOutputService.createExcelOutputExcel_Vest(response, vestdeviceData,deviceType,dateRangeReport.toString());
-	            	
+	            	excelOutputService.createExcelOutputExcel(response, vestdeviceData);
 	            }else if(vestdeviceData.isEmpty() && !monarchdeviceData.isEmpty() ){
-	            	//excelOutputService.createExcelOutputExcelForMonarch(response, monarchdeviceData);
-	            	//New excel format for Monarch
-					excelOutputService.createExcelOutputNewExcelForMonarch(response, monarchdeviceData,patient,deviceType,dateRangeReport.toString());
+	            	excelOutputService.createExcelOutputExcelForMonarch(response, monarchdeviceData);
 	            }else if(!vestdeviceData.isEmpty() && !monarchdeviceData.isEmpty() ){
-	            	
-	            	//excelOutputService.createExcelOutputExcelForAll(response, vestdeviceData, monarchdeviceData);
-	            	//New excel format for Monarch
-	            	excelOutputService.createExcelOutputNewExcelForAll(response, vestdeviceData, monarchdeviceData,patient,dateRangeReport.toString());
-	            	
+	            	excelOutputService.createExcelOutputExcelForAll(response, vestdeviceData, monarchdeviceData);
 	            }else{
 	            	response.setStatus(204);
 	            }

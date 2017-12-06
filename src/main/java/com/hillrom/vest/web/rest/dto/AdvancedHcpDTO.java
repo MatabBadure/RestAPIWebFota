@@ -10,7 +10,7 @@ public class AdvancedHcpDTO {
 	
 	private String credentials;
 	
-	private List<String> country;
+	private String country;
 	
 	private List<String> city;
 	
@@ -26,7 +26,7 @@ public class AdvancedHcpDTO {
 	}
 
 	public AdvancedHcpDTO(String name, String specialty, String credentials,
-			List<String> country, List<String> city, List<String> state, String zipcode,
+			String country, List<String> city, List<String> state, String zipcode,
 			String status) {
 		super();
 		this.name = name;
@@ -63,11 +63,11 @@ public class AdvancedHcpDTO {
 		this.credentials = credentials;
 	}
 
-	public List<String> getCountry() {
+	public String getCountry() {
 		return country;
 	}
 
-	public void setCountry(List<String> country) {
+	public void setCountry(String country) {
 		this.country = country;
 	}
 

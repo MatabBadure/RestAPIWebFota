@@ -10,7 +10,7 @@ public class AdvancedClinicDTO {
 	
 	private String clinicSpecialty;
 	
-	private List<String> country;
+	private String country;
 	
 	private List<String> city;
 	
@@ -27,7 +27,7 @@ public class AdvancedClinicDTO {
 	}
 
 	public AdvancedClinicDTO(String name, String clinicType, String specialty,
-			List<String> country, List<String> city, List<String> state, String zipcode,
+			String country, List<String> city, List<String> state, String zipcode,
 			String adherenceWindowSelected, String status) {
 		super();
 		this.clinicName = name;
@@ -53,11 +53,11 @@ public class AdvancedClinicDTO {
 
 	
 
-	public List<String> getCountry() {
+	public String getCountry() {
 		return country;
 	}
 
-	public void setCountry(List<String> country) {
+	public void setCountry(String country) {
 		this.country = country;
 	}
 

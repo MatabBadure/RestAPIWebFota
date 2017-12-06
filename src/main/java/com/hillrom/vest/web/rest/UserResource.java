@@ -1114,23 +1114,38 @@ public class UserResource {
 			List<PatientVestDeviceData>	vestdeviceData = new LinkedList<>();
 			List<PatientVestDeviceDataMonarch> monarchdeviceData = new LinkedList<>();
 
-			if(Objects.nonNull(checkPatientTypeMonarch) && Objects.nonNull(checkPatientTypeMonarch.getOldPatientId())){
+			if (Objects.nonNull(checkPatientTypeMonarch)
+					&& Objects.nonNull(checkPatientTypeMonarch
+							.getOldPatientId())
+					&& !checkPatientTypeMonarch.getOldPatientId().equals(
+							checkPatientTypeMonarch.getPatientId())) {
 				patientId = checkPatientTypeMonarch.getOldPatientId();
 				PatientInfo patientInfoOld = patientInfoRepository.findOneById(patientId);
 				monarchdeviceData.addAll(monarchdeviceDataRepository.findByPatientIdAndTimestampBetween(patientInfoOld.getId(), fromTimestamp, toTimestamp));
 
-			}else if(Objects.nonNull(checkPatientTypeVest) && Objects.nonNull(checkPatientTypeVest.getOldPatientId())){
+			} else if (Objects.nonNull(checkPatientTypeVest)
+					&& Objects.nonNull(checkPatientTypeVest.getOldPatientId())
+					&& !checkPatientTypeVest.getOldPatientId().equals(
+							checkPatientTypeVest.getPatientId())) {
 				patientId = checkPatientTypeVest.getOldPatientId();
 				PatientInfo patientInfoOld = patientInfoRepository.findOneById(patientId);
 				vestdeviceData.addAll(deviceDataRepository.findByPatientIdAndTimestampBetween(patientInfoOld.getId(), fromTimestamp, toTimestamp));
 			}
 			
-			if(Objects.nonNull(checkPatientTypeMonarch) && Objects.nonNull(checkPatientTypeMonarch.getSwappedPatientId())){
+			if (Objects.nonNull(checkPatientTypeMonarch)
+					&& Objects.nonNull(checkPatientTypeMonarch
+							.getSwappedPatientId()) && !checkPatientTypeMonarch
+							.getSwappedPatientId().equals(checkPatientTypeMonarch
+							.getPatientId())) {
 				patientId = checkPatientTypeMonarch.getSwappedPatientId();
 				PatientInfo patientInfoOld = patientInfoRepository.findOneById(patientId);
 				monarchdeviceData.addAll(monarchdeviceDataRepository.findByPatientIdAndTimestampBetween(patientInfoOld.getId(), fromTimestamp, toTimestamp));
 
-			}else if(Objects.nonNull(checkPatientTypeVest) && Objects.nonNull(checkPatientTypeVest.getSwappedPatientId())){
+			} else if (Objects.nonNull(checkPatientTypeVest)
+					&& Objects.nonNull(checkPatientTypeVest
+							.getSwappedPatientId()) && !checkPatientTypeVest
+							.getSwappedPatientId().equals(checkPatientTypeVest
+							.getPatientId())) {
 				patientId = checkPatientTypeVest.getSwappedPatientId();
 				PatientInfo patientInfoOld = patientInfoRepository.findOneById(patientId);
 				vestdeviceData.addAll(deviceDataRepository.findByPatientIdAndTimestampBetween(patientInfoOld.getId(), fromTimestamp, toTimestamp));
@@ -1145,7 +1160,7 @@ public class UserResource {
 
 	            	//excelOutputService.createExcelOutputExcel(response, vestdeviceData);
 	            	//New excel format for vest
-	            	excelOutputService.createExcelOutputExcel_Vest(response, vestdeviceData,deviceType,dateRangeReport.toString());
+	            	excelOutputService.createExcelOutputExcel_Vest(response, vestdeviceData,checkPatientTypeVest,deviceType,dateRangeReport.toString());
 	            	
 	            }else{
 	            	response.setStatus(204);
@@ -1158,7 +1173,7 @@ public class UserResource {
 
 					//excelOutputService.createExcelOutputExcelForMonarch(response, monarchdeviceData);
 					//New excel format for Monarch
-					excelOutputService.createExcelOutputNewExcelForMonarch(response, monarchdeviceData,patient,deviceType,dateRangeReport.toString());
+					excelOutputService.createExcelOutputNewExcelForMonarch(response, monarchdeviceData,checkPatientTypeMonarch,patient,deviceType,dateRangeReport.toString());
 	            	
 	            }else{
 	            	response.setStatus(204);
@@ -1174,17 +1189,17 @@ public class UserResource {
 	            	
 	            	//excelOutputService.createExcelOutputExcel(response, vestdeviceData);
 	            	//New excel format for vest
-	            	excelOutputService.createExcelOutputExcel_Vest(response, vestdeviceData,deviceType,dateRangeReport.toString());
+	            	excelOutputService.createExcelOutputExcel_Vest(response, vestdeviceData,checkPatientTypeVest,deviceType,dateRangeReport.toString());
 	            	
 	            }else if(vestdeviceData.isEmpty() && !monarchdeviceData.isEmpty() ){
 	            	//excelOutputService.createExcelOutputExcelForMonarch(response, monarchdeviceData);
 	            	//New excel format for Monarch
-					excelOutputService.createExcelOutputNewExcelForMonarch(response, monarchdeviceData,patient,deviceType,dateRangeReport.toString());
+					excelOutputService.createExcelOutputNewExcelForMonarch(response, monarchdeviceData,checkPatientTypeMonarch,patient,deviceType,dateRangeReport.toString());
 	            }else if(!vestdeviceData.isEmpty() && !monarchdeviceData.isEmpty() ){
 	            	
 	            	//excelOutputService.createExcelOutputExcelForAll(response, vestdeviceData, monarchdeviceData);
 	            	//New excel format for Monarch
-	            	excelOutputService.createExcelOutputNewExcelForAll(response, vestdeviceData, monarchdeviceData,patient,dateRangeReport.toString());
+	            	excelOutputService.createExcelOutputNewExcelForAll(response, vestdeviceData,checkPatientTypeVest, monarchdeviceData,checkPatientTypeMonarch,patient,dateRangeReport.toString());
 	            	
 	            }else{
 	            	response.setStatus(204);

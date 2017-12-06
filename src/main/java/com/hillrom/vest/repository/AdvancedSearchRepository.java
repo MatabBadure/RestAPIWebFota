@@ -95,22 +95,23 @@ public class AdvancedSearchRepository {
 				filter = filter.append("clinic.speciality like").append(" '%").append(advancedClinicDTO.getClinicSpecialty()).append("%' ");
 			}
 										    
-			filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedClinicDTO.getCountry())) ? (filter.append(" AND ")) : (filter.append(""));
-			if(!StringUtils.isBlank(advancedClinicDTO.getCountry())){
-			   	filter = filter.append("city_state_zip_map.country like").append(" '%").append(advancedClinicDTO.getCountry()).append("%' ");
+			filter = (filter.length()>0)&&(advancedClinicDTO.getCountry().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
+			if(advancedClinicDTO.getCountry().size()>0){
+				String csvCountries = String.join("','", advancedClinicDTO.getCountry());  //Forming the comma & single quote separated list
+			   	filter = filter.append("city_state_zip_map.country IN ('").append(csvCountries).append("') ");
 			}
 										    
 										    
 			filter = (filter.length()>0) &&(advancedClinicDTO.getState().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
 			if(advancedClinicDTO.getState().size()>0){
 				String csvStates = String.join("','", advancedClinicDTO.getState());  //Forming the comma & single quote separated list
-				filter = filter.append("clinic.state IN('").append(csvStates).append("') ");
+				filter = filter.append("clinic.state IN ('").append(csvStates).append("') ");
 			}
 										    
 			filter = (filter.length()>0) &&(advancedClinicDTO.getCity().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
 			if(advancedClinicDTO.getCity().size()>0){
 				String csvCities = String.join("','", advancedClinicDTO.getCity());
-				filter = filter.append("clinic.city IN('").append(csvCities).append("') ");
+				filter = filter.append("clinic.city IN ('").append(csvCities).append("') ");
 			}
 										    
 										    
@@ -249,12 +250,11 @@ public class AdvancedSearchRepository {
 	    	// rangeBuilder method used to form the where clause for age 
 	    }
 	   
-	    if(!advancedPatientDTO.getCountry().equalsIgnoreCase("All")){
-	    filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getCountry())) ? (filter.append(" AND ")) : (filter.append(""));
-	    	if(!StringUtils.isBlank(advancedPatientDTO.getCountry())){
-	    		filter = filter.append("kt.pcountry IN ").append("('").append(advancedPatientDTO.getCountry()).append("') ");
-	    	}
-	    }
+	    filter = (filter.length()>0)&&(advancedPatientDTO.getCountry().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
+		if(advancedPatientDTO.getCountry().size()>0){
+			String csvCountries = String.join("','", advancedPatientDTO.getCountry());  //Forming the comma & single quote separated list
+		   	filter =filter.append("kt.pcountry IN ('").append(csvCountries).append("') ");
+		}
 	    
 	    filter = (filter.length()>0) &&(advancedPatientDTO.getState().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
 	    if(advancedPatientDTO.getState().size()>0){
@@ -506,10 +506,11 @@ public class AdvancedSearchRepository {
 		    	filter = filter.append("kt.credentials like ").append("'%").append(advancedHcpDTO.getCredentials()).append("%' ");
 		    }
 			
-			filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedHcpDTO.getCountry())) ? (filter.append(" AND ")) : (filter.append(""));
-			if(!StringUtils.isBlank(advancedHcpDTO.getCountry())){
-		    	filter = filter.append("kt.country IN ('").append(advancedHcpDTO.getCountry()).append("') ");
-		    }
+			filter = (filter.length()>0)&&(advancedHcpDTO.getCountry().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
+			if(advancedHcpDTO.getCountry().size()>0){
+				String csvCountries = String.join("','", advancedHcpDTO.getCountry());  //Forming the comma & single quote separated list
+				filter = filter.append("kt.country IN ('").append(csvCountries).append("') ");
+			}
 			
 			filter = (filter.length()>0)&&(advancedHcpDTO.getState().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
 			if(advancedHcpDTO.getState().size()>0){

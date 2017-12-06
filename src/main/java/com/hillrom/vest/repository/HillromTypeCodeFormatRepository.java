@@ -17,4 +17,5 @@ public interface HillromTypeCodeFormatRepository extends JpaRepository<HillromTy
             + "where type='patient_diagnostic_code' and "
             + "(lower(type_code) like lower(?1) OR lower(type_code_value) like lower(?1))")
     public List<HillromTypeCodeFormat> findDiagnosisTypeCode(String searchString);
+	
 }

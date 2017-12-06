@@ -345,15 +345,17 @@ public class FOTAServiceUtil {
 							// Initially
 							HandleHolder holder = coUtil.getHandleHolderValuesFromPartNo(partNoHolder,fotaJsonData,fotaInfo,reqDev,reqReleaseDate);
 							
-							//Get Old Handle Id
-							/*handleId = coUtil.getOldHandle(handleHolderBin,fotaJsonData
+
+							/*//Get Old Handle Id
+							handleId = coUtil.getOldHandle(handleHolderBin,fotaJsonData
 									.get(DEVICE_SN));
 							if(handleId == null){
 								handleId = getHandleNumber();
-								/*Save device details to DB
+								//Save device details to DB
 								saveInprogressDeviceDetails(holder);
-								//holder.setHandleId(handleId);
-							//	handleHolderBin.put(handleId, holder);
+								holder.setHandleId(handleId);
+								handleHolderBin.put(handleId, holder);
+
 							}*/
 							handleId = getHandleNumber();
 							handleHolderBin.put(handleId, holder);
@@ -392,7 +394,7 @@ public class FOTAServiceUtil {
 							*/
 							
 							handleId = getHandleNumber();
-							//holder.setHandleId(handleId);
+
 							handleHolderBin.put(handleId, holder);
 							
 							//To capture chunk size

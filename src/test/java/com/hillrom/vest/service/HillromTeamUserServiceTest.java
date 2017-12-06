@@ -100,7 +100,7 @@ public class HillromTeamUserServiceTest {
     public void assertThatHillromUserDeletedSuccessfully() throws HillromException {
 		UserExtension newHRUser = userService.createUser(userExtensionDTO, BASE_URL);
     	String baseUrl = "baseUrl";
-		JSONObject jsonObject = userService.deleteUser(newHRUser.getId(),baseUrl);
+		JSONObject jsonObject = userService.deleteUser(newHRUser.getId(),baseUrl,newHRUser.getDeactivationReason());
         String message = (String) jsonObject.get("message");
         System.out.println("message Created : "+jsonObject);
         assertThat(message).isNotEmpty();

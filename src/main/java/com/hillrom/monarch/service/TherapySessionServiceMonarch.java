@@ -34,6 +34,7 @@ import com.hillrom.vest.domain.PatientComplianceMonarch;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEventMonarch;
 import com.hillrom.vest.domain.PatientVestDeviceDataMonarch;
+import com.hillrom.vest.domain.ProtocolConstants;
 import com.hillrom.vest.domain.ProtocolConstantsMonarch;
 import com.hillrom.vest.domain.TherapySessionMonarch;
 import com.hillrom.vest.domain.User;
@@ -95,14 +96,23 @@ public class TherapySessionServiceMonarch {
 			if(deviceType.equals("MONARCH")){
 				adherenceCalculationServiceMonarch.processAdherenceScore(patientNoEvent, existingTherapySessionMap, 
 					receivedTherapySessionMapMonarch, existingComplianceMapMonarch,protocol);
-			}else if(deviceType.equals("BOTH")){
+			}else if(deviceType.equals("BOTH")){				
+				// Merged Protocol for the both device patients
+				ProtocolConstants protocolMergedVest = adherenceCalculationService.getProtocolByPatientUserId(patientUser.getId());
+				// Convert Merged protocol with Vest object to monarch object
+				ProtocolConstantsMonarch protocolMergedMonarch = convertVestToMonarchProtocol(protocolMergedVest);
+				
 				adherenceCalculationServiceMonarch.processAdherenceScore(patientNoEvent, existingTherapySessionMap, 
-						receivedTherapySessionMapMonarch, existingComplianceMapMonarch,protocol,patientUser.getId());
-					
+						receivedTherapySessionMapMonarch, existingComplianceMapMonarch,protocolMergedMonarch,patientUser.getId());
 			}
-			
 		}
 		return therapySessionsMonarch;
+	}
+	
+	public ProtocolConstantsMonarch convertVestToMonarchProtocol(ProtocolConstants protocol){
+		ProtocolConstantsMonarch convertFromVestProtocol = new ProtocolConstantsMonarch(protocol.getMaxFrequency(), protocol.getMinFrequency(),
+				protocol.getMaxPressure(), protocol.getMinPressure(),protocol.getTreatmentsPerDay(),protocol.getMinDuration());  
+		return convertFromVestProtocol;
 	}
 	
 	/*public void removeExistingTherapySessions(

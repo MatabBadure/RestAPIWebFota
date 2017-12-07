@@ -1,5 +1,7 @@
 package com.hillrom.vest.web.rest.dto;
 
+import java.util.Comparator;
+
 import org.joda.time.DateTime;
 
 public class PatientVestDeviceDataExcelDTO {
@@ -113,5 +115,14 @@ public class PatientVestDeviceDataExcelDTO {
 		this.therapySessionTotalDuration = therapySessionTotalDuration;
 	}
 	
+	public static Comparator<PatientVestDeviceDataExcelDTO> vestDateAscComparator = new Comparator<PatientVestDeviceDataExcelDTO>() {
+
+		public int compare(PatientVestDeviceDataExcelDTO obj1, PatientVestDeviceDataExcelDTO obj2) {
+			DateTime sortByDate1 = obj1.getDate();
+			DateTime sortByDate2 = obj2.getDate();
+			// ascending order
+			return sortByDate1.compareTo(sortByDate2);
+		}
+	};
 
 }

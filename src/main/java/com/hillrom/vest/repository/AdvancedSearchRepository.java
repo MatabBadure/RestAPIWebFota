@@ -479,7 +479,7 @@ public class AdvancedSearchRepository {
 	//----------------------------------------------------------------------------------------------------------------------------------------------
 	
 
-	/*public Page<HcpVO> advancedSearchHcps(AdvancedHcpDTO advancedHcpDTO,
+	public Page<HcpVO> advancedSearchHcps(AdvancedHcpDTO advancedHcpDTO,
 
 			Pageable pageable, Map<String, Boolean> sortOrder) {
 		
@@ -625,7 +625,7 @@ public class AdvancedSearchRepository {
 		}
 		return null;
 
-	}*/
+	}
 
 	//----------------------------------------------------------------------------------------------------------------------------------------------
 

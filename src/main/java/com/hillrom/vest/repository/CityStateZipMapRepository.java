@@ -4,8 +4,10 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.hillrom.vest.domain.CityStateZipMap;
+
 import java.lang.String;
 
 public interface CityStateZipMapRepository extends JpaRepository<CityStateZipMap, Long> {
@@ -25,8 +27,8 @@ public interface CityStateZipMapRepository extends JpaRepository<CityStateZipMap
 
 	List<CityStateZipMap> findByState(String state);
 	
-	@Query("Select distinct(state) from CityStateZipMap where country=?1")
-	List<CityStateZipMap> findByCountry(String country);
+	@Query("Select distinct(state) from CityStateZipMap where country in :country")
+	List<CityStateZipMap> findByCountry(@Param("country")List<String> country);
 	
 	@Query("Select distinct(city) from CityStateZipMap csz where csz.state = ?1")
 	List<String> findUniqueCitiesByState(String state);

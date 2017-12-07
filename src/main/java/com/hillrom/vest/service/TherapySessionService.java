@@ -83,8 +83,11 @@ public class TherapySessionService {
 				adherenceCalculationService.processAdherenceScore(patientNoEvent, existingTherapySessionMap, 
 						receivedTherapySessionMap, existingComplianceMap,protocol);
 			}else if(deviceType.equals("BOTH")){
+				// Merged Protocol for the both device patients
+				ProtocolConstants protocolMerged = adherenceCalculationService.getMergedProtocolByPatientUserId(patientUser.getId());
+				
 				adherenceCalculationService.processAdherenceScore(patientNoEvent, existingTherapySessionMap, 
-						receivedTherapySessionMap, existingComplianceMap,protocol,patientUser.getId());
+						receivedTherapySessionMap, existingComplianceMap,protocolMerged,patientUser.getId());
 			}		
 			
 		}

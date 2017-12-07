@@ -1928,7 +1928,6 @@ public class AdherenceCalculationService {
 				isHMRCompliantMonarch = isHMRCompliant(protocolConstant, therapyMetricsMonarch.get(TOTAL_DURATION), adherenceSettingDay);
 				
 				
-				
 				/*existingTherapySessionMapMonarch = 
 						therapySessionServiceMonarch.getAllTherapySessionsMapByPatientUserId(patientUser.getId());
 				

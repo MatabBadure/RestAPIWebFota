@@ -2622,7 +2622,7 @@ public class AdherenceCalculationServiceMonarch{
 	 * Runs every morning 9AM after the TIMS job executed to integrate the patient who is using both devices after identified
 
 	 */
-	@Scheduled(cron="0 0 9 * * * ")
+	@Scheduled(cron="0 0 23 * * * ")
 	public void processDeviceDetails(){
 		try{
 			LocalDate today = LocalDate.now();
@@ -2905,7 +2905,7 @@ public class AdherenceCalculationServiceMonarch{
 	/**
 	 * Runs every morning 9:15AM after the TIMS job executed to integrate the old patient who is swapped after identified from swapped date
 	 */	
-	@Scheduled(cron="0 15 9 * * * ")
+	@Scheduled(cron="0 15 23 * * * ")
 	public void processMergeSwapDeviceDetails(){
 		try{
 			LocalDate today = LocalDate.now();

@@ -2622,7 +2622,7 @@ public class AdherenceCalculationServiceMonarch{
 	 * Runs every morning 9AM after the TIMS job executed to integrate the patient who is using both devices after identified
 
 	 */
-	@Scheduled(cron="0 00 23 * * * ")
+	@Scheduled(cron="0 0 23 * * * ")
 	public void processDeviceDetails(){
 		try{
 			LocalDate today = LocalDate.now();

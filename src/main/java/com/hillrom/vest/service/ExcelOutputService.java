@@ -5,6 +5,7 @@ import static com.hillrom.vest.config.Constants.DATE_RANGE_REPORT;
 import static com.hillrom.vest.config.Constants.DEVICE_ADDRESS;
 import static com.hillrom.vest.config.Constants.DURATION;
 import static com.hillrom.vest.config.Constants.EVENT;
+import static com.hillrom.vest.config.Constants.EVENT_ERROR_CODE;
 import static com.hillrom.vest.config.Constants.FREQUENCY;
 import static com.hillrom.vest.config.Constants.HILLROM_ID;
 import static com.hillrom.vest.config.Constants.HMR;
@@ -18,10 +19,10 @@ import static com.hillrom.vest.config.Constants.SERIAL_NO;
 import static com.hillrom.vest.config.Constants.THERAPY_SESSION_TOTAL;
 import static com.hillrom.vest.config.Constants.TIME;
 import static com.hillrom.vest.config.Constants.WIFIorLTE_SERIAL_NO;
-import static com.hillrom.vest.config.Constants.EVENT_ERROR_CODE;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -47,6 +48,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.hillrom.monarch.service.util.PatientVestDeviceTherapyUtilMonarch;
+import com.hillrom.vest.domain.PatientDevicesAssoc;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceDataMonarch;
@@ -92,11 +94,12 @@ public class ExcelOutputService {
 	 * createExcelOutputExcel_Vest new method
 	 * @param response
 	 * @param deviceEventsList
+	 * @param checkPatientTypeVest 
 	 * @param deviceType
 	 * @param dateRangeReport
 	 * @throws IOException
 	 */
-	public void createExcelOutputExcel_Vest(HttpServletResponse response,List<PatientVestDeviceData> deviceEventsList, String deviceType, String dateRangeReport) throws IOException{
+	public void createExcelOutputExcel_Vest(HttpServletResponse response,List<PatientVestDeviceData> deviceEventsList, PatientDevicesAssoc checkPatientTypeVest, String deviceType, String dateRangeReport) throws IOException{
 		log.debug("Received Device Data "+deviceEventsList);
 		
 		response.setContentType("application/vnd.ms-excel");
@@ -114,7 +117,7 @@ public class ExcelOutputService {
 				deviceEventsList.get(0).getPatient().getHillromId(),
 				deviceEventsList.get(0).getPatient().getFirstName(),
 				deviceEventsList.get(0).getPatient().getLastName(), " ", "VEST", " ", " ",
-				deviceEventsList.get(0).getSerialNumber(), " ", ReportDate, DATE_RANGE_REPORT,
+				checkPatientTypeVest.getSerialNumber(), " ", ReportDate, DATE_RANGE_REPORT,
 				dateRangeReport };
         setExcelHeader(excelSheet,header1);
         setExcelRowGrayColor(workBook,excelSheet);
@@ -129,7 +132,7 @@ public class ExcelOutputService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-        autoSizeColumns(excelSheet,13);
+        autoSizeColumns(excelSheet,12);
         
         workBook.write(response.getOutputStream());
         response.getOutputStream().flush();
@@ -169,7 +172,7 @@ public class ExcelOutputService {
 	public void createExcelOutputNewExcelForMonarch(
 			HttpServletResponse response,
 			List<PatientVestDeviceDataMonarch> deviceEventsList,
-			PatientInfo patientInfo, String deviceType, String dateRangeReport) throws IOException {
+			PatientDevicesAssoc checkPatientTypeMonarch, PatientInfo patientInfo, String deviceType, String dateRangeReport) throws IOException {
 		log.debug("Received Device Data "+deviceEventsList);
 		
 		response.setContentType("application/vnd.ms-excel");
@@ -182,8 +185,8 @@ public class ExcelOutputService {
         
       //Report Date as current date in mm/dd/YYYY
     	String ReportDate = getReportDate();
-        String[] header1 = { patientInfo.getHillromId(),patientInfo.getFirstName(),patientInfo.getLastName()," ",
-    			"MONARCH"," ",deviceEventsList.get(0).getSerialNumber()," ",ReportDate,DATE_RANGE_REPORT,dateRangeReport};
+        String[] header1 = {patientInfo.getHillromId(),patientInfo.getFirstName(),patientInfo.getLastName()," ",
+    			"MONARCH"," ",checkPatientTypeMonarch.getSerialNumber()," ",ReportDate,DATE_RANGE_REPORT,dateRangeReport};
         
         setExcelHeader(excelSheet,header1);
         
@@ -200,7 +203,7 @@ public class ExcelOutputService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		autoSizeColumns(excelSheet,13);
+		autoSizeColumns(excelSheet,11);
         workBook.write(response.getOutputStream());
         response.getOutputStream().flush();
 	}
@@ -255,6 +258,8 @@ public class ExcelOutputService {
 					log.debug("Therapy Session  :"+therapySessionForTheDay.size());
 					for (List<PatientVestDeviceDataMonarch> eventDetailsList : therapySessionForTheDay.values()) {
 						log.debug("Therapy eventDetailsList :"+therapySessionForTheDay.size());
+						//Sort By Date
+						Collections.sort(eventDetailsList,PatientVestDeviceDataMonarch.monarchDateAscComparator);
 						
 						 int duration = 0; int i = 0; int j = 0;
 						 for(PatientVestDeviceDataMonarch eventDetails : eventDetailsList){
@@ -328,6 +333,7 @@ public class ExcelOutputService {
 						} 
 				}
 		}
+		autoSizeColumns(excelSheet,10);
 	}
 	public void createExcelOutputExcelForAll(HttpServletResponse response,List<PatientVestDeviceData> deviceEventsListVest,List<PatientVestDeviceDataMonarch> deviceEventsListMonarch) throws IOException{
 		log.debug("Received Device Data for Vest :"+deviceEventsListVest+" & Monarch"+deviceEventsListMonarch);
@@ -419,8 +425,9 @@ public class ExcelOutputService {
 					//for(Map.Entry<Long, List<PatientVestDeviceDataExcelDTO>> session : therapySessionForTheDay.entrySet()){
 						
 				for(List<PatientVestDeviceDataExcelDTO> eventDetailsList : therapySessionForTheDay.values()){
-						 /*List<PatientVestDeviceDataExcelDTO> eventDetailsList = new LinkedList<PatientVestDeviceDataExcelDTO>();
-						 eventDetailsList = session.getValue();*/
+						//Sort by Vest Date
+						Collections.sort(eventDetailsList,PatientVestDeviceDataExcelDTO.vestDateAscComparator);
+					
 						 log.debug("eventDetailsList:"+eventDetailsList.size());
 						 int duration = 0; int i = 0; int j = 0;
 						 for(PatientVestDeviceDataExcelDTO eventDetails : eventDetailsList){
@@ -485,6 +492,7 @@ public class ExcelOutputService {
 						} 
 				}
 		}
+		autoSizeColumns(excelSheet,9);
 	}
 	
 	
@@ -681,7 +689,7 @@ public class ExcelOutputService {
 		}
 		return hssfCellStyle;
 	}
-	
+	///change
 	public void autoSizeColumns(HSSFSheet excelSheet,int columnCount){
 		for (int i = 0; i < columnCount; i++){
 			excelSheet.autoSizeColumn(i);
@@ -703,7 +711,7 @@ public class ExcelOutputService {
 	}
 	public void createExcelOutputNewExcelForAll(HttpServletResponse response,
 			List<PatientVestDeviceData> deviceEventsListVest,
-			List<PatientVestDeviceDataMonarch> deviceEventsListMonarch, PatientInfo patientInfo, String dateRangeReport) throws IOException {
+			PatientDevicesAssoc checkPatientTypeVest, List<PatientVestDeviceDataMonarch> deviceEventsListMonarch, PatientDevicesAssoc checkPatientTypeMonarch, PatientInfo patientInfo, String dateRangeReport) throws IOException {
 		
 		log.debug("Received Device Data for Vest :"+deviceEventsListVest+" & Monarch"+deviceEventsListMonarch);
 		
@@ -721,7 +729,7 @@ public class ExcelOutputService {
 		String[] headerVest1 = { deviceEventsListVest.get(0).getPatient().getHillromId(),
 				deviceEventsListVest.get(0).getPatient().getFirstName(),
 				deviceEventsListVest.get(0).getPatient().getLastName(), " ", "VEST", " ", " ",
-				deviceEventsListVest.get(0).getSerialNumber(), " ", ReportDate, DATE_RANGE_REPORT,
+				checkPatientTypeVest.getSerialNumber(), " ", ReportDate, DATE_RANGE_REPORT,
 				dateRangeReport };
 		setExcelHeader(excelSheet, headerVest1);
         setExcelRowGrayColor(workBook,excelSheet);
@@ -735,7 +743,7 @@ public class ExcelOutputService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-        autoSizeColumns(excelSheet,13);
+        autoSizeColumns(excelSheet,12);
 
         //HSSFWorkbook workBook = new HSSFWorkbook();
         HSSFSheet excelSheetMonarch = workBook.createSheet("Therapy Report Monarch");
@@ -745,7 +753,7 @@ public class ExcelOutputService {
 		String[] headerMonarch1 = { patientInfo.getHillromId(),
 				patientInfo.getFirstName(),
 				patientInfo.getLastName(), " ", "MONARCH", " ",
-				deviceEventsListMonarch.get(0).getSerialNumber(), " ", ReportDate,
+				checkPatientTypeMonarch.getSerialNumber(), " ", ReportDate,
 				DATE_RANGE_REPORT, dateRangeReport };
 		setExcelHeader(excelSheetMonarch, headerMonarch1);
         
@@ -761,7 +769,7 @@ public class ExcelOutputService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		autoSizeColumns(excelSheetMonarch,13);
+		autoSizeColumns(excelSheetMonarch,11);
 
 		workBook.write(response.getOutputStream());
         response.getOutputStream().flush();

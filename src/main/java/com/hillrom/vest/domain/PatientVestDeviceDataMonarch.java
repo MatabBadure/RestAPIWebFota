@@ -2,7 +2,7 @@ package com.hillrom.vest.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.util.Comparator;
 import java.util.Objects;
 
 import javax.persistence.Column;
@@ -14,8 +14,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -311,4 +309,14 @@ public class PatientVestDeviceDataMonarch implements Serializable,Comparable<Pat
 	public Object clone()throws CloneNotSupportedException{  
 		return super.clone();  
 	}
+	
+	public static Comparator<PatientVestDeviceDataMonarch> monarchDateAscComparator = new Comparator<PatientVestDeviceDataMonarch>() {
+
+		public int compare(PatientVestDeviceDataMonarch obj1, PatientVestDeviceDataMonarch obj2) {
+			DateTime sortByDate1 = obj1.getDate();
+			DateTime sortByDate2 = obj2.getDate();
+			// ascending order
+			return sortByDate1.compareTo(sortByDate2);
+		}
+	};
 }

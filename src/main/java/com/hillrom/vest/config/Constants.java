@@ -218,6 +218,12 @@ public final class Constants {
 	public static final String RESET_SCORE = "scoreReset";
     //hill-1847
 	
+	//Gimp-14
+	public static final String TEST_RESULTS="TestResults";
+	public static final String FVC_P = "FVC_P";
+	public static final String FEV1_P = "FEV1_P";
+	//Gimp-14
+	
 	// Compliance Graph 
 	public static final String KEY_MAX = "max";
 	public static final String KEY_MIN = "min";
@@ -227,7 +233,7 @@ public final class Constants {
 	public static final String INTENSITY_LABEL = "Avg Pressure/Intensity";
 	public static final String FREQUENCY_LABEL = "Avg Frequency";
 	public static final String DURATION_LABEL = "Avg Duration";
-
+	
 	// Cumulative Stats Graph 
 	public static final String HMR_NON_ADHERENCE_LABEL = "Patients Below Therapy Minutes";
 	public static final String SETTING_DEVIATION_LABEL = "Patients Below Frequency Setting";

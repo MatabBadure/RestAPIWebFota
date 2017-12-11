@@ -2692,7 +2692,7 @@ public class AdherenceCalculationServiceMonarch{
 	 * Runs every morning 9AM after the TIMS job executed to integrate the patient who is using both devices after identified
 
 	 */
-	@Scheduled(cron="0 0 9 * * * ")
+	@Scheduled(cron="0 0 23 * * * ")
 	public void processDeviceDetails(){
 		try{
 			LocalDate today = LocalDate.now();
@@ -2905,8 +2905,13 @@ public class AdherenceCalculationServiceMonarch{
 						PatientProtocolDataMonarch newProtocol = new PatientProtocolDataMonarch(oldProtocol.getType(), patientInfo, user,
 								oldProtocol.getTreatmentsPerDay(), oldProtocol.getMinMinutesPerTreatment(), oldProtocol.getTreatmentLabel(),
 								oldProtocol.getMinFrequency(), oldProtocol.getMaxFrequency(), oldProtocol.getMinIntensity(),
-								oldProtocol.getMaxIntensity());						
-							
+								oldProtocol.getMaxIntensity());
+						
+						String protocolKey = patientProtocolMonarchRepository.id();
+						
+						newProtocol.setId(protocolKey);
+						newProtocol.setProtocolKey(protocolKey);
+						
 						newProtocolList.add(newProtocol);
 					}
 					protocolMonarchService.saveAll(newProtocolList);							
@@ -2960,7 +2965,11 @@ public class AdherenceCalculationServiceMonarch{
 								oldProtocol.getTreatmentsPerDay(), oldProtocol.getMinMinutesPerTreatment(), oldProtocol.getTreatmentLabel(),
 								oldProtocol.getMinFrequency(), oldProtocol.getMaxFrequency(), oldProtocol.getMinPressure(),
 								oldProtocol.getMaxPressure());
-							
+
+						String protocolKey = patientProtocolRepository.id();
+						newProtocol.setId(protocolKey);
+						newProtocol.setProtocolKey(protocolKey);
+						
 						newProtocolList.add(newProtocol);
 					}
 					protocolVestService.saveAll(newProtocolList);
@@ -3006,7 +3015,7 @@ public class AdherenceCalculationServiceMonarch{
 	/**
 	 * Runs every morning 9:15AM after the TIMS job executed to integrate the old patient who is swapped after identified from swapped date
 	 */	
-	@Scheduled(cron="0 15 9 * * * ")
+	@Scheduled(cron="0 15 23 * * * ")
 	public void processMergeSwapDeviceDetails(){
 		try{
 			LocalDate today = LocalDate.now();

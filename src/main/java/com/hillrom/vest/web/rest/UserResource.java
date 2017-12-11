@@ -68,6 +68,7 @@ import com.hillrom.vest.domain.PatientDevicesAssoc;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientProtocolData;
 import com.hillrom.vest.domain.PatientProtocolDataMonarch;
+import com.hillrom.vest.domain.PatientTestResult;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceDataMonarch;
 import com.hillrom.vest.domain.PatientVestDeviceHistory;
@@ -91,6 +92,7 @@ import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.AdherenceCalculationService;
 import com.hillrom.vest.service.ExcelOutputService;
 import com.hillrom.vest.service.GraphService;
+import com.hillrom.vest.service.PateintTestResultService;
 import com.hillrom.vest.service.PatientComplianceService;
 import com.hillrom.vest.service.PatientHCPService;
 import com.hillrom.vest.service.PatientProtocolService;
@@ -193,11 +195,16 @@ public class UserResource {
 	@Inject
 	private GraphService adherenceTrendGraphServiceMonarch;
     
-	
 	@Qualifier("complianceGraphService")
 	@Inject
-	private GraphService complianceGraphService;
-
+	private GraphService complianceGraphService;	
+	
+	//Gimp-14
+	@Qualifier("testResultsGraphService")
+	@Inject
+	private GraphService testResultsGraphService;
+	//Gimp-14
+	
 	@Qualifier("cumulativeStatsGraphService")
 	@Inject
 	private GraphService cumulativeStatsGraphService;
@@ -225,13 +232,15 @@ public class UserResource {
 	
 	@Inject
     private PatientProtocolMonarchService patientProtocolMonarchService;
-  @Inject
+	@Inject
     private ClinicRepository clinicRepository;
 	
-
   	@Inject
   	private 
   	PatientInfoRepository patientInfoRepository;
+  	
+	@Inject
+	private PateintTestResultService pateintTestResultService;
 
 	/**
 	 * GET /users -> get all users.
@@ -1114,23 +1123,38 @@ public class UserResource {
 			List<PatientVestDeviceData>	vestdeviceData = new LinkedList<>();
 			List<PatientVestDeviceDataMonarch> monarchdeviceData = new LinkedList<>();
 
-			if(Objects.nonNull(checkPatientTypeMonarch) && Objects.nonNull(checkPatientTypeMonarch.getOldPatientId())){
+			if (Objects.nonNull(checkPatientTypeMonarch)
+					&& Objects.nonNull(checkPatientTypeMonarch
+							.getOldPatientId())
+					&& !checkPatientTypeMonarch.getOldPatientId().equals(
+							checkPatientTypeMonarch.getPatientId())) {
 				patientId = checkPatientTypeMonarch.getOldPatientId();
 				PatientInfo patientInfoOld = patientInfoRepository.findOneById(patientId);
 				monarchdeviceData.addAll(monarchdeviceDataRepository.findByPatientIdAndTimestampBetween(patientInfoOld.getId(), fromTimestamp, toTimestamp));
 
-			}else if(Objects.nonNull(checkPatientTypeVest) && Objects.nonNull(checkPatientTypeVest.getOldPatientId())){
+			} else if (Objects.nonNull(checkPatientTypeVest)
+					&& Objects.nonNull(checkPatientTypeVest.getOldPatientId())
+					&& !checkPatientTypeVest.getOldPatientId().equals(
+							checkPatientTypeVest.getPatientId())) {
 				patientId = checkPatientTypeVest.getOldPatientId();
 				PatientInfo patientInfoOld = patientInfoRepository.findOneById(patientId);
 				vestdeviceData.addAll(deviceDataRepository.findByPatientIdAndTimestampBetween(patientInfoOld.getId(), fromTimestamp, toTimestamp));
 			}
 			
-			if(Objects.nonNull(checkPatientTypeMonarch) && Objects.nonNull(checkPatientTypeMonarch.getSwappedPatientId())){
+			if (Objects.nonNull(checkPatientTypeMonarch)
+					&& Objects.nonNull(checkPatientTypeMonarch
+							.getSwappedPatientId()) && !checkPatientTypeMonarch
+							.getSwappedPatientId().equals(checkPatientTypeMonarch
+							.getPatientId())) {
 				patientId = checkPatientTypeMonarch.getSwappedPatientId();
 				PatientInfo patientInfoOld = patientInfoRepository.findOneById(patientId);
 				monarchdeviceData.addAll(monarchdeviceDataRepository.findByPatientIdAndTimestampBetween(patientInfoOld.getId(), fromTimestamp, toTimestamp));
 
-			}else if(Objects.nonNull(checkPatientTypeVest) && Objects.nonNull(checkPatientTypeVest.getSwappedPatientId())){
+			} else if (Objects.nonNull(checkPatientTypeVest)
+					&& Objects.nonNull(checkPatientTypeVest
+							.getSwappedPatientId()) && !checkPatientTypeVest
+							.getSwappedPatientId().equals(checkPatientTypeVest
+							.getPatientId())) {
 				patientId = checkPatientTypeVest.getSwappedPatientId();
 				PatientInfo patientInfoOld = patientInfoRepository.findOneById(patientId);
 				vestdeviceData.addAll(deviceDataRepository.findByPatientIdAndTimestampBetween(patientInfoOld.getId(), fromTimestamp, toTimestamp));
@@ -1145,7 +1169,7 @@ public class UserResource {
 
 	            	//excelOutputService.createExcelOutputExcel(response, vestdeviceData);
 	            	//New excel format for vest
-	            	excelOutputService.createExcelOutputExcel_Vest(response, vestdeviceData,deviceType,dateRangeReport.toString());
+	            	excelOutputService.createExcelOutputExcel_Vest(response, vestdeviceData,checkPatientTypeVest,deviceType,dateRangeReport.toString());
 	            	
 	            }else{
 	            	response.setStatus(204);
@@ -1158,7 +1182,7 @@ public class UserResource {
 
 					//excelOutputService.createExcelOutputExcelForMonarch(response, monarchdeviceData);
 					//New excel format for Monarch
-					excelOutputService.createExcelOutputNewExcelForMonarch(response, monarchdeviceData,patient,deviceType,dateRangeReport.toString());
+					excelOutputService.createExcelOutputNewExcelForMonarch(response, monarchdeviceData,checkPatientTypeMonarch,patient,deviceType,dateRangeReport.toString());
 	            	
 	            }else{
 	            	response.setStatus(204);
@@ -1174,17 +1198,17 @@ public class UserResource {
 	            	
 	            	//excelOutputService.createExcelOutputExcel(response, vestdeviceData);
 	            	//New excel format for vest
-	            	excelOutputService.createExcelOutputExcel_Vest(response, vestdeviceData,deviceType,dateRangeReport.toString());
+	            	excelOutputService.createExcelOutputExcel_Vest(response, vestdeviceData,checkPatientTypeVest,deviceType,dateRangeReport.toString());
 	            	
 	            }else if(vestdeviceData.isEmpty() && !monarchdeviceData.isEmpty() ){
 	            	//excelOutputService.createExcelOutputExcelForMonarch(response, monarchdeviceData);
 	            	//New excel format for Monarch
-					excelOutputService.createExcelOutputNewExcelForMonarch(response, monarchdeviceData,patient,deviceType,dateRangeReport.toString());
+					excelOutputService.createExcelOutputNewExcelForMonarch(response, monarchdeviceData,checkPatientTypeMonarch,patient,deviceType,dateRangeReport.toString());
 	            }else if(!vestdeviceData.isEmpty() && !monarchdeviceData.isEmpty() ){
 	            	
 	            	//excelOutputService.createExcelOutputExcelForAll(response, vestdeviceData, monarchdeviceData);
 	            	//New excel format for Monarch
-	            	excelOutputService.createExcelOutputNewExcelForAll(response, vestdeviceData, monarchdeviceData,patient,dateRangeReport.toString());
+	            	excelOutputService.createExcelOutputNewExcelForAll(response, vestdeviceData,checkPatientTypeVest, monarchdeviceData,checkPatientTypeMonarch,patient,dateRangeReport.toString());
 	            	
 	            }else{
 	            	response.setStatus(204);
@@ -1625,6 +1649,35 @@ public class UserResource {
     }
     //hill-1847
     
+    //Gimp-14
+    /**
+     * Get the Patient test results graphs in Hill-Rom users
+     * @param id
+     * @param from
+     * @param to
+     * @return
+     */
+    @RequestMapping(value = "/users/{id}/testResultsGraph",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getTestResultsGraph(@PathVariable Long id,
+    		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
+    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to){
+    	try{    
+    		List<PatientTestResult> patientTestResults;
+    		patientTestResults = pateintTestResultService.getPatientTestResultByUserId(id, from,to); //Get the test results of patient
+    		if(patientTestResults.size() > 0){
+    			Graph testResultsGraph = testResultsGraphService.populateGraphData(patientTestResults, new Filter(from,to,null,null)); //to populate the data for graph
+    			return new ResponseEntity<>(testResultsGraph,HttpStatus.OK); 
+    		}    		
+    		return new ResponseEntity<>(HttpStatus.OK);
+    	} catch(Exception ex){
+    		JSONObject jsonObject = new JSONObject();
+        	jsonObject.put("ERROR", ExceptionConstants.HR_717);
+    		return new ResponseEntity<>(jsonObject, HttpStatus.INTERNAL_SERVER_ERROR);
+    	}
+    }    
+   //Gimp-14
     
     /**
      * GET  /users/:userId/clinics/:clinicId/statistics -> get the patient statistics for clinic Badge associated with user.

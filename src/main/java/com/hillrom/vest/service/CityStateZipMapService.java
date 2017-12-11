@@ -86,9 +86,7 @@ public class CityStateZipMapService {
 	}
 	
 	//To get list of states from country code
-	public List<CityStateZipMap> getStateVOByCountryCode(String country) throws HillromException {
-		if (StringUtils.isEmpty(country))
-			throw new HillromException(ExceptionConstants.HR_724);
+	public List<CityStateZipMap> getStateVOByCountryCode(List<String> country) throws HillromException {
 		List<CityStateZipMap> stateZipMaps = cityStateZipMapJpaRepository.findByCountry(country);
 		return stateZipMaps;
 	}

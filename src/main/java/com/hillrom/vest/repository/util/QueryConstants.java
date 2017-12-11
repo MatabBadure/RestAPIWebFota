@@ -1020,6 +1020,7 @@ public class QueryConstants {
 	
 
 
+
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------//
 	public static String QUERY_ADVANCED_HCP_SEARCH_FOR_ALL_DEVICETYPE_HILLROM_LOGIN= ""
 			+ "Select * from ("
@@ -1044,5 +1045,6 @@ public class QueryConstants {
 			+ "left outer join "
 			+ " CITY_STATE_ZIP_MAP cszm on user.zipcode = cszm.zip "
 			+ ") kt";
+
 
 }

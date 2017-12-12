@@ -493,7 +493,8 @@ public class AdvancedSearchRepository {
 			 */
 			 
 			if(!StringUtils.isBlank(advancedHcpDTO.getName())){
-				filter = filter.append("(kt.clinicName like ").append("'%").append(advancedHcpDTO.getName()).append("%'"); 
+				filter = filter.append("(kt.firstName like ").append("'%").append(advancedHcpDTO.getName()).append("%'"); 
+				filter = filter.append(" OR ").append("kt.lastName like ").append("'%").append(advancedHcpDTO.getName()).append("%') ");
 			} 
 			
 			filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedHcpDTO.getSpecialty())) ? (filter.append(" AND ")) : (filter.append(""));

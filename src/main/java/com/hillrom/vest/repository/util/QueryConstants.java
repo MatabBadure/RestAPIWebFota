@@ -1029,7 +1029,7 @@ public class QueryConstants {
 			+ " user.is_deleted	as isDeleted, user.zipcode as zipcode,userExt.address as address, "
 			+ " userExt.city as hcity,userExt.credentials as credentials,userExt.fax_number,userExt.primary_phone, "
 			+ " userExt.mobile_phone, userExt.speciality as speciality,userExt.state as hstate,clinic.id as clinicId, "
-			+ " clinic.name as clinicName, user.created_date as createdAt, user.activated isActivated, "
+			+ " clinic.name as name, user.created_date as createdAt, user.activated isActivated, "
 			+ " userExt.npi_number as npiNumber,cszm.country as country "
 			+ "FROM "
 			+ " USER user "

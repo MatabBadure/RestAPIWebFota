@@ -115,7 +115,7 @@ public class AdvancedSearchRepository {
 										    
 			filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedClinicDTO.getZipcode())) ? (filter.append(" AND ")) : (filter.append(""));
 			if(!StringUtils.isBlank(advancedClinicDTO.getZipcode())){
-				filter = filter.append("clinic.zipcode = ").append(advancedClinicDTO.getZipcode());
+				filter = filter.append("clinic.zipcode like ").append("'%").append(advancedClinicDTO.getZipcode()).append("%' ");
 			}
 										    
 			filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedClinicDTO.getClinicStatus())) ? (filter.append(" AND ")) : (filter.append(""));

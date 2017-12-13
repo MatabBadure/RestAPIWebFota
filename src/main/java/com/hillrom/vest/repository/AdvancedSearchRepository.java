@@ -516,7 +516,7 @@ public class AdvancedSearchRepository {
 			
 			filter = (filter.length()>0)&&(advancedHcpDTO.getCity().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
 			if(advancedHcpDTO.getCity().size()>0){
-			    	filter = filter.append("kt.hcity IN ('").append(commaSeparatedValues(advancedHcpDTO.getState())).append("') ");
+			    	filter = filter.append("kt.hcity IN ('").append(commaSeparatedValues(advancedHcpDTO.getCity())).append("') ");
 		    }
 			
 			filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedHcpDTO.getZipcode())) ? (filter.append(" AND ")) : (filter.append(""));

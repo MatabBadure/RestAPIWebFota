@@ -2196,23 +2196,45 @@ public class AdherenceCalculationServiceMonarch{
 			SortedMap<LocalDate, List<TherapySession>> existingTherapySessionMapVest,
 			SortedMap<LocalDate, List<TherapySessionMonarch>> existingTherapySessionMapMonarch,
 			LocalDate date) throws Exception{
-		LocalDate lastTransmissionDateVest = date;
-		LocalDate lastTransmissionDateMonarch = date;
+		LocalDate lastTransmissionDateVest = null;
+		LocalDate lastTransmissionDateMonarch = null;
+		
 		// Get Latest TransmissionDate for Monarch, if data has not been transmitted for the day get mostRecent date
-		if(Objects.isNull(existingTherapySessionMapMonarch.get(date))){
-			SortedMap<LocalDate,List<TherapySessionMonarch>> mostRecentTherapySessionMap = existingTherapySessionMapMonarch.headMap(date);
-			if(mostRecentTherapySessionMap.size()>0)
-				lastTransmissionDateMonarch = mostRecentTherapySessionMap.lastKey();
+		if(existingTherapySessionMapMonarch.size()>0) {
+			if(Objects.isNull(existingTherapySessionMapMonarch.get(date))){
+				SortedMap<LocalDate,List<TherapySessionMonarch>> mostRecentTherapySessionMap = existingTherapySessionMapMonarch.headMap(date);
+				if(mostRecentTherapySessionMap.size()>0)
+					lastTransmissionDateMonarch = mostRecentTherapySessionMap.lastKey();
+			}else {
+				lastTransmissionDateMonarch = date;
+			}
 		}
 		
 		// Get Latest TransmissionDate for Vest, if data has not been transmitted for the day get mostRecent date
-		if(Objects.isNull(existingTherapySessionMapVest.get(date))){
-			SortedMap<LocalDate,List<TherapySession>> mostRecentTherapySessionMap = existingTherapySessionMapVest.headMap(date);
-			if(mostRecentTherapySessionMap.size()>0)
-				lastTransmissionDateVest = mostRecentTherapySessionMap.lastKey();
+		if(existingTherapySessionMapVest.size()>0) {
+			if(Objects.isNull(existingTherapySessionMapVest.get(date))){
+				SortedMap<LocalDate,List<TherapySession>> mostRecentTherapySessionMap = existingTherapySessionMapVest.headMap(date);
+				if(mostRecentTherapySessionMap.size()>0)
+					lastTransmissionDateVest = mostRecentTherapySessionMap.lastKey();
+			}else {
+				lastTransmissionDateVest = date;
+			}
 		}
 		
-		return (lastTransmissionDateMonarch.isAfter(lastTransmissionDateVest) ? lastTransmissionDateMonarch : lastTransmissionDateVest);
+		LocalDate lastTransmissionDate = null;
+		
+		if(Objects.nonNull(lastTransmissionDateVest)) {
+			if(Objects.nonNull(lastTransmissionDateMonarch)) {
+				lastTransmissionDate = lastTransmissionDateMonarch.isAfter(lastTransmissionDateVest) ? lastTransmissionDateMonarch : lastTransmissionDateVest;
+			}
+			else {
+				lastTransmissionDate = lastTransmissionDateVest;
+			}
+		}else if(Objects.nonNull(lastTransmissionDateMonarch)) {
+			lastTransmissionDate = lastTransmissionDateMonarch;
+		}
+		return lastTransmissionDate;
+//		return (lastTransmissionDateMonarch.isAfter(lastTransmissionDateVest) ? lastTransmissionDateMonarch : lastTransmissionDateVest);
 	}
 
 	private double getLatestHMR(

@@ -104,20 +104,18 @@ public class AdvancedSearchRepository {
 										    
 			filter = (filter.length()>0) &&(advancedClinicDTO.getState().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
 			if(advancedClinicDTO.getState().size()>0){
-				String csvStates = String.join("','", advancedClinicDTO.getState());  //Forming the comma & single quote separated list
-				filter = filter.append("clinic.state IN ('").append(csvStates).append("') ");
+				filter = filter.append("clinic.state IN ('").append(commaSeparatedValues(advancedClinicDTO.getState())).append("') ");
 			}
 										    
 			filter = (filter.length()>0) &&(advancedClinicDTO.getCity().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
 			if(advancedClinicDTO.getCity().size()>0){
-				String csvCities = String.join("','", advancedClinicDTO.getCity());
-				filter = filter.append("clinic.city IN ('").append(csvCities).append("') ");
+				filter = filter.append("clinic.city IN ('").append(commaSeparatedValues(advancedClinicDTO.getCity())).append("') ");
 			}
 										    
 										    
 			filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedClinicDTO.getZipcode())) ? (filter.append(" AND ")) : (filter.append(""));
 			if(!StringUtils.isBlank(advancedClinicDTO.getZipcode())){
-				filter = filter.append("clinic.zipcode = ").append(advancedClinicDTO.getZipcode());
+				filter = filter.append("clinic.zipcode like ").append("'%").append(advancedClinicDTO.getZipcode()).append("%' ");
 			}
 										    
 			filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedClinicDTO.getClinicStatus())) ? (filter.append(" AND ")) : (filter.append(""));
@@ -258,14 +256,12 @@ public class AdvancedSearchRepository {
 	    
 	    filter = (filter.length()>0) &&(advancedPatientDTO.getState().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
 	    if(advancedPatientDTO.getState().size()>0){
-	    	String csvStates = String.join("','", advancedPatientDTO.getState());  //Forming the comma & single quote separated list
-	    	filter = filter.append("kt.state IN ('").append(csvStates).append("') ");
+	    	filter = filter.append("kt.state IN ('").append(commaSeparatedValues(advancedPatientDTO.getState())).append("') ");
 	    }
 	    
 	    filter = (filter.length()>0) &&(advancedPatientDTO.getCity().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
 	    if(advancedPatientDTO.getCity().size()>0){
-	    	String csvCities = String.join("','", advancedPatientDTO.getCity());	//Forming the comma & single quote separated list
-	    	filter = filter.append("kt.pcity IN ('").append(csvCities).append("') ");
+	    	filter = filter.append("kt.pcity IN ('").append(commaSeparatedValues(advancedPatientDTO.getCity())).append("') ");
 	    }
 	    
 	    
@@ -494,7 +490,8 @@ public class AdvancedSearchRepository {
 
 			 
 			if(!StringUtils.isBlank(advancedHcpDTO.getName())){
-				filter = filter.append("(kt.clinicName like ").append("'%").append(advancedHcpDTO.getName()).append("%'"); 
+				filter = filter.append("(kt.firstName like ").append("'%").append(advancedHcpDTO.getName()).append("%'"); 
+				filter = filter.append(" OR ").append("kt.lastName like ").append("'%").append(advancedHcpDTO.getName()).append("%') ");
 			} 
 			
 			filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedHcpDTO.getSpecialty())) ? (filter.append(" AND ")) : (filter.append(""));
@@ -515,14 +512,12 @@ public class AdvancedSearchRepository {
 			
 			filter = (filter.length()>0)&&(advancedHcpDTO.getState().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
 			if(advancedHcpDTO.getState().size()>0){
-				String csvStates = String.join("','", advancedHcpDTO.getState());  //Forming the comma & single quote separated list
-		    	filter = filter.append("kt.hstate IN ('").append(csvStates).append("') ");
+			    	filter = filter.append("kt.hstate IN ('").append(commaSeparatedValues(advancedHcpDTO.getState())).append("') ");
 		    }
 			
 			filter = (filter.length()>0)&&(advancedHcpDTO.getCity().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
 			if(advancedHcpDTO.getCity().size()>0){
-				String csvCities = String.join("','", advancedHcpDTO.getCity());	//Forming the comma & single quote separated list
-		    	filter = filter.append("kt.hcity IN ('").append(csvCities).append("') ");
+			    	filter = filter.append("kt.hcity IN ('").append(commaSeparatedValues(advancedHcpDTO.getState())).append("') ");
 		    }
 			
 			filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedHcpDTO.getZipcode())) ? (filter.append(" AND ")) : (filter.append(""));
@@ -542,11 +537,11 @@ public class AdvancedSearchRepository {
 			}
 			
 			finalQuery = finalQuery.append(baseQuery);
-				//checking if the filter object is null , if not finalQuery = where+filter 
-				if(filter.length()>0){
-					finalQuery.append(whereClause);
-					finalQuery.append(filter);
-				}
+			//checking if the filter object is null , if not finalQuery = where+filter 
+			if(filter.length()>0){
+				finalQuery.append(whereClause);
+				finalQuery.append(filter);
+			}
 			
 			log.debug("Advanced HCP Search Query : " + finalQuery);
 			
@@ -719,5 +714,18 @@ public class AdvancedSearchRepository {
 		String parsedDate = formatter.format(initDate);
 		return parsedDate.toString();
 	}
-
+	
+	/*
+	 * Replace string values having apostrophe with escape sequence and convert into comma separated values
+	 */
+	public static String commaSeparatedValues(List<String> list){
+		List<String> csvList = new ArrayList<String>();
+		String value = "";
+		for (String x : list) {
+			value = x.replace("'", "''");
+			csvList.add(value);
+		}
+		String csvValues = String.join("','", csvList);  //Forming the comma & single quote separated list
+		return csvValues;
+	}
 }

@@ -220,8 +220,8 @@ public final class Constants {
 	
 	//Gimp-14
 	public static final String TEST_RESULTS="TestResults";
-	public static final String FVC_P = "FVC_P";
-	public static final String FEV1_P = "FEV1_P";
+	public static final String FVC_P = "FVC% Predicted";
+	public static final String FEV1_P = "FEV1% Predicted";
 	//Gimp-14
 	
 	// Compliance Graph 

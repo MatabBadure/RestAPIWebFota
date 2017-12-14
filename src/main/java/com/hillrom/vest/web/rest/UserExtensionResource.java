@@ -1014,7 +1014,12 @@ public class UserExtensionResource {
     		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         }
     }
-    
+    /**
+     * Modified for GIMP 11
+     * @param patientUserId
+     * @param deviceType
+     * @return
+     */
     @RequestMapping(value = "/patient/{patientUserId}/firsttrasmissiondate",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)

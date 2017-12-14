@@ -16,4 +16,7 @@ public class AdherenceScoreConstants {
 	public static int OLD_TRAINING_DATE = 1;
 
 	public static final int ADHERENCE_SETTING_DEFAULT_DAYS = 3;
+	
+	public static final String FIRST_TRANSMISSION_FIRTS_TYPE = "first_trans";
+	public static final String FIRST_TRANSMISSION_TRAINING_TYPE = "training";
 }

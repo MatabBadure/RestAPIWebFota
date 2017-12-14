@@ -125,7 +125,7 @@
 	<include file="classpath:/config/liquibase/changelog/20170224160200_add_column_VEST_DEVICE_DATA_MONARCH.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20170227143200_add_column_PATIENT_VEST_DEVICE_RAW_LOGS_MONARCH.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20170316014700_add_column_PATIENT_DEVICES_ASSOC.xml" relativeToChangelogFile="false"/>	
-  <include file="classpath:/config/liquibase/changelog/20172803114330_add_extra_columns_to_PATIENT_DEVICES_ASSOC.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20172803114330_add_extra_columns_to_PATIENT_DEVICES_ASSOC.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20170329161200_add_column_hmr_vest_PATIENT_COMPLIANCE_MONARCH.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20170330160400_add_columns_PATIENT_DEVICES_ASSOC.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20170329194000_alter_datatype_notification_type_in_Notification.xml" relativeToChangelogFile="false"/>
@@ -150,4 +150,7 @@
 	<include file="classpath:/config/liquibase/changelog/20171107055300_upload_canada_zip_codes.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20171114160100_upload_patient_diagnostic_codes.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20171116020900_create_city_state_zip_map_index.xml" relativeToChangelogFile="false"/>
+	
+	<!-- Added liquibase script for calculation adherence score by tarining date -->
+	<include file="classpath:/config/liquibase/changelog/20171207111135_added_training_date_colums_to_patient_no_event_tables.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

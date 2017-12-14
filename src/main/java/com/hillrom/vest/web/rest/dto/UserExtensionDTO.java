@@ -64,6 +64,8 @@ public class UserExtensionDTO extends UserDTO {
 	private String monarchGarmentSize;
 
 	private String monarchGarmentType;
+	
+	private String timeZone;
 
     public UserExtensionDTO() {
     }
@@ -262,13 +264,34 @@ public class UserExtensionDTO extends UserDTO {
 		this.expired = expired;
 	}
 
+	
+	/**
+	 * @return the timeZone
+	 */
+	public String getTimeZone() {
+		return timeZone;
+	}
+
+	/**
+	 * @param timeZone the timeZone to set
+	 */
+	public void setTimeZone(String timeZone) {
+		this.timeZone = timeZone;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
-		return "UserExtensionDTO [speciality=" + speciality + ", credentials="
-				+ credentials + ", primaryPhone=" + primaryPhone
-				+ ", mobilePhone=" + mobilePhone + ", faxNumber=" + faxNumber
-				+ ", address=" + address + ", city=" + city + ", state="
-				+ state + ", npiNumber=" + npiNumber + ", role=" + role +"]";
+		return "UserExtensionDTO [speciality=" + speciality + ", credentials=" + credentials + ", primaryPhone="
+				+ primaryPhone + ", mobilePhone=" + mobilePhone + ", faxNumber=" + faxNumber + ", address=" + address
+				+ ", city=" + city + ", state=" + state + ", npiNumber=" + npiNumber + ", role=" + role
+				+ ", clinicList=" + clinicList + ", hillromId=" + hillromId + ", dob=" + dob + ", relationship="
+				+ relationship + ", clinicMRNId=" + clinicMRNId + ", expired=" + expired + ", vestGarmentColor="
+				+ vestGarmentColor + ", vestGarmentSize=" + vestGarmentSize + ", vestGarmentType=" + vestGarmentType
+				+ ", monarchGarmentColor=" + monarchGarmentColor + ", monarchGarmentSize=" + monarchGarmentSize
+				+ ", monarchGarmentType=" + monarchGarmentType + ", timeZone=" + timeZone + "]";
 	}
 
 }

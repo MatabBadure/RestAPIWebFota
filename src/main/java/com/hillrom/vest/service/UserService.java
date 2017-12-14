@@ -1162,6 +1162,8 @@ public class UserService {
 			newUser.setGender(userExtensionDTO.getGender());
 		if(Objects.nonNull(userExtensionDTO.getHillromId()))
 			newUser.setHillromId(userExtensionDTO.getHillromId());
+		if(Objects.nonNull(userExtensionDTO.getTimeZone()))
+			newUser.setTimeZone(userExtensionDTO.getTimeZone());
 		newUser.setLangKey(userExtensionDTO.getLangKey());
 	}
 
@@ -1349,9 +1351,10 @@ public class UserService {
 		return jsonObject;
 	}
 
-	public JSONObject deleteUser(Long id,  String baseUrl) throws HillromException {
+	public JSONObject deleteUser(Long id,  String baseUrl,String reason ) throws HillromException {
     	JSONObject jsonObject = new JSONObject();
     	UserExtension existingUser = userExtensionRepository.findOne(id);
+    	existingUser.setDeactivationReason(reason);
     	List<Authority> authorities  = authorityRepository.findAll();
     	Map<String,Authority> authorityMap = new HashMap<>();
     	authorities.stream().forEach(authority -> {
@@ -1676,7 +1679,10 @@ public class UserService {
 				}
 			}
 		}
-
+		UserExtension userExtn = userExtensionRepository.findOne(id);
+		user.setDeactivationReason(userExtn.getDeactivationReason());
+		user.setUserPreferenceTimezone(userExtn.getTimeZone());		
+		
 		if (Objects.nonNull(user)) {
 			return user;
 		} else {

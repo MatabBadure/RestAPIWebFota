@@ -205,17 +205,19 @@ public class UserExtensionResource {
      */
     @RequestMapping(value = "/user/{id}",
             method = RequestMethod.DELETE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
     
     //hill-1845
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CUSTOMER_SERVICES, AuthoritiesConstants.FOTA_ADMIN,AuthoritiesConstants.FOTA_APPROVER})
     //hill-1845
-    public ResponseEntity<JSONObject> delete(@PathVariable Long id, HttpServletRequest request) {
+    public ResponseEntity<JSONObject> delete(@PathVariable Long id, HttpServletRequest request,@RequestBody JSONObject reasonCode) {
         log.debug("REST request to delete UserExtension : {}", id);
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
         JSONObject jsonObject = new JSONObject();
 		try {
-			jsonObject = userService.deleteUser(id, baseUrl);
+			String reason = reasonCode.get("reasonCode").toString();
+			jsonObject = userService.deleteUser(id, baseUrl,reason);
 			 if (jsonObject.containsKey("ERROR")) {
 		        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.FORBIDDEN);
 		        } else {

@@ -6,6 +6,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -477,33 +478,155 @@ public class AdvancedSearchRepository {
 	
 	//----------------------------------------------------------------------------------------------------------------------------------------------
 	
-	/*public Page<HcpVO> advancedSearchHcps(AdvancedHcpDTO advancedHcpDTO,
+
+	public Page<HcpVO> advancedSearchHcps(AdvancedHcpDTO advancedHcpDTO,
+
 			Pageable pageable, Map<String, Boolean> sortOrder) {
 		
 		String baseQuery = QueryConstants.QUERY_ADVANCED_HCP_SEARCH_FOR_ALL_DEVICETYPE_HILLROM_LOGIN;
 		String whereClause = " WHERE ";
 		StringBuilder filter = new StringBuilder();
 		StringBuilder finalQuery = new StringBuilder();
+
+		
 		try{
 		
-			Query formation
-			 * filter: used to append the values from AdvancedPatientDTO
+
 			 
 			if(!StringUtils.isBlank(advancedHcpDTO.getName())){
-				filter = filter.append("(kt.pfirstName like ").append("'%").append(advancedHcpDTO.getName()).append("%'"); 
-				filter = filter.append(" OR ").append("kt.plastName like ").append("'%").append(advancedHcpDTO.getName()).append("%') ");
+				filter = filter.append("(kt.clinicName like ").append("'%").append(advancedHcpDTO.getName()).append("%'"); 
 			} 
 			
-			filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedHcpDTO.getHillromId())) ? (filter.append(" AND ")) : (filter.append(""));
-			if(!StringUtils.isBlank(advancedHcpDTO.getHillromId())){
-		    	filter = filter.append("kt.phillrom_id like ").append("'%").append(advancedHcpDTO.getHillromId()).append("%' ");
+			filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedHcpDTO.getSpecialty())) ? (filter.append(" AND ")) : (filter.append(""));
+			if(!StringUtils.isBlank(advancedHcpDTO.getSpecialty())){
+		    	filter = filter.append("kt.speciality like ").append("'%").append(advancedHcpDTO.getSpecialty()).append("%' ");
 		    }
+			
+			filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedHcpDTO.getCredentials())) ? (filter.append(" AND ")) : (filter.append(""));
+			if(!StringUtils.isBlank(advancedHcpDTO.getCredentials())){
+		    	filter = filter.append("kt.credentials like ").append("'%").append(advancedHcpDTO.getCredentials()).append("%' ");
+		    }
+			
+			filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedHcpDTO.getCountry())) ? (filter.append(" AND ")) : (filter.append(""));
+			if(!StringUtils.isBlank(advancedHcpDTO.getCountry())){
+		    	filter = filter.append("kt.country IN ('").append(advancedHcpDTO.getCountry()).append("') ");
+		    }
+			
+			filter = (filter.length()>0)&&(advancedHcpDTO.getState().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
+			if(advancedHcpDTO.getState().size()>0){
+				String csvStates = String.join("','", advancedHcpDTO.getState());  //Forming the comma & single quote separated list
+		    	filter = filter.append("kt.hstate IN ('").append(csvStates).append("') ");
+		    }
+			
+			filter = (filter.length()>0)&&(advancedHcpDTO.getCity().size()>0) ? (filter.append(" AND ")) : (filter.append(""));
+			if(advancedHcpDTO.getCity().size()>0){
+				String csvCities = String.join("','", advancedHcpDTO.getCity());	//Forming the comma & single quote separated list
+		    	filter = filter.append("kt.hcity IN ('").append(csvCities).append("') ");
+		    }
+			
+			filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedHcpDTO.getZipcode())) ? (filter.append(" AND ")) : (filter.append(""));
+			if(!StringUtils.isBlank(advancedHcpDTO.getZipcode())){
+		    	filter = filter.append("kt.zipcode like ").append("'%").append(advancedHcpDTO.getZipcode()).append("%' ");
+		    }
+			
+			filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedHcpDTO.getStatus())) ? (filter.append(" AND ")) : (filter.append(""));
+			if(!StringUtils.isBlank(advancedHcpDTO.getStatus())){
+				if(advancedHcpDTO.getStatus().equalsIgnoreCase("All")){
+					filter = filter.append("kt.isDeleted IN (true,false) ");
+				}
+				else if(advancedHcpDTO.getStatus().equalsIgnoreCase("Active"))
+					filter = filter.append("kt.isDeleted IN ").append("(false) ");
+				else if(advancedHcpDTO.getStatus().equalsIgnoreCase("Inactive"))
+					filter = filter.append("kt.isDeleted IN ").append("(true) ");
+			}
+			
+			finalQuery = finalQuery.append(baseQuery);
+				//checking if the filter object is null , if not finalQuery = where+filter 
+				if(filter.length()>0){
+					finalQuery.append(whereClause);
+					finalQuery.append(filter);
+				}
+			
+			log.debug("Advanced HCP Search Query : " + finalQuery);
+			
+			String countSqlQuery = "select count(distinct hcpUsers.user_id) from (" + finalQuery + " ) hcpUsers";
+			
+			Query countQuery = entityManager.createNativeQuery(countSqlQuery);
+			BigInteger count = (BigInteger) countQuery.getSingleResult();
+
+			Query query = getOrderedByQuery(finalQuery, sortOrder);
+
+			List<HcpVO> hcpUsers = new ArrayList<>();
+
+			Map<Long, HcpVO> hcpUsersMap = new HashMap<>();
+			List<Object[]> results = query.getResultList();
+
+			results.forEach((record) -> {
+				Long id = ((BigInteger) record[0]).longValue();
+				String email = (String) record[1];
+				String firstName = (String) record[2];
+				String lastName = (String) record[3];
+				Boolean isDeleted = (Boolean) record[4];
+				String zipcode = (String) record[5];
+				String address = (String) record[6];
+				String city = (String) record[7];
+				String credentials = (String) record[8];
+
+				String faxNumber = (String) record[9];
+				String primaryPhone = (String) record[10];
+				String mobilePhone = (String) record[11];
+				String speciality = (String) record[12];
+				String state = (String) record[13];
+				String clinicId = (String) record[14];
+				String clinicName = (String) record[15];
+				Timestamp createdAt = (Timestamp) record[16];
+				DateTime createdAtDatetime = new DateTime(createdAt);
+				Boolean isActivated = (Boolean) record[17];
+				String npiNumber = (String) record[18];
+
+				HcpVO hcpVO = hcpUsersMap.get(id);
+
+				Map<String, String> clinicMap = new HashMap<>();
+				if (null != clinicId) {
+					clinicMap.put("id", clinicId);
+					clinicMap.put("name", clinicName);
+				}
+				if (hcpVO == null) {
+					hcpVO = new HcpVO(id, firstName, lastName, email, isDeleted, zipcode, address, city, credentials,
+							faxNumber, primaryPhone, mobilePhone, speciality, state, createdAtDatetime, isActivated,
+							npiNumber);
+					if (clinicMap.keySet().size() > 0) {
+						hcpVO.getClinics().add(clinicMap);
+					}
+					hcpUsersMap.put(id, hcpVO);
+				} else {
+					hcpUsers.remove(hcpVO);
+					if (clinicMap.keySet().size() > 0) {
+						hcpVO.getClinics().add(clinicMap);
+					}
+				}
+				hcpUsers.add(hcpVO);
+			});
+			int firstResult = pageable.getOffset();
+			int maxResults = firstResult + pageable.getPageSize();
+			List<HcpVO> hcpUsersSubList = new ArrayList<>();
+			if (firstResult < hcpUsers.size()) {
+				maxResults = maxResults > hcpUsers.size() ? hcpUsers.size() : maxResults;
+				hcpUsersSubList = hcpUsers.subList(firstResult, maxResults);
+			}
+			Page<HcpVO> page = new PageImpl<HcpVO>(hcpUsersSubList, null, count.intValue());
+
+			return page;
+			
+
 		}
 		catch(Exception e){
 			e.printStackTrace();
 		}
 		return null;
-	}*/
+
+	}
+
 	//----------------------------------------------------------------------------------------------------------------------------------------------
 
 	private void setPaginationParams(Pageable pageable, Query query) {

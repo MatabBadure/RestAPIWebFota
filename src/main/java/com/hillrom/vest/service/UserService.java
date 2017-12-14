@@ -2375,68 +2375,56 @@ public class UserService {
      * Runs every midnight to find patient reaching 18 years in coming 30/3/2/1 days and send them email notification
      */
      //@Scheduled(cron="0 10 00 * * *")
-     public void processPatientReRegister(){
+		public void processPatientReRegister(){
         
-        List<Object[]> patientDtlsList = new ArrayList<Object[]>();;
-        
+		List<Object[]> patientDtlsList = new ArrayList<Object[]>();;
+		        
+		
+		String eMail = "";
+			
+		try{
+			       
+			log.debug("Started calculating patients who is reaching 18 years in next 30/3/2/1 days ");
+			               
+			int alertDays[]=new int[4];
+			alertDays[0]=30;alertDays[1]=3;alertDays[2]=2;alertDays[3]=1;
 
-        String eMail = "";
-        
-            try{
-                   
-                   log.debug("Started calculating patients who is reaching 18 years in next 30 days ");
-                   
-                        int alertDays[]=new int[4];
-                      alertDays[0]=30;alertDays[1]=3;alertDays[2]=2;alertDays[3]=1;
-                      
-                      Calendar cal = null;
-                      for(int i=0;i<alertDays.length;i++){
-                             cal = Calendar.getInstance();
-                             cal.add(Calendar.DATE, alertDays[i]);
-                             
-                             int year = cal.get(Calendar.YEAR);
-                             int month = cal.get(Calendar.MONTH)+1;
-                             int day = cal.get(Calendar.DAY_OF_MONTH);
-       
-                               // get all patients Details through repository 
-                             patientDtlsList.addAll(userRepository.findUserPatientsMaturityDobAfterDays(year,month,day));
-                      }
-                      
-                   
+			Calendar cal = null;
+			for(int i=0;i<alertDays.length;i++){
+				cal = Calendar.getInstance();
+				cal.add(Calendar.DATE, alertDays[i]);
 
-                      patientDtlsList.stream().collect(Collectors.groupingBy(object->(String)object[0]));
-                      
-                      
+				int year = cal.get(Calendar.YEAR);
+				int month = cal.get(Calendar.MONTH)+1;
+				int day = cal.get(Calendar.DAY_OF_MONTH);
 
-                      // send activation link to those patients
-                      for (Object[] object : patientDtlsList) {
-                      
-                       eMail =  (String) object[3];
-                       User user = new User();
+				// get all patients Details through repository 
+				patientDtlsList.addAll(userRepository.findUserPatientsMaturityDobAfterDays(year,month,day));
+			}
 
-                       user.setEmail(eMail);
-                       user.setFirstName((String) object[7]);
-                       user.setLastName((String) object[8]);
-                       user.setActivationKey((String) object[9]);
+			patientDtlsList.stream().collect(Collectors.groupingBy(object->(String)object[0]));
 
-                       
-                       if(StringUtils.isNotEmpty(eMail) && !user.isReRegister()) {
-                              mailService.sendMailTo18YearOldPatient(user);
+			// send activation link to those patients
+			for (Object[] object : patientDtlsList) {
 
-                                   }
-                      
-                   }
-                   
-            }catch(Exception ex){
-                     StringWriter writer = new StringWriter();
-                     PrintWriter printWriter = new PrintWriter( writer );
-                     ex.printStackTrace( printWriter );
-                     System.out.println("ex :"+ex);
-                     mailService.sendJobFailureNotification("processPatientReRegister",writer.toString());
-              }
-            return;
-     }
-   
+				eMail =  (String) object[3];
+				User user = userRepository.getOne((Long)object[5]);
+				if(StringUtils.isNotEmpty(eMail) && !user.isReRegister()) {
+					mailService.sendMailTo18YearOldPatient(user);
+				}
+			}
+
+		}
+		catch(Exception ex){
+			StringWriter writer = new StringWriter();
+			PrintWriter printWriter = new PrintWriter( writer );
+			ex.printStackTrace( printWriter );
+			System.out.println("ex :"+ex);
+			mailService.sendJobFailureNotification("processPatientReRegister",writer.toString());
+		}
+		return;
+		}
+	   
      
      
 }

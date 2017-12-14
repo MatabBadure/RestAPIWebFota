@@ -694,7 +694,7 @@ public class MailService {
     		user.setActivationLinkSentDate(DateTime.now());
     		userRepository.saveAndFlush(user);
     		sendActivationEmailTo18Yrs(user, baseUrl);
-   // 		eventPublisher.publishEvent(new OnCredentialsChangeEvent(user.getId()));
+    		eventPublisher.publishEvent(new OnCredentialsChangeEvent(user.getId()));
       }
 
 	@Async

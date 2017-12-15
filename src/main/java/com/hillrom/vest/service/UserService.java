@@ -6,6 +6,7 @@ import static com.hillrom.vest.config.Constants.VEST;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -2407,8 +2408,9 @@ public class UserService {
 			// send activation link to those patients
 			for (Object[] object : patientDtlsList) {
 
-				eMail =  (String) object[3];
-				User user = userRepository.getOne((Long)object[5]);
+				//eMail =  (String) object[3];
+				User user = userRepository.getOne(((BigInteger) object[1]).longValue());
+				eMail = user.getEmail();
 				if(StringUtils.isNotEmpty(eMail) && !user.isReRegister()) {
 					mailService.sendMailTo18YearOldPatient(user);
 				}

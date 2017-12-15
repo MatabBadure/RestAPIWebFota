@@ -81,7 +81,7 @@ public class TestResultsGraphService extends AbstractGraphService {
 	private GraphDataVO createSeriesData(Filter filter,
 			PatientTestResult patientTestResult, String seriesName) {
 		GraphDataVO point;		
-		if(seriesName.equalsIgnoreCase("FVC_P")){
+		if(seriesName.equalsIgnoreCase(FVC_P)){
 			point = new GraphDataVO(DateUtil.formatDate(
 				patientTestResult.getTestResultDate(), MMddyyyy),
 				patientTestResult.getFVC_P());

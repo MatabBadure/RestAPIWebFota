@@ -56,6 +56,10 @@ public class PatientNoEventService {
 				patientNoEvent.setFirstTransmissionDate(transmittedDate);
 				patientNoEvent.setFirstTransmissionDateBeforeUpdate(transmittedDate);
 				patientNoEvent.setFirstTransDateType(FIRST_TRANSMISSION_FIRTS_TYPE);
+			}else if(Objects.nonNull(trainingDate) && trainingDate.isBefore(transmittedDate)){
+				patientNoEvent.setFirstTransmissionDate(transmittedDate);
+				patientNoEvent.setFirstTransDateType(FIRST_TRANSMISSION_FIRTS_TYPE);
+				patientNoEvent.setDateFirstTransmissionDateUpdated(new LocalDate());
 			}else{
 				patientNoEvent.setFirstTransmissionDate(transmittedDate);
 				patientNoEvent.setFirstTransDateType(FIRST_TRANSMISSION_FIRTS_TYPE);

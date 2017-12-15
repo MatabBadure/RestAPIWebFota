@@ -1,6 +1,7 @@
 package com.hillrom.monarch.service;
 
 import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_COMPLIANCE_SCORE;
+import static com.hillrom.vest.config.AdherenceScoreConstants.FIRST_TRANSMISSION_FIRTS_TYPE;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -87,10 +88,14 @@ public class PatientNoEventMonarchService {
 			}else if(Objects.nonNull(trainingDate) && trainingDate.equals(transmittedDate)){ 
 				patientNoEvent.setFirstTransmissionDate(transmittedDate);
 				patientNoEvent.setFirstTransmissionDateBeforeUpdate(transmittedDate);
-				patientNoEvent.setFirstTransDateType("first_trans");
+				patientNoEvent.setFirstTransDateType(FIRST_TRANSMISSION_FIRTS_TYPE);
+			}else if(Objects.nonNull(trainingDate) && trainingDate.isBefore(transmittedDate)){
+				patientNoEvent.setFirstTransmissionDate(transmittedDate);
+				patientNoEvent.setFirstTransDateType(FIRST_TRANSMISSION_FIRTS_TYPE);
+				patientNoEvent.setDateFirstTransmissionDateUpdated(new LocalDate());
 			}else{
 				patientNoEvent.setFirstTransmissionDate(transmittedDate);
-				patientNoEvent.setFirstTransDateType("first_trans");
+				patientNoEvent.setFirstTransDateType(FIRST_TRANSMISSION_FIRTS_TYPE);
 			}
 			
 			noEventsMonarchRepository.save(patientNoEvent);

@@ -50,6 +50,17 @@ public interface UserRepository extends JpaRepository<User, Long> {
             + " and DAY(pi.dob) = ?3 and YEAR(pi.dob) + 18 = ?1 "
             + " and upa.relationshipLabel = 'Caregiver' and upa.userRole = 'CARE_GIVER'")
        List<Object[]> findUserPatientsMaturityDobAfter90Days(int year, int month, int day);
+       
+   @Query(" SELECT pi.id, pi.firstName, pi.lastName, pi.email, pi.dob "
+    		   + " ,uupa.id ,uupa.email, uupa.firstName ,uupa.lastName, uupa.activationKey "
+    		   + " FROM PatientInfo pi "
+    		   + " left join pi.userPatientAssoc upa "
+    		   + " left join upa.userPatientAssocPK.user uupa  "
+    		   + " where MONTH(pi.dob) = ?2  "
+    		   + " and DAY(pi.dob) = ?3 and YEAR(pi.dob) + 18 = ?1 "
+    		   + " and upa.relationshipLabel IN ('Parent','Caregiver','Sibling') and upa.userRole = 'CARE_GIVER'")
+       List<Object[]> findUserPatientsMaturityDobAfterDays(int year, int month, int day);
+
 
     
     

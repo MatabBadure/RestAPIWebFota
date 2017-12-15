@@ -28,6 +28,7 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -44,6 +45,7 @@ import com.hillrom.vest.domain.PatientProtocolDataMonarch;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserSurveyAnswer;
 import com.hillrom.vest.repository.UserRepository;
+import com.hillrom.vest.security.OnCredentialsChangeEvent;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.web.rest.dto.CareGiverStatsNotificationVO;
@@ -79,6 +81,9 @@ public class MailService {
     
     @Inject
     private HillromPDFHandler hillromPDFHandler;
+
+    @Inject
+    private ApplicationEventPublisher eventPublisher;
 
     /**
      * System default email address that sends the e-mails.
@@ -217,6 +222,18 @@ public class MailService {
         context.setVariable("baseUrl", baseUrl);
         String content = templateEngine.process("activationEmail", context);
         String subject = messageSource.getMessage("email.reactivation.title", null, locale);
+        sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
+    }
+    
+    @Async
+    public void sendActivationEmailTo18Yrs(User user, String baseUrl) {
+        log.debug("Sending re-registration e-mail to '{}'", user.getEmail());
+        Locale locale = getLocale(user);
+        Context context = new Context(locale);
+        context.setVariable("user", userNameFormatting(user));
+        context.setVariable("baseUrl", baseUrl);
+        String content = templateEngine.process("notify18YrsReRegistration", context);
+        String subject = messageSource.getMessage("email.re-registration.title", null, locale);
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
     }
     
@@ -673,7 +690,11 @@ public class MailService {
      }
     
         public void sendMailTo18YearOldPatient(User user) {
-        this.sendActivationEmail(user, this.baseUrl );
+        	user.setActivationKey(RandomUtil.generateActivationKey());
+    		user.setActivationLinkSentDate(DateTime.now());
+    		userRepository.saveAndFlush(user);
+    		sendActivationEmailTo18Yrs(user, baseUrl);
+    		eventPublisher.publishEvent(new OnCredentialsChangeEvent(user.getId()));
       }
 
 	@Async

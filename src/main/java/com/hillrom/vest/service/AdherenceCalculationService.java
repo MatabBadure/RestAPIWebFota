@@ -1532,7 +1532,7 @@ public class AdherenceCalculationService {
 			if (firstTransmittedDate.isAfter(therapyDate)) {
 				noEventService.updatePatientFirstTransmittedDate(
 						patientUser.getId(), therapyDate, patient.getId());
-				firstTransmittedDate = therapyDate;
+						firstTransmittedDate = therapyDate;
 			}
 			
 			int daysBetween = DateUtil.getDaysCountBetweenLocalDates(firstTransmittedDate, therapyDate);

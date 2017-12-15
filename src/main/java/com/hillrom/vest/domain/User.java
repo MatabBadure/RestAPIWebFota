@@ -168,7 +168,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Column(name = "expiration_date", nullable = true)
     private DateTime expirationDate = null;
     
-    @Column(name="re_register")
+    @Column(name="re_registered")
     private Boolean reRegister = false;
     
   //Garment changes

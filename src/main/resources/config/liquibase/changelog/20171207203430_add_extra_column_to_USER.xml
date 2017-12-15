@@ -8,9 +8,10 @@
     <!--
         Added re_register column in USER table.
     -->
-    <changeSet id="20171207203430" author="jhipster">
+    <changeSet id="20171207203430" author="jhipster">	
     	<addColumn tableName="USER">
-			<column name="re_register" type="bit(1)"/>
+			<column name="re_registered"  type="boolean" defaultValueBoolean="false">
+            </column>
         </addColumn>
     </changeSet>
 </databaseChangeLog>

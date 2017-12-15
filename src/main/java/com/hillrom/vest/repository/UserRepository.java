@@ -39,28 +39,26 @@ public interface UserRepository extends JpaRepository<User, Long> {
     
     @Query("from User user where activated = false and activationLinkSentDate between ?1 and ?2")
     List<User> findAllByActivatedIsFalseAndActivationLinkSentDateBetweeen(DateTime dateTime1, DateTime dateTime2);
-
-    
-    @Query(" SELECT pi.id, pi.firstName, pi.lastName, pi.email, pi.dob "
-            + " ,uupa.id ,uupa.email, uupa.firstName ,uupa.lastName, uupa.activationKey "
-            + " FROM PatientInfo pi "
-            + " left join pi.userPatientAssoc upa "
-            + " left join upa.userPatientAssocPK.user uupa  "
-            + " where MONTH(pi.dob) = ?2  "
-            + " and DAY(pi.dob) = ?3 and YEAR(pi.dob) + 18 = ?1 "
-            + " and upa.relationshipLabel = 'Caregiver' and upa.userRole = 'CARE_GIVER'")
-       List<Object[]> findUserPatientsMaturityDobAfter90Days(int year, int month, int day);
        
-   @Query(" SELECT pi.id, pi.firstName, pi.lastName, pi.email, pi.dob "
+   /*@Query(" SELECT pi.id, pi.firstName, pi.lastName, uupa.email, pi.dob "
     		   + " ,uupa.id ,uupa.email, uupa.firstName ,uupa.lastName, uupa.activationKey "
     		   + " FROM PatientInfo pi "
     		   + " left join pi.userPatientAssoc upa "
     		   + " left join upa.userPatientAssocPK.user uupa  "
     		   + " where MONTH(pi.dob) = ?2  "
     		   + " and DAY(pi.dob) = ?3 and YEAR(pi.dob) + 18 = ?1 "
-    		   + " and upa.relationshipLabel IN ('Parent','Caregiver','Sibling') and upa.userRole = 'CARE_GIVER'")
-       List<Object[]> findUserPatientsMaturityDobAfterDays(int year, int month, int day);
+    		   + " and upa.relationshipLabel IN ('Self') and upa.userRole = 'PATIENT'")
+       List<Object[]> findUserPatientsMaturityDobAfterDays(int year, int month, int day);*/
 
+    @Query(nativeQuery=true,
+  			 value=" SELECT pi.id as patientId ,us.id as userId from USER us"
+  			 		+ " left outer join USER_PATIENT_ASSOC upa on upa.user_id = us.id "
+  			 		+ " left outer join PATIENT_INFO pi on pi.id = upa.patient_id "
+  			 		+ " where MONTH(pi.dob) = ?2  "
+  	    		    + " and DAY(pi.dob) = ?3 and YEAR(pi.dob) + 18 = ?1 "
+  			 		+ "	and upa.relation_label = 'Self' and upa.user_role = 'PATIENT' ")
+    List<Object[]> findUserPatientsMaturityDobAfterDays(int year, int month, int day);
+       
 
     
     

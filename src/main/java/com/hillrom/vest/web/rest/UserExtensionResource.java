@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hillrom.monarch.service.PatientNoEventMonarchService;
 import com.hillrom.vest.config.Constants;
+import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
@@ -303,19 +304,25 @@ public class UserExtensionResource {
             @RequestParam(value = "sort_by", required = false) String sortBy,
             @RequestParam(value = "asc",required = false) Boolean isAscending)
         throws URISyntaxException {
-    	if(searchString.endsWith("_")){
-    		   searchString = searchString.replace("_", "\\\\_");
+    	if(!StringUtils.isBlank(searchString)) {
+    		if(searchString.endsWith("_")){
+    			searchString = searchString.replace("_", "\\\\_");
+    		}
+    		String queryString = new StringBuilder("'%").append(searchString).append("%'").toString();
+    		Map<String,Boolean> sortOrder = new HashMap<>();
+    		if(sortBy != null  && !sortBy.equals("")) {
+    			isAscending =  (isAscending != null) ?  isAscending : true;
+    			sortOrder.put(sortBy, isAscending);
+    		}
+    		Page<HcpVO> page = userSearchRepository.findHCPBy(queryString,filter,
+    				PaginationUtil.generatePageRequest(offset, limit),sortOrder, associatedToClinicId);
+    		HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/user/hcp/search", offset, limit);
+    		return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     	}
-    	String queryString = new StringBuilder("'%").append(searchString).append("%'").toString();
-    	Map<String,Boolean> sortOrder = new HashMap<>();
-    	if(sortBy != null  && !sortBy.equals("")) {
-    		isAscending =  (isAscending != null) ?  isAscending : true;
-    		sortOrder.put(sortBy, isAscending);
+    	else{
+    		List<Clinic> emptyList = new ArrayList<Clinic>();
+    		return new ResponseEntity<>(emptyList,HttpStatus.OK); 
     	}
-    	Page<HcpVO> page = userSearchRepository.findHCPBy(queryString,filter,
-    			PaginationUtil.generatePageRequest(offset, limit),sortOrder, associatedToClinicId);
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/user/hcp/search", offset, limit);
-        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
     
     /**

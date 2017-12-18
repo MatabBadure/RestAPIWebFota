@@ -1592,11 +1592,17 @@ public class UserService {
 			throw new HillromException(ExceptionConstants.HR_553);//Invalid Activation Key
 		}
 		
-		if(existingUser.isPresent()){
-			if(!currentUser.getEmail().equalsIgnoreCase(params.get("emailId"))){
-				currentUser.setEmail(currentUser.getEmail());
+		if(StringUtils.isNotBlank(currentUser.getEmail())) {
+			Optional<User> user = userRepository.findOneByEmail(params.get("emailId"));
+			if (user.isPresent()) {
+				throw new HillromException(ExceptionConstants.HR_501);
+    		}
+			if(existingUser.isPresent()){
+				if(!currentUser.getEmail().equalsIgnoreCase(params.get("emailId"))){
+					currentUser.setEmail(params.get("emailId"));
+				}
 			}
-		}
+    	}
 
 		Long qid = Long.parseLong(params.get("questionId"));
 		String answer = params.get("answer");
@@ -2375,7 +2381,7 @@ public class UserService {
 	/**
      * Runs every midnight to find patient reaching 18 years in coming 30/3/2/1 days and send them email notification
      */
-     //@Scheduled(cron="0 10 00 * * *")
+     //@Scheduled(cron="00 00 10 * * *")
 		public void processPatientReRegister(){
         
 		List<Object[]> patientDtlsList = new ArrayList<Object[]>();;

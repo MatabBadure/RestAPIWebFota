@@ -1984,13 +1984,16 @@ public class UserService {
 		}
 	 }
 	
-	public User setUserNotificationSetting(Long id, Map<String, Boolean> paramsMap) throws HillromException {
+	public User setUserNotificationSetting(Long id, Map<String, String> paramsMap) throws HillromException {
 		User user = userRepository.findOne(id);
 		if (Objects.nonNull(user)) {
-			user.setMissedTherapyNotification(paramsMap.get("isMissedTherapyNotification"));
-			user.setNonHMRNotification(paramsMap.get("isNonHMRNotification"));
-			user.setSettingDeviationNotification(paramsMap.get("isSettingDeviationNotification"));			
-			user.setMessageNotification(paramsMap.get("isMessageNotification"));
+			user.setMissedTherapyNotification(Boolean.parseBoolean(paramsMap.get("isMissedTherapyNotification")));
+			user.setNonHMRNotification(Boolean.parseBoolean(paramsMap.get("isNonHMRNotification")));
+			user.setSettingDeviationNotification(Boolean.parseBoolean(paramsMap.get("isSettingDeviationNotification")));			
+			user.setMessageNotification(Boolean.parseBoolean(paramsMap.get("isMessageNotification")));
+			user.setMissedTherapyNotificationFreq(paramsMap.get("missedTherapyNotificationFreq"));
+			user.setNonHMRNotificationFreq(paramsMap.get("nonHMRNotificationFreq"));
+			user.setSettingDeviationNotificationFreq(paramsMap.get("settingDeviationNotificationFreq"));						
 			userRepository.save(user);
 			return user;
 		} else {
@@ -2379,9 +2382,6 @@ public class UserService {
     			mailService.sendJobFailureNotification("processPatientReRegister",writer.toString());
     		}
             return;
-     }
-   
-     
-     
+     }     
 }
 

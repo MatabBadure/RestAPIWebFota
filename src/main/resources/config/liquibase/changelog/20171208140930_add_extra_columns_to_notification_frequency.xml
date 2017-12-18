@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <!--
+        Added missed_therapy_notification_frequency column to the USER Table.
+        Added non_hmr_notification_frequency column to the USER Table.
+        Added setting_deviation_notification_frequency column to the USER Table.
+        Added message_notification_frequency column to the USER Table.
+    -->
+    <changeSet id="20171208140930" author="jhipster">
+    	<addColumn tableName="USER">
+			<column name="missed_therapy_notification_freq" type="varchar(255)"/>
+			<column name="non_hmr_notification_freq" type="varchar(255)"/>
+			<column name="setting_deviation_notification_freq" type="varchar(255)"/>			
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

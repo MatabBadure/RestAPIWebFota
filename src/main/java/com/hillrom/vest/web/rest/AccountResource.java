@@ -363,4 +363,24 @@ public class AccountResource {
 		}
         
     }
+    
+    /**
+     * PUT  /update_emailpassword -> changes the current user's email,password
+     */
+    @RequestMapping(value = "/account/re_register",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    public ResponseEntity<JSONObject> updateReRegisteredUser(@RequestBody(required=true) Map<String,String> params) {
+    	JSONObject JsonObject = new JSONObject();
+		try {
+			JsonObject = userService.updateReRegisteredUser(params);
+			if(null != JsonObject.get("ERROR"))
+	    		return ResponseEntity.badRequest().body(JsonObject);
+	        return new ResponseEntity<>(HttpStatus.OK);
+		} catch (HillromException e) {
+			JsonObject.put("ERROR", e.getMessage());
+			return ResponseEntity.badRequest().body(JsonObject);
+		}
+    }
 }

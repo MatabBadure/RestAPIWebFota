@@ -97,6 +97,7 @@ IF operation_type_indicator = 'CREATE' THEN
 								`modified_date` = today_date,
 								`old_patient_id` = temp_patient_info_id,
 								`hub_id` = pat_hub_id,
+								`training_date` = pat_training_date,
 								`bluetooth_id` = pat_bluetooth_id,
 								`diagnosis1` = pat_diagnosis_code1,
 								`diagnosis2` = pat_diagnosis_code2,

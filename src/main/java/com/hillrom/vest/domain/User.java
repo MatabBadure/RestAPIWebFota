@@ -176,6 +176,9 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Column(name="setting_deviation_notification_freq")
     private String settingDeviationNotificationFreq;
     
+    @Column(name="re_registered")
+    private Boolean reRegister = false;
+    
    //Garment changes
     @Transient
     @JsonSerialize
@@ -584,7 +587,6 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
         return true;
     }
-
 	
     /**
 	 * @return the userPreferenceTimezone
@@ -598,6 +600,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	 */
 	public void setUserPreferenceTimezone(String userPreferenceTimezone) {
 		this.userPreferenceTimezone = userPreferenceTimezone;
+	}
+	
+	public Boolean isReRegister() {
+		return reRegister;
+	}
+
+	public void setReRegister(Boolean reRegister) {
+		this.reRegister = reRegister;
 	}
 
 	@Override
@@ -631,19 +641,20 @@ public class User extends AbstractAuditingEntity implements Serializable {
 				+ messageNotification + ", activationLinkSentDate="
 				+ activationLinkSentDate + ", expired=" + expired
 				+ ", expirationDate=" + expirationDate
-				+ ", nonHMRNotificationFreq="
-				+ nonHMRNotificationFreq
+				+ ", nonHMRNotificationFreq=" + nonHMRNotificationFreq
 				+ ", missedTherapyNotificationFreq="
 				+ missedTherapyNotificationFreq
 				+ ", settingDeviationNotificationFreq="
-				+ settingDeviationNotificationFreq
-				+ ", vestGarmentColor="
-				+ vestGarmentColor + ", vestGarmentSize=" + vestGarmentSize
-				+ ", vestGarmentType=" + vestGarmentType
-				+ ", monarchGarmentColor=" + monarchGarmentColor
-				+ ", monarchGarmentSize=" + monarchGarmentSize
-				+ ", monarchGarmentType=" + monarchGarmentType
-				+ ", deactivationReason=" + deactivationReason
-				+ ", userPreferenceTimezone=" + userPreferenceTimezone + "]";
+				+ settingDeviationNotificationFreq + ", reRegister="
+				+ reRegister + ", vestGarmentColor=" + vestGarmentColor
+				+ ", vestGarmentSize=" + vestGarmentSize + ", vestGarmentType="
+				+ vestGarmentType + ", monarchGarmentColor="
+				+ monarchGarmentColor + ", monarchGarmentSize="
+				+ monarchGarmentSize + ", monarchGarmentType="
+				+ monarchGarmentType + ", deactivationReason="
+				+ deactivationReason + ", userPreferenceTimezone="
+				+ userPreferenceTimezone + "]";
 	}
+
 }
+

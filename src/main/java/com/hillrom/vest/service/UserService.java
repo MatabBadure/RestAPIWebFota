@@ -1592,17 +1592,11 @@ public class UserService {
 			throw new HillromException(ExceptionConstants.HR_553);//Invalid Activation Key
 		}
 		
-		if(StringUtils.isNotBlank(currentUser.getEmail())) {
-			Optional<User> user = userRepository.findOneByEmail(params.get("emailId"));
-			if (user.isPresent()) {
-				throw new HillromException(ExceptionConstants.HR_501);
-    		}
-			if(existingUser.isPresent()){
-				if(!currentUser.getEmail().equalsIgnoreCase(params.get("emailId"))){
-					currentUser.setEmail(params.get("emailId"));
-				}
+		if(existingUser.isPresent()){
+			if(!currentUser.getEmail().equalsIgnoreCase(params.get("emailId"))){
+				currentUser.setEmail(params.get("emailId"));
 			}
-    	}
+		}
 
 		Long qid = Long.parseLong(params.get("questionId"));
 		String answer = params.get("answer");

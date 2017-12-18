@@ -2375,7 +2375,7 @@ public class UserService {
 	/**
      * Runs every midnight to find patient reaching 18 years in coming 30/3/2/1 days and send them email notification
      */
-     //@Scheduled(cron="00 00 10 * * *")
+	//@Scheduled(cron="0 10 00 * * *")
 		public void processPatientReRegister(){
         
 		List<Object[]> patientDtlsList = new ArrayList<Object[]>();;

@@ -2905,8 +2905,13 @@ public class AdherenceCalculationServiceMonarch{
 						PatientProtocolDataMonarch newProtocol = new PatientProtocolDataMonarch(oldProtocol.getType(), patientInfo, user,
 								oldProtocol.getTreatmentsPerDay(), oldProtocol.getMinMinutesPerTreatment(), oldProtocol.getTreatmentLabel(),
 								oldProtocol.getMinFrequency(), oldProtocol.getMaxFrequency(), oldProtocol.getMinIntensity(),
-								oldProtocol.getMaxIntensity());						
-							
+								oldProtocol.getMaxIntensity());
+						
+						String protocolKey = patientProtocolMonarchRepository.id();
+						
+						newProtocol.setId(protocolKey);
+						newProtocol.setProtocolKey(protocolKey);
+						
 						newProtocolList.add(newProtocol);
 					}
 					protocolMonarchService.saveAll(newProtocolList);							
@@ -2960,7 +2965,11 @@ public class AdherenceCalculationServiceMonarch{
 								oldProtocol.getTreatmentsPerDay(), oldProtocol.getMinMinutesPerTreatment(), oldProtocol.getTreatmentLabel(),
 								oldProtocol.getMinFrequency(), oldProtocol.getMaxFrequency(), oldProtocol.getMinPressure(),
 								oldProtocol.getMaxPressure());
-							
+
+						String protocolKey = patientProtocolRepository.id();
+						newProtocol.setId(protocolKey);
+						newProtocol.setProtocolKey(protocolKey);
+						
 						newProtocolList.add(newProtocol);
 					}
 					protocolVestService.saveAll(newProtocolList);

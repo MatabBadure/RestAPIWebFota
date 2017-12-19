@@ -100,7 +100,6 @@ private final Logger log = LoggerFactory.getLogger(AdvancedSearchResource.class)
 
 @RequestMapping(value = "/advancedSearch/hcp", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE) 	
 	public ResponseEntity<?> searchHcpsAssociated(@RequestBody AdvancedHcpDTO advancedHcpDTO,
-    		//@RequestParam(value = "clinicId", required=false)String associatedToClinicId,
     		@RequestParam(value = "page" , required = false) Integer offset,
             @RequestParam(value = "per_page", required = false) Integer limit,
             @RequestParam(value = "sort_by", required = false) String sortBy,
@@ -117,7 +116,7 @@ private final Logger log = LoggerFactory.getLogger(AdvancedSearchResource.class)
 		
 		try {
 			page = advancedSearchService.advancedSearchHcps(advancedHcpDTO,PaginationUtil.generatePageRequest(offset, limit),sortOrder);
-			HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/clinics/advanced/search", offset, limit);
+			HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/advancedSearch/hcp", offset, limit);
 			return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
 		} catch (HillromException e) {
 			return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);

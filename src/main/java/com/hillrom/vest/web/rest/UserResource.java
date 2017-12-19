@@ -1736,6 +1736,7 @@ public class UserResource {
         JSONObject jsonObject = new JSONObject();        
 		adherenceCalculationServiceMonarch.processMergeSwapDeviceDetails();        	
 		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+
     }  
     
     @RequestMapping(value = "/processHcpClinicAdminNotification",
@@ -1747,4 +1748,23 @@ public class UserResource {
     	        adherenceCalculationService.processCareGiverNotifications();        	
     			return new ResponseEntity<>(jsonObject, HttpStatus.OK);
     	    }    
+
+    }
+    
+    /**
+     * GET  /users/:userId/clinics/:clinicId/statistics -> get the patient statistics for clinic Badge associated with user.
+     */
+    @RequestMapping(value = "/testing18YrsReRegister",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP, AuthoritiesConstants.CLINIC_ADMIN})
+    public ResponseEntity<?> processPatientReRegister() throws HillromException {
+        log.debug("REST request for testing 18 Yrs reregister");
+        JSONObject jsonObject = new JSONObject();        
+		userService.processPatientReRegister();        	
+		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+    }
+    
+
 }

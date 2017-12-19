@@ -63,7 +63,6 @@ public class TestResultsGraphService extends AbstractGraphService {
 			Series durationSeries = GraphUtils
 					.createSeriesObjectWithName(seriesname);
 			for (PatientTestResult patientTestRes : patientTestResultList) {
-
 				GraphDataVO point = createSeriesData(filter,
 						patientTestRes, seriesname);
 				durationSeries.getData().add(point);
@@ -81,9 +80,8 @@ public class TestResultsGraphService extends AbstractGraphService {
 	 */
 	private GraphDataVO createSeriesData(Filter filter,
 			PatientTestResult patientTestResult, String seriesName) {
-		GraphDataVO point;
-		System.out.println("patientTestResult.getTestResultDate() ::"+patientTestResult.getTestResultDate());
-		if(seriesName.equalsIgnoreCase("FVC_P")){
+		GraphDataVO point;		
+		if(seriesName.equalsIgnoreCase(FVC_P)){
 			point = new GraphDataVO(DateUtil.formatDate(
 				patientTestResult.getTestResultDate(), MMddyyyy),
 				patientTestResult.getFVC_P());

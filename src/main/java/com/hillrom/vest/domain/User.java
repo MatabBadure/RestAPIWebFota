@@ -166,7 +166,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     @Column(name = "expiration_date", nullable = true)
     private DateTime expirationDate = null;
-    
+
     @Column(name="non_hmr_notification_freq")
     private String nonHMRNotificationFreq;
     
@@ -180,6 +180,11 @@ public class User extends AbstractAuditingEntity implements Serializable {
     private Boolean reRegister = false;
     
    //Garment changes
+
+    @Column(name="re_registered")
+    private Boolean reRegister = false;
+    
+  //Garment changes
     @Transient
     @JsonSerialize
     @JsonDeserialize
@@ -569,7 +574,15 @@ public class User extends AbstractAuditingEntity implements Serializable {
 			String settingDeviationNotificationFreq) {
 		this.settingDeviationNotificationFreq = settingDeviationNotificationFreq;
 	}
-	
+
+	public Boolean isReRegister() {
+		return reRegister;
+	}
+
+	public void setReRegister(Boolean reRegister) {
+		this.reRegister = reRegister;
+	}
+  
 	@Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -618,9 +631,6 @@ public class User extends AbstractAuditingEntity implements Serializable {
         }
     }
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", password=" + password + ", title=" + title
@@ -646,6 +656,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
 				+ missedTherapyNotificationFreq
 				+ ", settingDeviationNotificationFreq="
 				+ settingDeviationNotificationFreq + ", reRegister="
+				+ ", expirationDate=" + expirationDate + ", reRegister="
 				+ reRegister + ", vestGarmentColor=" + vestGarmentColor
 				+ ", vestGarmentSize=" + vestGarmentSize + ", vestGarmentType="
 				+ vestGarmentType + ", monarchGarmentColor="

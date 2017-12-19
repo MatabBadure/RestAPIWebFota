@@ -1594,7 +1594,7 @@ public class UserService {
 		
 		if(existingUser.isPresent()){
 			if(!currentUser.getEmail().equalsIgnoreCase(params.get("emailId"))){
-				currentUser.setEmail(currentUser.getEmail());
+				currentUser.setEmail(params.get("emailId"));
 			}
 		}
 
@@ -2034,13 +2034,16 @@ public class UserService {
 		}
 	 }
 	
-	public User setUserNotificationSetting(Long id, Map<String, Boolean> paramsMap) throws HillromException {
+	public User setUserNotificationSetting(Long id, Map<String, String> paramsMap) throws HillromException {
 		User user = userRepository.findOne(id);
 		if (Objects.nonNull(user)) {
-			user.setMissedTherapyNotification(paramsMap.get("isMissedTherapyNotification"));
-			user.setNonHMRNotification(paramsMap.get("isNonHMRNotification"));
-			user.setSettingDeviationNotification(paramsMap.get("isSettingDeviationNotification"));			
-			user.setMessageNotification(paramsMap.get("isMessageNotification"));
+			user.setMissedTherapyNotification(Boolean.parseBoolean(paramsMap.get("isMissedTherapyNotification")));
+			user.setNonHMRNotification(Boolean.parseBoolean(paramsMap.get("isNonHMRNotification")));
+			user.setSettingDeviationNotification(Boolean.parseBoolean(paramsMap.get("isSettingDeviationNotification")));			
+			user.setMessageNotification(Boolean.parseBoolean(paramsMap.get("isMessageNotification")));
+			user.setMissedTherapyNotificationFreq(paramsMap.get("missedTherapyNotificationFreq"));
+			user.setNonHMRNotificationFreq(paramsMap.get("nonHMRNotificationFreq"));
+			user.setSettingDeviationNotificationFreq(paramsMap.get("settingDeviationNotificationFreq"));						
 			userRepository.save(user);
 			return user;
 		} else {
@@ -2375,7 +2378,63 @@ public class UserService {
 	/**
      * Runs every midnight to find patient reaching 18 years in coming 30/3/2/1 days and send them email notification
      */
-     //@Scheduled(cron="0 10 00 * * *")
+	//@Scheduled(cron="*/5 * * * * *")
+     public void processPatientReRegister(){
+    	 
+    	 List<Object[]> patientDtlsList = null;
+    	 
+
+    	 String eMail = "";
+    	 
+            try{
+                   
+                   log.debug("Started calculating patients who is reaching 18 years in next 90 days ");
+                   
+                      Calendar cal = Calendar.getInstance();
+                      cal.add(Calendar.DATE, 90);
+                      
+                      int year = cal.get(Calendar.YEAR);
+                      int month = cal.get(Calendar.MONTH)+1;
+                      int day = cal.get(Calendar.DAY_OF_MONTH);
+
+                   	  // get all patients Details through repository 
+                      patientDtlsList = userRepository.findUserPatientsMaturityDobAfter90Days(year,month,day);
+                   
+
+                      patientDtlsList.stream().collect(Collectors.groupingBy(object->(String)object[0]));
+                      
+                      
+
+                      // send activation link to those patients
+                      for (Object[] object : patientDtlsList) {
+                    	
+                    	 eMail =  (String) object[3];
+                    	 User user = new User();
+
+                    	 user.setEmail(eMail);
+                    	 user.setFirstName((String) object[7]);
+                    	 user.setLastName((String) object[8]);
+                    	 user.setActivationKey((String) object[9]);
+
+                    	 
+                    	 if(StringUtils.isNotEmpty(eMail)) {
+                    		 mailService.sendMailTo18YearOldPatient(user);
+
+         				}
+                    	
+                   }
+                   
+            }catch(Exception ex){
+    			StringWriter writer = new StringWriter();
+    			PrintWriter printWriter = new PrintWriter( writer );
+    			ex.printStackTrace( printWriter );
+    			System.out.println("ex :"+ex);
+    			mailService.sendJobFailureNotification("processPatientReRegister",writer.toString());
+    		}
+            return;
+     }     
+
+	//@Scheduled(cron="0 10 00 * * *")
 		public void processPatientReRegister(){
         
 		List<Object[]> patientDtlsList = new ArrayList<Object[]>();;
@@ -2428,6 +2487,6 @@ public class UserService {
 		}
 	   
      
-     
+  
 }
 

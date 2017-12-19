@@ -1019,7 +1019,7 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     @RolesAllowed({AuthoritiesConstants.PATIENT, AuthoritiesConstants.HCP, AuthoritiesConstants.CLINIC_ADMIN})
-    public ResponseEntity<JSONObject> updateUserNotification(@PathVariable Long id, @RequestBody Map<String, Boolean> paramsMap) {
+    public ResponseEntity<JSONObject> updateUserNotification(@PathVariable Long id, @RequestBody Map<String, String> paramsMap) {
     	JSONObject json = new JSONObject();
     	try {
 			json.put("user", userService.setUserNotificationSetting(id, paramsMap));
@@ -1736,6 +1736,19 @@ public class UserResource {
         JSONObject jsonObject = new JSONObject();        
 		adherenceCalculationServiceMonarch.processMergeSwapDeviceDetails();        	
 		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+
+    }  
+    
+    @RequestMapping(value = "/processHcpClinicAdminNotification",
+    	     method = RequestMethod.GET,
+    	     produces = MediaType.APPLICATION_JSON_VALUE)	
+    public ResponseEntity<?> processHcpClinicAdminNotificationsFreq() throws HillromException {
+    	        log.debug("REST request to get testing Device Cron");
+    	        JSONObject jsonObject = new JSONObject();        
+    	        adherenceCalculationService.processCareGiverNotifications();        	
+    			return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+    	    }    
+
     }
     
     /**
@@ -1753,4 +1766,5 @@ public class UserResource {
 		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
     }
     
+
 }

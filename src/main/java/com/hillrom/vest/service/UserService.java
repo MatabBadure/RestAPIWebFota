@@ -1594,7 +1594,7 @@ public class UserService {
 		
 		if(existingUser.isPresent()){
 			if(!currentUser.getEmail().equalsIgnoreCase(params.get("emailId"))){
-				currentUser.setEmail(currentUser.getEmail());
+				currentUser.setEmail(params.get("emailId"));
 			}
 		}
 
@@ -1612,6 +1612,11 @@ public class UserService {
 			currentUser.setReRegister(true);
 			currentUser.setActivated(true);
 			userRepository.save(currentUser);
+			
+			PatientInfo patientInfo = getPatientInfoObjFromPatientUser(currentUser);
+			patientInfo.setEmail(params.get("emailId"));
+			patientInfoRepository.save(patientInfo);
+			
 		}else{
 			throw new HillromException(ExceptionConstants.HR_557);//Invalid Security Question or Answer
 
@@ -2375,7 +2380,7 @@ public class UserService {
 	/**
      * Runs every midnight to find patient reaching 18 years in coming 30/3/2/1 days and send them email notification
      */
-     //@Scheduled(cron="0 10 00 * * *")
+	//@Scheduled(cron="0 10 00 * * *")
 		public void processPatientReRegister(){
         
 		List<Object[]> patientDtlsList = new ArrayList<Object[]>();;

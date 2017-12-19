@@ -48,7 +48,8 @@ import com.hillrom.vest.domain.util.MMDDYYYYLocalDateSerializer;
 @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class,property= "id")
 public class User extends AbstractAuditingEntity implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    
+	private static final long serialVersionUID = 1L;
 
 	@Id
     @Column(name = "id")
@@ -176,11 +177,6 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Column(name="setting_deviation_notification_freq")
     private String settingDeviationNotificationFreq;
     
-    @Column(name="re_registered")
-    private Boolean reRegister = false;
-    
-   //Garment changes
-
     @Column(name="re_registered")
     private Boolean reRegister = false;
     
@@ -575,14 +571,6 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		this.settingDeviationNotificationFreq = settingDeviationNotificationFreq;
 	}
 
-	public Boolean isReRegister() {
-		return reRegister;
-	}
-
-	public void setReRegister(Boolean reRegister) {
-		this.reRegister = reRegister;
-	}
-  
 	@Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -600,6 +588,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
         return true;
     }
+
 	
     /**
 	 * @return the userPreferenceTimezone
@@ -668,4 +657,3 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	}
 
 }
-

@@ -328,21 +328,16 @@ public class UserResource {
 				sortOrder.put(sortBy, isAscending);
 		}
 		Page<PatientUserVO> page;
-		HttpHeaders headers;
-
-		if (StringUtils.isNotBlank(filter) || StringUtils.isNotBlank(deviceType)) {
-			try {
-				page = userService.patientSearchUnderHCPUser(
-						queryString, id, clinicId, filter,sortOrder,deviceType, offset, limit);
-				headers = PaginationUtil.generatePaginationHttpHeaders(
-						page, "/user/hcp/"+id+"/patient/search", offset, limit);
-				return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
-			} catch (HillromException e) {
-				return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
-			}
+		try {
+			page = userService.patientSearchUnderHCPUser(
+					queryString, id, clinicId, filter,sortOrder,deviceType, offset, limit);
+			HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(
+					page, "/user/hcp/"+id+"/patient/search", offset, limit);
+			return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+		} catch (HillromException e) {
+			return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
 		}
-		List<PatientUserVO> emptyList = new ArrayList<PatientUserVO>();
-		return new ResponseEntity<>(emptyList,HttpStatus.OK);
+		
 
 	}
    
@@ -1488,19 +1483,12 @@ public class UserResource {
 				sortOrder.put(sortBy, isAscending);
 		}
 		
-		Page<PatientUserVO> page;
-		HttpHeaders headers;
-
-		if(StringUtils.isNotBlank(filter) || StringUtils.isNotBlank(deviceType))	{
-			page = userService.associatedPatientSearchInClinicAdmin(id,
-					queryString,clinicId, filter,sortOrder, deviceType,offset, limit);
-
-			headers = PaginationUtil.generatePaginationHttpHeaders(
-					page, "/user/clinicadmin/"+id+"/patient/search", offset, limit);
-			return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
-		}
-		List<PatientUserVO> emptyList = new ArrayList<PatientUserVO>();
-		return new ResponseEntity<>(emptyList,HttpStatus.OK);
+		Page<PatientUserVO> page = userService.associatedPatientSearchInClinicAdmin(id,
+				queryString,clinicId, filter,sortOrder, deviceType,offset, limit);
+		
+		HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(
+				page, "/user/clinicadmin/"+id+"/patient/search", offset, limit);
+		return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
 
 	}
 
@@ -1755,12 +1743,10 @@ public class UserResource {
     	     method = RequestMethod.GET,
     	     produces = MediaType.APPLICATION_JSON_VALUE)	
     public ResponseEntity<?> processHcpClinicAdminNotificationsFreq() throws HillromException {
-    	        log.debug("REST request to get testing Device Cron");
-    	        JSONObject jsonObject = new JSONObject();        
-    	        adherenceCalculationService.processCareGiverNotifications();        	
-    			return new ResponseEntity<>(jsonObject, HttpStatus.OK);
-    	    }    
-
+        log.debug("REST request to get testing Device Cron");
+        JSONObject jsonObject = new JSONObject();        
+        adherenceCalculationService.processCareGiverNotifications();        	
+		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
     }
     
     /**
@@ -1778,5 +1764,4 @@ public class UserResource {
 		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
     }
     
-
 }

@@ -37,6 +37,8 @@ import com.hillrom.vest.web.rest.dto.ClinicVO;
 import com.hillrom.vest.web.rest.dto.HcpVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 
+import static com.hillrom.vest.config.AdherenceScoreConstants.ADHERENCE_SETTING_DEFAULT_DAYS;
+
 @Repository
 public class AdvancedSearchRepository {
 
@@ -380,17 +382,17 @@ public class AdvancedSearchRepository {
 	    if(!advancedPatientDTO.getBelowTherapyMin().equalsIgnoreCase("All")){
     		filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getBelowTherapyMin())) ? (filter.append(" AND ")) : (filter.append(""));
     		if(advancedPatientDTO.getBelowTherapyMin().equalsIgnoreCase("Yes"))
-    			filter = filter.append("kt.isHMRNonCompliant = 1");
+    			filter = filter.append("kt.isHMRNonCompliant = 0");
     		else if(advancedPatientDTO.getBelowTherapyMin().equalsIgnoreCase("No"))
-    			filter = filter.append("(kt.isHMRNonCompliant IS NULL OR kt.isHMRNonCompliant = 0)");	
+    			filter = filter.append("(kt.isHMRNonCompliant IS NULL OR kt.isHMRNonCompliant = 1)");	
 	    }
 	    
 	    if(!advancedPatientDTO.getMissedTherapyDays().equalsIgnoreCase("All")){
     		filter = (filter.length()>0)&&(!StringUtils.isBlank(advancedPatientDTO.getMissedTherapyDays())) ? (filter.append(" AND ")) : (filter.append(""));
     		if(advancedPatientDTO.getMissedTherapyDays().equalsIgnoreCase("Yes"))
-    			filter = filter.append("kt.isMissedTherapy = 1");
+    			filter = filter.append(" (kt.isMissedTherapy >= IF(ISNULL(kt.adherencesetting),"+ADHERENCE_SETTING_DEFAULT_DAYS+",kt.adherencesetting))");
     		else if(advancedPatientDTO.getMissedTherapyDays().equalsIgnoreCase("No"))
-    			filter = filter.append("(kt.isMissedTherapy IS NULL OR kt.isMissedTherapy = 0)");	
+    			filter = filter.append("(kt.isMissedTherapy < IF(ISNULL(kt.adherencesetting),"+ADHERENCE_SETTING_DEFAULT_DAYS+",kt.adherencesetting))");
 	    }
 	    
 	    finalQuery = finalQuery.append(BaseQuery);

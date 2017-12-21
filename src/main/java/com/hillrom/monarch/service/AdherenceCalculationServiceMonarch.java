@@ -1441,7 +1441,7 @@ public class AdherenceCalculationServiceMonarch{
 		newCompliance.setScore(score);
 		
 		// Setting to missed therapy count as 0 for any of the device is having therapy
-		if( (resetFlag == 3 || resetFlag == 4) ){
+		if( (resetFlag == 3 || resetFlag == 4 || resetFlag == 1) ){
 			if(( Objects.nonNull(sortedTherapy.get(complianceDate)) || Objects.nonNull(sortedTherapyVest.get(complianceDate))))
 				newCompliance.setMissedTherapyCount(0);
 			else

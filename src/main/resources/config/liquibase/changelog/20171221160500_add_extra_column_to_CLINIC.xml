@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    
+	
+	<!--
+        Added is_message_opted column in CLINIC table.
+    -->
+    <changeSet id="20171221160500" author="jhipster">
+    	<addColumn tableName="CLINIC">
+        	<column name="is_message_opted"  type="boolean" defaultValueBoolean="true">
+            </column>
+        </addColumn>
+    
+    </changeSet>
+</databaseChangeLog>

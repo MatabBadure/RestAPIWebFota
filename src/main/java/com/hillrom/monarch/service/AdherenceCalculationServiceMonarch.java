@@ -848,7 +848,7 @@ public class AdherenceCalculationServiceMonarch{
 			//ProtocolConstantsMonarch userProtocolConstant = protocolMonarchService.getProtocolForPatientUserId(oldUserId);
 			
 			// Merged Protocol for the both device patients
-			ProtocolConstants userProtocolConstantVest = adherenceCalculationService.getProtocolByPatientUserId(userId);
+			ProtocolConstants userProtocolConstantVest = adherenceCalculationService.getMergedProtocolByPatientUserId(userId);
 			// Convert Merged protocol with Vest object to monarch object
 			ProtocolConstantsMonarch userProtocolConstant = therapySessionMonarchService.convertVestToMonarchProtocol(userProtocolConstantVest);
 
@@ -1398,7 +1398,6 @@ public class AdherenceCalculationServiceMonarch{
 			newCompliance.setGlobalHMRNonAdherenceCounter(++globalHMRNonAdhrenceCounter);
 			
 			newCompliance.setHmrCompliant(false);
-			
 			if(isSettingsDeviatedMonarch || isSettingsDeviatedVest){				
 				score = score < SETTING_DEVIATION_POINTS ? 0 : score - SETTING_DEVIATION_POINTS;
 			}
@@ -1448,7 +1447,7 @@ public class AdherenceCalculationServiceMonarch{
 			else
 				newCompliance.setMissedTherapyCount(prevCompliance.getMissedTherapyCount()+1);
 		}
-		
+
 		// Saving the updated score for the specific date of compliance
 		
 		return newCompliance;
@@ -2714,7 +2713,7 @@ public class AdherenceCalculationServiceMonarch{
 	 * Runs every morning 9AM after the TIMS job executed to integrate the patient who is using both devices after identified
 
 	 */
-	@Scheduled(cron="0 0 9 * * * ")
+	@Scheduled(cron="0 0 23 * * * ")
 	public void processDeviceDetails(){
 		try{
 			LocalDate today = LocalDate.now();
@@ -3037,7 +3036,7 @@ public class AdherenceCalculationServiceMonarch{
 	/**
 	 * Runs every morning 9:15AM after the TIMS job executed to integrate the old patient who is swapped after identified from swapped date
 	 */	
-	@Scheduled(cron="0 15 9 * * * ")
+	@Scheduled(cron="0 15 23 * * * ")
 	public void processMergeSwapDeviceDetails(){
 		try{
 			LocalDate today = LocalDate.now();

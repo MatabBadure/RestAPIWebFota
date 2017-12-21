@@ -98,7 +98,7 @@ public class TherapySessionServiceMonarch {
 					receivedTherapySessionMapMonarch, existingComplianceMapMonarch,protocol);
 			}else if(deviceType.equals("BOTH")){				
 				// Merged Protocol for the both device patients
-				ProtocolConstants protocolMergedVest = adherenceCalculationService.getProtocolByPatientUserId(patientUser.getId());
+				ProtocolConstants protocolMergedVest = adherenceCalculationService.getMergedProtocolByPatientUserId(patientUser.getId());
 				// Convert Merged protocol with Vest object to monarch object
 				ProtocolConstantsMonarch protocolMergedMonarch = convertVestToMonarchProtocol(protocolMergedVest);
 				

@@ -1612,6 +1612,11 @@ public class UserService {
 			currentUser.setReRegister(true);
 			currentUser.setActivated(true);
 			userRepository.save(currentUser);
+			
+			PatientInfo patientInfo = getPatientInfoObjFromPatientUser(currentUser);
+			patientInfo.setEmail(params.get("emailId"));
+			patientInfoRepository.save(patientInfo);
+			
 		}else{
 			throw new HillromException(ExceptionConstants.HR_557);//Invalid Security Question or Answer
 

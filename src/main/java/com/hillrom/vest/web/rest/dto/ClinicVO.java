@@ -56,6 +56,8 @@ public class ClinicVO implements Serializable,Comparable<ClinicVO> {
     private Boolean adherenceSettingFlag;
     //end: HILL-2004
     
+    Boolean isMessageOpted;
+    
     @JsonIgnore
     private List<ClinicVO> childClinicVOs = new LinkedList<>();
 
@@ -85,6 +87,36 @@ public class ClinicVO implements Serializable,Comparable<ClinicVO> {
 		this.adherenceSettingModifiedDte = adherenceSettingModifiedDte;
 		this.adherenceSettingFlag = adherenceSettingFlag;
 		//end: HILL-2004
+				
+	}
+    
+    public ClinicVO(String id,String name, String address, String address2, String zipcode, String city,
+			String state, String phoneNumber, String faxNumber, String speciality, Long clinicAdminId,
+			Boolean parent, String hillromId,Boolean deleted,DateTime createdAt,Integer adherenceSetting, 
+			DateTime adherenceSettingModifiedDte, Boolean isMessageOpted
+			) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.address = address;
+		this.address2 = address2;
+		this.zipcode = zipcode;
+		this.city = city;
+		this.state = state;
+		this.phoneNumber = phoneNumber;
+		this.faxNumber = faxNumber;
+		this.speciality = speciality;
+		this.clinicAdminId = clinicAdminId;
+		this.parent = parent;
+		this.hillromId = hillromId;
+		this.deleted = deleted;
+		this.createdAt = createdAt;
+		this.adherenceSetting = adherenceSetting;
+		//start: HILL-2004
+		this.adherenceSettingModifiedDte = adherenceSettingModifiedDte;
+		this.adherenceSettingFlag = adherenceSettingFlag;
+		//end: HILL-2004
+		this.isMessageOpted=isMessageOpted;
 				
 	}
     
@@ -344,6 +376,14 @@ public class ClinicVO implements Serializable,Comparable<ClinicVO> {
 		}
 	
 		
+		public Boolean getIsMessageOpted() {
+			return isMessageOpted;
+		}
+
+		public void setIsMessageOpted(Boolean isMessageOpted) {
+			this.isMessageOpted = isMessageOpted;
+		}
+
 		@Override
 		public int compareTo(ClinicVO clinicVO) {
 			

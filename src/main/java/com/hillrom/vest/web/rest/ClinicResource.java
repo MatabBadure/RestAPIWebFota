@@ -567,4 +567,24 @@ public class ClinicResource {
 		return filterMap;
 	}
 
+	/**
+	 * 
+	 * @param userId
+	 * @return
+	 */
+    @RequestMapping(value = "/isMessagesOpted/{userId}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+
+    public Boolean isMessagesOpted(@PathVariable String userId) {
+        try {
+			log.debug("REST request to know whether message opted or not");
+			Boolean value = clinicService.isMessagesOpted(userId);
+			return value;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+    }
 }

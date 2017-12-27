@@ -25,6 +25,7 @@ import com.hillrom.vest.repository.NoteRepository;
 import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.UserRepository;
+import com.hillrom.vest.service.util.GraphUtils;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
 
@@ -81,9 +82,13 @@ public class NoteService {
 		
 		if(Objects.isNull(patientNoEvent))
 			throw new HillromException(ExceptionConstants.HR_585);
-		if(Objects.isNull(patientNoEvent.getFirstTransmissionDate()) ||  date.isBefore(patientNoEvent.getFirstTransmissionDate()))
+		/*if(Objects.isNull(patientNoEvent.getFirstTransmissionDate()) ||  date.isBefore(patientNoEvent.getFirstTransmissionDate()))
+			throw new HillromException(ExceptionConstants.HR_701);*/
+		//Start GIMP 11
+		LocalDate firstTransmissionDateByType = GraphUtils.getFirstTransmissionDateVestByType(patientNoEvent);
+		if(Objects.isNull(firstTransmissionDateByType) ||  date.isBefore(firstTransmissionDateByType))
 			throw new HillromException(ExceptionConstants.HR_701);
-			
+		//Ends GIMP 11	
 		Note existingNote = findOneByUserIdAndDate(userId,date);
 		if(Objects.isNull(existingNote)){
 			existingNote = new Note();

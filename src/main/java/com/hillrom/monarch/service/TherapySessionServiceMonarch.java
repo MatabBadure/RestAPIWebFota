@@ -2,7 +2,6 @@ package com.hillrom.monarch.service;
 
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateWeightedAvg;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,7 +26,6 @@ import org.springframework.stereotype.Service;
 import com.hillrom.monarch.repository.PatientMonarchDeviceDataRepository;
 import com.hillrom.monarch.repository.PatientNoEventsMonarchRepository;
 import com.hillrom.monarch.repository.TherapySessionMonarchRepository;
-import com.hillrom.monarch.service.util.PatientVestDeviceTherapyUtilMonarch;
 import com.hillrom.monarch.web.rest.dto.TherapyDataMonarchVO;
 import com.hillrom.vest.domain.NoteMonarch;
 import com.hillrom.vest.domain.PatientComplianceMonarch;
@@ -39,6 +37,7 @@ import com.hillrom.vest.domain.TherapySessionMonarch;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.service.AdherenceCalculationService;
 import com.hillrom.vest.service.util.DateUtil;
+import com.hillrom.vest.service.util.GraphUtils;
 import com.hillrom.vest.web.rest.dto.TreatmentStatisticsVO;
 
 @Service
@@ -201,8 +200,17 @@ public class TherapySessionServiceMonarch {
 		
 		// This is to discard the records if the user requested data beyond his/her first transmission date.
 		PatientNoEventMonarch patientNoEvent = patientNoEventMonarchService.findByPatientUserId(patientUserId);
-		if(Objects.nonNull(patientNoEvent) && Objects.nonNull(patientNoEvent.getFirstTransmissionDate()))
-			from = from.isAfter(patientNoEvent.getFirstTransmissionDate()) ? from : patientNoEvent.getFirstTransmissionDate();
+		/*if(Objects.nonNull(patientNoEvent) && Objects.nonNull(patientNoEvent.getFirstTransmissionDate()))
+			from = from.isAfter(patientNoEvent.getFirstTransmissionDate()) ? from : patientNoEvent.getFirstTransmissionDate();*/
+		//Start GIMP 11
+		if(Objects.nonNull(patientNoEvent)){
+			LocalDate firstTransmissionDateByType = GraphUtils.getFirstTransmissionDateMonarchByType(patientNoEvent);
+			if(Objects.nonNull(firstTransmissionDateByType)){
+				from = from.isAfter(patientNoEvent.getFirstTransmissionDate()) ? from : patientNoEvent.getFirstTransmissionDate();
+			}
+		}
+		//End GIMP 11
+		
 		// Prepare the list of dates to which data has to be shown
 		List<LocalDate> dates = DateUtil.getAllLocalDatesBetweenDates(from, to);
 		List<TherapyDataMonarchVO> processedTherapies = new LinkedList<>();

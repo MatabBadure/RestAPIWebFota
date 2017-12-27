@@ -8,7 +8,6 @@ import static com.hillrom.vest.security.AuthoritiesConstants.HCP;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -54,6 +53,7 @@ import com.hillrom.monarch.repository.PatientMonarchDeviceDataRepository;
 import com.hillrom.monarch.service.AdherenceCalculationServiceMonarch;
 import com.hillrom.monarch.service.PatientComplianceMonarchService;
 import com.hillrom.monarch.service.PatientHCPMonarchService;
+import com.hillrom.monarch.service.PatientNoEventMonarchService;
 import com.hillrom.monarch.service.PatientProtocolMonarchService;
 import com.hillrom.monarch.service.PatientVestDeviceMonarchService;
 import com.hillrom.monarch.service.TherapySessionServiceMonarch;
@@ -239,6 +239,8 @@ public class UserResource {
   	private 
   	PatientInfoRepository patientInfoRepository;
   	
+  	@Inject
+  	private PatientNoEventMonarchService patientNoEventMonarchService;
 	@Inject
 	private PateintTestResultService pateintTestResultService;
 
@@ -1722,6 +1724,22 @@ public class UserResource {
 		adherenceCalculationServiceMonarch.processDeviceDetails();        	
 		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
     }
+    
+    
+    /**
+     * GET  Cron job for Adherence recalculation.
+     */
+    @RequestMapping(value = "/testingAdherenceTraningDateCron",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    public ResponseEntity<?> getAdherenceTraningDateCron() throws HillromException {
+        log.debug("REST request to getAdherenceTraningDateCron");
+        JSONObject jsonObject = new JSONObject();        
+        patientNoEventMonarchService.processAdherenceScoreForVestMonarchByTrainingDate();        	
+		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+    }
+    
     
     /**
      * GET  /users/:userId/clinics/:clinicId/statistics -> get the patient statistics for clinic Badge associated with user.

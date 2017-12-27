@@ -1,5 +1,7 @@
 package com.hillrom.vest.service;
 
+import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateWeightedAvg;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -16,13 +18,9 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 
 import org.joda.time.DateTime;
-import org.joda.time.Days;
 import org.joda.time.LocalDate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.hillrom.vest.batch.processing.PatientVestDeviceDataDeltaReader;
 import com.hillrom.vest.domain.Note;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientInfo;
@@ -30,14 +28,12 @@ import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.ProtocolConstants;
 import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.User;
-import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.PatientNoEventsRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.service.util.DateUtil;
+import com.hillrom.vest.service.util.GraphUtils;
 import com.hillrom.vest.web.rest.dto.TherapyDataVO;
 import com.hillrom.vest.web.rest.dto.TreatmentStatisticsVO;
-
-import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateWeightedAvg;
 
 @Service
 @Transactional
@@ -173,6 +169,7 @@ public class TherapySessionService {
 	}
 
 	/**
+	 * 
 	 * prepare dummy therapy data for the week
 	 * @param from
 	 * @param to
@@ -189,8 +186,16 @@ public class TherapySessionService {
 		
 		// This is to discard the records if the user requested data beyond his/her first transmission date.
 		PatientNoEvent patientNoEvent = patientNoEventService.findByPatientUserId(patientUserId);
-		if(Objects.nonNull(patientNoEvent) && Objects.nonNull(patientNoEvent.getFirstTransmissionDate()))
-			from = from.isAfter(patientNoEvent.getFirstTransmissionDate()) ? from : patientNoEvent.getFirstTransmissionDate();
+		/*if(Objects.nonNull(patientNoEvent) && Objects.nonNull(patientNoEvent.getFirstTransmissionDate()))
+			from = from.isAfter(patientNoEvent.getFirstTransmissionDate()) ? from : patientNoEvent.getFirstTransmissionDate();*/
+		//Starts GIMP 11
+		if(Objects.nonNull(patientNoEvent)){
+			LocalDate firstTransmissionDateByType = GraphUtils.getFirstTransmissionDateVestByType(patientNoEvent);
+			if(Objects.nonNull(firstTransmissionDateByType)){
+				from = from.isAfter(firstTransmissionDateByType) ? from : firstTransmissionDateByType;
+			}
+		}
+		//Ends GIMP 11
 		// Prepare the list of dates to which data has to be shown
 		List<LocalDate> dates = DateUtil.getAllLocalDatesBetweenDates(from, to);
 		List<TherapyDataVO> processedTherapies = new LinkedList<>();

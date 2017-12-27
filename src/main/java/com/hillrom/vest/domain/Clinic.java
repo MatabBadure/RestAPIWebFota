@@ -112,6 +112,12 @@ public class Clinic implements Serializable,Comparable<Clinic> {
     @JsonIgnore
     private Set<ClinicUserAssoc> clinicUserAssoc = new HashSet<>();
     
+    /*@NotAudited
+    @OneToMany(mappedBy = "entityUserAssocPK.clinic",fetch=FetchType.LAZY)
+    @JsonIgnore
+    private Set<EntityUserAssoc> entityUserAssoc = new HashSet<>();*/
+    
+    
     @ManyToMany(mappedBy="clinics")
     @JsonBackReference
     private Set<UserExtension> users = new HashSet<>();
@@ -126,7 +132,17 @@ public class Clinic implements Serializable,Comparable<Clinic> {
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime createdAt;
 
-    public String getId() {
+    
+    
+  /*  public Set<EntityUserAssoc> getEntityUserAssoc() {
+		return entityUserAssoc;
+	}
+
+	public void setEntityUserAssoc(Set<EntityUserAssoc> entityUserAssoc) {
+		this.entityUserAssoc = entityUserAssoc;
+	}*/
+
+	public String getId() {
 		return id;
 	}
 

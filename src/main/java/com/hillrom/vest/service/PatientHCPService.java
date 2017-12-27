@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.vest.config.Constants;
+import com.hillrom.vest.domain.Authority;
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.ClinicPatientAssoc;
 import com.hillrom.vest.domain.PatientCompliance;
@@ -103,8 +104,11 @@ public class PatientHCPService {
 		    	for(Map<String, String> hcpId : hcpList) {
 		    		UserExtension hcpUser = userExtensionRepository.findOne(Long.parseLong(hcpId.get("id")));
 		    		if(hcpUser != null) {
-			    		UserPatientAssoc userPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, hcpUser), AuthoritiesConstants.HCP, RelationshipLabelConstants.HCP);
-			    		hcpPatientAssocList.add(userPatientAssoc);
+		    			for(Authority auth : hcpUser.getAuthorities()){
+		    				UserPatientAssoc userPatientAssoc = new UserPatientAssoc(new UserPatientAssocPK(patientInfo, hcpUser), auth.getName(), auth.getName());
+				    		hcpPatientAssocList.add(userPatientAssoc);
+		    			}
+			    		
 		    		} else {
 		    			throw new HillromException(ExceptionConstants.HR_532);//Invalid HCP id
 		    		}
@@ -134,13 +138,20 @@ public class PatientHCPService {
     		throw new HillromException(ExceptionConstants.HR_512);//No such user exist
      	}
     }
-
+    /** 
+     * GIMP 
+     * @param patientInfo
+     * @return
+     */
 	private List<HcpClinicsVO> getHCPUsersAssociatedWithPatient(PatientInfo patientInfo) {
 		List<HcpClinicsVO> hcpUsers = new LinkedList<>();
 		for(UserPatientAssoc userPatientAssoc : patientInfo.getUserPatientAssoc()){
 			if(AuthoritiesConstants.HCP.equals(userPatientAssoc.getUserRole())){
 				UserExtension hcp = (UserExtension)userPatientAssoc.getUser();
 				hcpUsers.add(new HcpClinicsVO(hcp,hcp.getClinics()));
+			}else if(AuthoritiesConstants.CLINIC_ADMIN.equals(userPatientAssoc.getUserRole())){
+				UserExtension hcp = (UserExtension)userPatientAssoc.getUser();
+				hcpUsers.add(new HcpClinicsVO(hcp,hcp.getClinicsAdmin(),userPatientAssoc.getUserRole()));
 			}
 		}
 		return RandomUtil.sortHcpClinicsVOListByLastNameFirstName(hcpUsers);
@@ -151,7 +162,8 @@ public class PatientHCPService {
 		for(UserPatientAssoc userPatientAssoc : patientInfo.getUserPatientAssoc()){
 			if(AuthoritiesConstants.HCP.equals(userPatientAssoc.getUserRole())){
 				hcpUsers.add(userPatientAssoc.getUser());
-				
+			}else if(AuthoritiesConstants.CLINIC_ADMIN.equals(userPatientAssoc.getUserRole())){
+				hcpUsers.add(userPatientAssoc.getUser());
 			}
 		}
 		return hcpUsers;

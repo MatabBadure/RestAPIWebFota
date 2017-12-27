@@ -736,5 +736,65 @@ public class MailService {
 		return userName.substring(0, 1).toUpperCase()
 				+ userName.substring(1).toLowerCase();
 	}
+	
+    public void sendNotificationMailToPatientBasedOnFreq(User user,String notificationType){
+        log.debug("Sending password reset e-mail to '{}'", user.getEmail());
+        Context context = new Context();
+        context.setVariable("user", user);
+        context.setVariable("notificationUrl", patientDashboardUrl);
+        String content = "";
+        String subject = "";
+ 	   content = templateEngine.process("patientNotificationEmail", context);
+        subject = messageSource.getMessage("email.therapynotification.title", null, null);
+        sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
+     }
+    
+    public void sendNotificationMailToHCPAndClinicAdminBasedOnFreq(User user){
+    	log.debug("Sending Notification shall have a frequency for HCP and Clinic Admin '{}'", user.getEmail());
+        Context context = new Context();
+        context.setVariable("user", user);
+    //    context.setVariable("clinicStatisticsMap",statistics);
+        context.setVariable("today", DateUtil.convertLocalDateToStringFromat(org.joda.time.LocalDate.now().minusDays(1), "MMM dd,yyyy"));
+        context.setVariable("notificationUrl", hcpOrClinicAdminDashboardUrl);
+        String content = "";
+        String subject = "";
+
+        content = templateEngine.process("clinicPersonnelNotificationEmail", context);
+        subject = messageSource.getMessage("email.clinicPersonnelNotificationEmail.subject", null, null);
+        
+        sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
+    }
+    public void sendNotificationMailToHCPAndClinicAdminMonarchBasedOnFreq(User user){
+    	log.debug("Sending password reset e-mail to '{}'", user.getEmail());
+        Context context = new Context();
+        context.setVariable("user", user);
+  //      context.setVariable("clinicStatisticsMap",statistics);
+        context.setVariable("today", DateUtil.convertLocalDateToStringFromat(org.joda.time.LocalDate.now().minusDays(1), "MMM dd,yyyy"));
+        context.setVariable("notificationUrl", hcpOrClinicAdminDashboardUrl);
+        String content = "";
+        String subject = "";
+
+        content = templateEngine.process("clinicPersonnelNotificationEmail", context);
+        subject = messageSource.getMessage("email.statisticsnotification.subject", null, null);
+        
+        sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
+    }
+
+    public void sendNotificationCareGiverBasedOnFreq(CareGiverStatsNotificationVO careGiverStatsNotificationVO){
+    	log.debug("Sending care giver statistics e-mail to '{}'", careGiverStatsNotificationVO.getCGEmail());
+        Context context = new Context();
+        context.setVariable("careGiverStatsNotificationVO", careGiverStatsNotificationVO.getCareGiverName());
+        
+        context.setVariable("today", DateUtil.convertLocalDateToStringFromat(org.joda.time.LocalDate.now().minusDays(1), "MMM dd,yyyy"));
+ //       context.setVariable("notificationUrl", careGiverDashboardUrl);
+        String content = "";
+        String subject = "";
+
+        content = templateEngine.process("caregiverNotificationEmail", context);
+        subject = messageSource.getMessage("email.notificationEmail.subject", null, null);
+        
+        sendEmail(new String[]{careGiverStatsNotificationVO.getCGEmail()}, subject, content, false, true);
+    }
+    
 }
 	

@@ -9,12 +9,14 @@ import static com.hillrom.vest.config.Constants.YYYY_MM_DD;
 
 import java.security.InvalidParameterException;
 import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -330,8 +332,14 @@ public class DateUtil {
 	   }
 	   
 
-
-
-
+	   public static String getDayOfTheWeek(){
+		   
+		    Date now = new Date();
+		   
+	        SimpleDateFormat simpleDateformat = new SimpleDateFormat("EEEE"); // the day of the week spelled out completely
+	        String dayOfTheWeek = simpleDateformat.format(now);
+	 
+	        return dayOfTheWeek;
+	   }
 
 }

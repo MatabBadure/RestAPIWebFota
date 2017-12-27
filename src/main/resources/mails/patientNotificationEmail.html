@@ -1,0 +1,37 @@
+<html>
+<head>
+	<title th:text="#{email.messageNotification.title}">VisiView® Portal - Patient Notification</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+	<div style="font-family: MyriadPro-Regular, 'Myriad Pro Regular', MyriadPro, 'Myriad Pro', Helvetica, Arial, sans-serif;">
+		<div>
+			<h4 style="font-size: 14px;" th:text="#{email.reset.greeting(${user})}">Dear&nbsp;</h4>
+		</div>
+		<div>
+			<p style="font-size: 14px; ">You are being notified you missed an airway clearance therapy goal set by your healthcare team. To review the <br /><br />
+			details of the notification in the VisiView® Portal, click the link below. <br /><br /><br /><br />
+			<!-- <a style="font-size: 14px;" th:href="@{|${baseUrl}/#/${messageURLStr}|}">Review your dashboard</a>.<insert hyper-link to clinic dashboard in the text>  --> 
+			</p> 
+		</div>
+		
+		<div style="margin: 10px 0px;">			
+		</div>
+		<div style="">
+			<p style="font-size: 14px;">If you have any problems or have questions, please contact Hill-Rom Respiratory Customer Support at 800-426-4224.
+						
+			</p>
+		</div>
+		<div style="margin: 40px 0px;">
+			<h4 style="font-size: 14px; margin-bottom: 0px;">Regards,</h4>
+			<p style="margin-top: 5px; font-size: 14px;">Your HILL-Rom Respiratory Care Team</p>
+		</div>
+		<div style="margin: 50px 0px;">
+			<p style="font-size: 12px;">*** PLEASE DO NOT REPLY TO THIS EMAIL, IF YOU NEED TO CONTACT HILL-ROM RESPIRATORY CARE, PLEASE CALL 800-426-4224
+			OR VISIT OUR WEBSITE AT <a href="HTTP://RESPIRATORYCARE.HILL-ROM.COM/">HTTP://RESPIRATORYCARE.HILL-ROM.COM/.</a><br/>
+			ANY REPLIES TO THIS EMAIL WILL NOT BE RECEIVED BY HILL-ROM RESPIRATORY CARE.***
+			</p>
+		</div>
+	</div>
+</body>
+</html>

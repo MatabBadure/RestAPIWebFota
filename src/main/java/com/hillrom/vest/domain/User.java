@@ -171,6 +171,15 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Column(name="re_registered")
     private Boolean reRegister = false;
     
+    @Column(name="non_hmr_notification_freq")
+    private String nonHMRNotificationFreq;
+    
+    @Column(name="missed_therapy_notification_freq")
+    private String missedTherapyNotificationFreq;
+    
+    @Column(name="setting_deviation_notification_freq")
+    private String settingDeviationNotificationFreq;
+    
   //Garment changes
     @Transient
     @JsonSerialize
@@ -228,7 +237,23 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		this.nonHMRNotification = nonHMRNotification;
 		this.settingDeviationNotification = settingDeviationNotification;
 	}
-
+	public User(String firstName, String lastName, String email,
+			boolean missedTherapyNotification, boolean nonHMRNotification,
+			boolean settingDeviationNotification,
+			String nonHMRNotificationFreq,
+			String missedTherapyNotificationFreq,
+			String settingDeviationNotificationFreq) {
+		super();
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+		this.missedTherapyNotification = missedTherapyNotification;
+		this.nonHMRNotification = nonHMRNotification;
+		this.settingDeviationNotification = settingDeviationNotification;
+		this.nonHMRNotificationFreq = nonHMRNotificationFreq;
+		this.missedTherapyNotificationFreq = missedTherapyNotificationFreq;
+		this.settingDeviationNotificationFreq = settingDeviationNotificationFreq;
+	}
 
 	public String getDeactivationReason() {
 		return deactivationReason;
@@ -560,6 +585,32 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		this.userPreferenceTimezone = userPreferenceTimezone;
 	}
 
+	public String getNonHMRNotificationFreq() {
+		return nonHMRNotificationFreq;
+	}
+
+	public void setNonHMRNotificationFreq(String nonHMRNotificationFreq) {
+		this.nonHMRNotificationFreq = nonHMRNotificationFreq;
+	}
+
+	public String getMissedTherapyNotificationFreq() {
+		return missedTherapyNotificationFreq;
+	}
+
+	public void setMissedTherapyNotificationFreq(
+			String missedTherapyNotificationFreq) {
+		this.missedTherapyNotificationFreq = missedTherapyNotificationFreq;
+	}
+
+	public String getSettingDeviationNotificationFreq() {
+		return settingDeviationNotificationFreq;
+	}
+
+	public void setSettingDeviationNotificationFreq(
+			String settingDeviationNotificationFreq) {
+		this.settingDeviationNotificationFreq = settingDeviationNotificationFreq;
+	}
+	
 	@Override
     public int hashCode() {
         if(email != null) return email.hashCode();
@@ -588,14 +639,18 @@ public class User extends AbstractAuditingEntity implements Serializable {
 				+ messageNotification + ", activationLinkSentDate="
 				+ activationLinkSentDate + ", expired=" + expired
 				+ ", expirationDate=" + expirationDate + ", reRegister="
-				+ reRegister + ", vestGarmentColor=" + vestGarmentColor
-				+ ", vestGarmentSize=" + vestGarmentSize + ", vestGarmentType="
-				+ vestGarmentType + ", monarchGarmentColor="
-				+ monarchGarmentColor + ", monarchGarmentSize="
-				+ monarchGarmentSize + ", monarchGarmentType="
-				+ monarchGarmentType + ", deactivationReason="
-				+ deactivationReason + ", userPreferenceTimezone="
-				+ userPreferenceTimezone + "]";
+				+ reRegister + ", nonHMRNotificationFreq="
+				+ nonHMRNotificationFreq + ", missedTherapyNotificationFreq="
+				+ missedTherapyNotificationFreq
+				+ ", settingDeviationNotificationFreq="
+				+ settingDeviationNotificationFreq + ", vestGarmentColor="
+				+ vestGarmentColor + ", vestGarmentSize=" + vestGarmentSize
+				+ ", vestGarmentType=" + vestGarmentType
+				+ ", monarchGarmentColor=" + monarchGarmentColor
+				+ ", monarchGarmentSize=" + monarchGarmentSize
+				+ ", monarchGarmentType=" + monarchGarmentType
+				+ ", deactivationReason=" + deactivationReason
+				+ ", userPreferenceTimezone=" + userPreferenceTimezone + "]";
 	}
 
 }

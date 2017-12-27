@@ -82,6 +82,8 @@ import com.hillrom.vest.domain.PatientDevicesAssoc;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.PatientNoEventMonarch;
+import com.hillrom.vest.domain.PatientProtocolData;
+import com.hillrom.vest.domain.PatientProtocolDataMonarch;
 import com.hillrom.vest.domain.PatientVestDeviceHistoryMonarch;
 import com.hillrom.vest.domain.PatientVestDevicePK;
 import com.hillrom.vest.domain.ProtocolConstants;
@@ -95,6 +97,7 @@ import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.PatientDevicesAssocRepository;
 import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.PatientNoEventsRepository;
+import com.hillrom.vest.repository.PatientProtocolRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.service.AdherenceCalculationService;
 import com.hillrom.vest.service.ClinicPatientService;
@@ -111,8 +114,19 @@ import com.hillrom.vest.web.rest.dto.CareGiverStatsNotificationVO;
 import com.hillrom.vest.web.rest.dto.ClinicStatsNotificationVO;
 import com.hillrom.vest.web.rest.dto.PatientStatsVO;
 //hill-1956
+import com.hillrom.monarch.repository.AdherenceResetMonarchRepository;
+import com.hillrom.monarch.repository.ClinicMonarchRepository;
+import com.hillrom.monarch.repository.NotificationMonarchRepository;
+import com.hillrom.monarch.repository.PatientComplianceMonarchRepository;
+import com.hillrom.monarch.repository.PatientMonarchDeviceRepository;
+import com.hillrom.monarch.repository.PatientNoEventsMonarchRepository;
+import com.hillrom.monarch.repository.PatientProtocolMonarchRepository;
+import com.hillrom.monarch.repository.TherapySessionMonarchRepository;
 //hill-1956
-
+import com.hillrom.vest.domain.AdherenceReset;
+import com.hillrom.vest.domain.AdherenceResetMonarch;
+import com.hillrom.vest.repository.AdherenceResetRepository;
+//hill-1956
 
 @Service
 @Transactional
@@ -216,12 +230,12 @@ public class AdherenceCalculationServiceMonarch{
 	
 	@Inject
     private PatientNoEventService noEventService;
+  
+@Inject
+    private PatientProtocolMonarchRepository patientProtocolMonarchRepository;
 	
 	@Inject
-	public PatientNoEventsRepository noEventsRepository;
-	
-	@Inject
-	public PatientNoEventsMonarchRepository noEventsMonarchRepository;
+    private PatientProtocolRepository patientProtocolRepository;
 	
 	private final Logger log = LoggerFactory.getLogger(AdherenceCalculationServiceMonarch.class);
 	
@@ -1272,8 +1286,10 @@ public class AdherenceCalculationServiceMonarch{
 		// Setting the new score with respect to the compliance deduction
 		newCompliance.setScore(score);
 		
-		// Setting the missed therapy count to 0, since having therapy
-		newCompliance.setMissedTherapyCount(0);
+		if(Objects.isNull(sortedTherapy.get(complianceDate))){
+			// Setting the missed therapy count to 0, since having therapy
+			newCompliance.setMissedTherapyCount(0);
+		}
 		
 		// Saving the updated score for the specific date of compliance		
 		return newCompliance;
@@ -1429,7 +1445,7 @@ public class AdherenceCalculationServiceMonarch{
 		newCompliance.setScore(score);
 		
 		// Setting to missed therapy count as 0 for any of the device is having therapy
-		if( (resetFlag == 3 || resetFlag == 4) ){
+		if( (resetFlag == 3 || resetFlag == 4 || resetFlag == 1) ){
 			if(( Objects.nonNull(sortedTherapy.get(complianceDate)) || Objects.nonNull(sortedTherapyVest.get(complianceDate))))
 				newCompliance.setMissedTherapyCount(0);
 			else
@@ -1476,8 +1492,10 @@ public class AdherenceCalculationServiceMonarch{
 		LocalDate yesterday = LocalDate.now().minusDays(1);
 		List<NotificationMonarch> notifications = notificationMonarchRepository.findByDate(yesterday);
 		if(notifications.size() > 0){
+			
 			List<Long> patientUserIds = new LinkedList<>();
 			for(NotificationMonarch notification : notifications){
+				
 				patientUserIds.add(notification.getPatientUser().getId());
 			}
 			List<PatientComplianceMonarch> complianceList = patientComplianceMonarchRepository.findByDateBetweenAndPatientUserIdIn(yesterday,
@@ -1509,11 +1527,54 @@ public class AdherenceCalculationServiceMonarch{
 	
 	private boolean isPatientUserAcceptNotification(User patientUser,
 			String notificationType) {
-		return (patientUser.isNonHMRNotification() && HMR_NON_COMPLIANCE.equalsIgnoreCase(notificationType)) || 
+		
+		return isNonHMRNotificationCheck(patientUser, notificationType) ||
+				isSettingDeviationNotificationCheck(patientUser, notificationType) ||
+				(patientUser.isMissedTherapyNotification() && MISSED_THERAPY.equalsIgnoreCase(notificationType)) ||
+				isNonHMRSettingDeviationNotificationCheck(patientUser, notificationType); 
+				
+		
+		/*return (patientUser.isNonHMRNotification() && HMR_NON_COMPLIANCE.equalsIgnoreCase(notificationType)) || 
 				(patientUser.isSettingDeviationNotification() && SETTINGS_DEVIATION.equalsIgnoreCase(notificationType)) ||
 				(patientUser.isMissedTherapyNotification() && MISSED_THERAPY.equalsIgnoreCase(notificationType) ||
 				(HMR_AND_SETTINGS_DEVIATION.equalsIgnoreCase(notificationType) && 
-						(patientUser.isNonHMRNotification() || patientUser.isSettingDeviationNotification())));
+						(patientUser.isNonHMRNotification() || patientUser.isSettingDeviationNotification())));*/
+	}
+	
+	private boolean isNonHMRNotificationCheck(User patientUser,
+			String notificationType){
+		return patientUser.isNonHMRNotification() && 
+					(HMR_NON_COMPLIANCE.equalsIgnoreCase(notificationType) ||
+					HMR_NON_COMPLIANCE_VEST.equalsIgnoreCase(notificationType) ||
+					HMR_NON_COMPLIANCE_MONARCH.equalsIgnoreCase(notificationType)); 
+	}
+	
+	private boolean isSettingDeviationNotificationCheck(User patientUser,
+			String notificationType){
+		return patientUser.isSettingDeviationNotification() && 
+					(SETTINGS_DEVIATION.equalsIgnoreCase(notificationType) ||
+					SETTINGS_DEVIATION_VEST.equalsIgnoreCase(notificationType) ||
+					SETTINGS_DEVIATION_MONARCH.equalsIgnoreCase(notificationType)); 
+	}
+	
+	private boolean isNonHMRSettingDeviationNotificationCheck(User patientUser,
+			String notificationType){
+		return (HMR_AND_SETTINGS_DEVIATION.equalsIgnoreCase(notificationType) ||
+				
+				HMR_AND_SETTINGS_DEVIATION_VEST.equalsIgnoreCase(notificationType) ||
+				HMR_AND_SETTINGS_DEVIATION_MONARCH.equalsIgnoreCase(notificationType) ||
+				
+				HMR_VEST_AND_SETTINGS_DEVIATION.equalsIgnoreCase(notificationType) ||
+				HMR_MONARCH_AND_SETTINGS_DEVIATION.equalsIgnoreCase(notificationType) ||
+				
+				HMR_MONARCH_AND_SETTINGS_DEVIATION_VEST.equalsIgnoreCase(notificationType) ||
+				HMR_VEST_AND_SETTINGS_DEVIATION_VEST.equalsIgnoreCase(notificationType) ||
+				
+				HMR_MONARCH_AND_SETTINGS_DEVIATION_MONARCH.equalsIgnoreCase(notificationType) ||
+				HMR_VEST_AND_SETTINGS_DEVIATION_MONARCH.equalsIgnoreCase(notificationType)  &&
+				
+				(patientUser.isNonHMRNotification() || patientUser.isSettingDeviationNotification()));
+				
 	}
 
 	/**
@@ -2138,23 +2199,45 @@ public class AdherenceCalculationServiceMonarch{
 			SortedMap<LocalDate, List<TherapySession>> existingTherapySessionMapVest,
 			SortedMap<LocalDate, List<TherapySessionMonarch>> existingTherapySessionMapMonarch,
 			LocalDate date) throws Exception{
-		LocalDate lastTransmissionDateVest = date;
-		LocalDate lastTransmissionDateMonarch = date;
+		LocalDate lastTransmissionDateVest = null;
+		LocalDate lastTransmissionDateMonarch = null;
+		
 		// Get Latest TransmissionDate for Monarch, if data has not been transmitted for the day get mostRecent date
-		if(Objects.isNull(existingTherapySessionMapMonarch.get(date))){
-			SortedMap<LocalDate,List<TherapySessionMonarch>> mostRecentTherapySessionMap = existingTherapySessionMapMonarch.headMap(date);
-			if(mostRecentTherapySessionMap.size()>0)
-				lastTransmissionDateMonarch = mostRecentTherapySessionMap.lastKey();
+		if(existingTherapySessionMapMonarch.size()>0) {
+			if(Objects.isNull(existingTherapySessionMapMonarch.get(date))){
+				SortedMap<LocalDate,List<TherapySessionMonarch>> mostRecentTherapySessionMap = existingTherapySessionMapMonarch.headMap(date);
+				if(mostRecentTherapySessionMap.size()>0)
+					lastTransmissionDateMonarch = mostRecentTherapySessionMap.lastKey();
+			}else {
+				lastTransmissionDateMonarch = date;
+			}
 		}
 		
 		// Get Latest TransmissionDate for Vest, if data has not been transmitted for the day get mostRecent date
-		if(Objects.isNull(existingTherapySessionMapVest.get(date))){
-			SortedMap<LocalDate,List<TherapySession>> mostRecentTherapySessionMap = existingTherapySessionMapVest.headMap(date);
-			if(mostRecentTherapySessionMap.size()>0)
-				lastTransmissionDateVest = mostRecentTherapySessionMap.lastKey();
+		if(existingTherapySessionMapVest.size()>0) {
+			if(Objects.isNull(existingTherapySessionMapVest.get(date))){
+				SortedMap<LocalDate,List<TherapySession>> mostRecentTherapySessionMap = existingTherapySessionMapVest.headMap(date);
+				if(mostRecentTherapySessionMap.size()>0)
+					lastTransmissionDateVest = mostRecentTherapySessionMap.lastKey();
+			}else {
+				lastTransmissionDateVest = date;
+			}
 		}
 		
-		return (lastTransmissionDateMonarch.isAfter(lastTransmissionDateVest) ? lastTransmissionDateMonarch : lastTransmissionDateVest);
+		LocalDate lastTransmissionDate = null;
+		
+		if(Objects.nonNull(lastTransmissionDateVest)) {
+			if(Objects.nonNull(lastTransmissionDateMonarch)) {
+				lastTransmissionDate = lastTransmissionDateMonarch.isAfter(lastTransmissionDateVest) ? lastTransmissionDateMonarch : lastTransmissionDateVest;
+			}
+			else {
+				lastTransmissionDate = lastTransmissionDateVest;
+			}
+		}else if(Objects.nonNull(lastTransmissionDateMonarch)) {
+			lastTransmissionDate = lastTransmissionDateMonarch;
+		}
+		return lastTransmissionDate;
+//		return (lastTransmissionDateMonarch.isAfter(lastTransmissionDateVest) ? lastTransmissionDateMonarch : lastTransmissionDateVest);
 	}
 
 	private double getLatestHMR(
@@ -2286,8 +2369,8 @@ public class AdherenceCalculationServiceMonarch{
 							existingTherapySessionMapVest,adherenceSettingDay);
 					
 					ProtocolConstants protocolConstantVest = adherenceCalculationService.getProtocolByPatientUserId(patientUser.getId());
-					
-					isSettingsDeviatedVest = adherenceCalculationService.isSettingsDeviatedForSettingDays(latestSettingDaysTherapySessionsVest, protocolConstantVest, adherenceSettingDay);					
+
+					isSettingsDeviatedVest = adherenceCalculationService.isSettingsDeviatedForSettingDays(latestSettingDaysTherapySessionsVest, protocolConstantVest, adherenceSettingDay);
 				}
 				
 				applySettingsDeviatedDaysCount(latestCompliance, complianceMap,
@@ -2520,7 +2603,7 @@ public class AdherenceCalculationServiceMonarch{
 		}
 		return isSettingsDeviated;
 	}
-	
+
 	private boolean isSettingsDeviatedForSettingDays(List<TherapySessionMonarch> lastSettingDaysTherapySessions,
 			List<TherapySession> lastSettingDaysTherapySessionsVest,
 			ProtocolConstantsMonarch protocol, Integer adherenceSettingDay){
@@ -2580,7 +2663,7 @@ public class AdherenceCalculationServiceMonarch{
 	 * Runs every morning 9AM after the TIMS job executed to integrate the patient who is using both devices after identified
 
 	 */
-	@Scheduled(cron="0 0 9 * * * ")
+	@Scheduled(cron="0 0 23 * * * ")
 	public void processDeviceDetails(){
 		try{
 			LocalDate today = LocalDate.now();
@@ -2785,6 +2868,26 @@ public class AdherenceCalculationServiceMonarch{
 				notificationMonarchService.saveAll(notificationListToSave);
 				
 				if(flag == 2){
+					
+					List<PatientProtocolDataMonarch> oldProtocolList = patientProtocolMonarchRepository.findByPatientId(patDevice.getOldPatientId());
+					
+					List<PatientProtocolDataMonarch> newProtocolList = new LinkedList<>();
+					for(PatientProtocolDataMonarch oldProtocol : oldProtocolList){
+						
+						PatientProtocolDataMonarch newProtocol = new PatientProtocolDataMonarch(oldProtocol.getType(), patientInfo, user,
+								oldProtocol.getTreatmentsPerDay(), oldProtocol.getMinMinutesPerTreatment(), oldProtocol.getTreatmentLabel(),
+								oldProtocol.getMinFrequency(), oldProtocol.getMaxFrequency(), oldProtocol.getMinIntensity(),
+								oldProtocol.getMaxIntensity());
+						
+						String protocolKey = patientProtocolMonarchRepository.id();
+						
+						newProtocol.setId(protocolKey);
+						newProtocol.setProtocolKey(protocolKey);
+						
+						newProtocolList.add(newProtocol);
+					}
+					protocolMonarchService.saveAll(newProtocolList);							
+					
 					List<TherapySessionMonarch> therapySessionMonarchList = therapySessionMonarchRepository.findByPatientUserId(userOld.getId());
 					
 					List <TherapySessionMonarch> therapySessionListToSave = new LinkedList<>();
@@ -2824,6 +2927,26 @@ public class AdherenceCalculationServiceMonarch{
 			}else if( Objects.nonNull(vestCreatedDate) && Objects.nonNull(monarchCreatedDate) && (vestCreatedDate.isAfter(monarchCreatedDate) 
 													|| (vestCreatedDate.isEqual(monarchCreatedDate) && Constants.VEST.equals(patDevice.getDeviceType())) )){
 				if(flag == 2){
+					
+					List<PatientProtocolData> oldProtocolList = patientProtocolRepository.findByPatientId(patDevice.getOldPatientId());
+					
+					List<PatientProtocolData> newProtocolList = new LinkedList<>();
+					for(PatientProtocolData oldProtocol : oldProtocolList){
+						
+						PatientProtocolData newProtocol = new PatientProtocolData(oldProtocol.getType(), patientInfo, user,
+								oldProtocol.getTreatmentsPerDay(), oldProtocol.getMinMinutesPerTreatment(), oldProtocol.getTreatmentLabel(),
+								oldProtocol.getMinFrequency(), oldProtocol.getMaxFrequency(), oldProtocol.getMinPressure(),
+								oldProtocol.getMaxPressure());
+
+						String protocolKey = patientProtocolRepository.id();
+						newProtocol.setId(protocolKey);
+						newProtocol.setProtocolKey(protocolKey);
+						
+						newProtocolList.add(newProtocol);
+					}
+					protocolVestService.saveAll(newProtocolList);
+					
+					
 					List<TherapySession> therapySessionList = therapySessionRepository.findByPatientUserId(userOld.getId());
 					
 					List <TherapySession> therapySessionListToSave = new LinkedList<>();
@@ -2864,7 +2987,7 @@ public class AdherenceCalculationServiceMonarch{
 	/**
 	 * Runs every morning 9:15AM after the TIMS job executed to integrate the old patient who is swapped after identified from swapped date
 	 */	
-	@Scheduled(cron="0 15 9 * * * ")
+	@Scheduled(cron="0 15 23 * * * ")
 	public void processMergeSwapDeviceDetails(){
 		try{
 			LocalDate today = LocalDate.now();
@@ -2916,6 +3039,22 @@ public class AdherenceCalculationServiceMonarch{
 		// Get the Patient & User of old shell details
 		PatientInfo patientInfoOld = patientInfoRepository.findOneById(patDevice.getSwappedPatientId());
 		User userOld = userService.getUserObjFromPatientInfo(patientInfoOld);
+
+		// Getting the therapy details of the shell patient
+		List<TherapySessionMonarch> therapySessionMonarchList = therapySessionMonarchRepository.findByPatientUserId(userOld.getId());
+		
+		List<TherapySessionMonarch> therapySessionMonarchListExist = therapySessionMonarchRepository.findByPatientUserId(user.getId());
+		
+		SortedMap<LocalDate,List<TherapySessionMonarch>> sortedExistTherapy = null;
+		if(Objects.nonNull(therapySessionMonarchListExist) && !therapySessionMonarchListExist.isEmpty())
+			sortedExistTherapy = groupTherapySessionsByDate(therapySessionMonarchListExist);
+		
+		SortedMap<LocalDate,List<TherapySessionMonarch>> sortedTherapyToValidate = null;
+		
+		if(Objects.nonNull(therapySessionMonarchList) && !therapySessionMonarchList.isEmpty()){
+			therapySessionMonarchList.addAll(therapySessionMonarchListExist);
+			sortedTherapyToValidate = groupTherapySessionsByDate(therapySessionMonarchList);			
+		}
 		
 		// Getting compliance list of old patient
 		List<PatientComplianceMonarch> patientComplianceList = patientComplianceMonarchRepository.findByPatientUserId(userOld.getId());
@@ -2932,6 +3071,8 @@ public class AdherenceCalculationServiceMonarch{
 		List <PatientComplianceMonarch> complianceListToSave = new LinkedList<>();			
 		for(PatientComplianceMonarch patientCompliance : patientComplianceList){
 			
+			LocalDate lastestTransmissionDate = Objects.nonNull(sortedTherapyToValidate) ? sortedTherapyToValidate.lastKey() : null;
+			
 			if(!existComplianceDate.contains(patientCompliance.getDate())){
 				PatientComplianceMonarch compliance = new PatientComplianceMonarch(patientCompliance.getScore(),
 					patientCompliance.getDate(),
@@ -2942,7 +3083,7 @@ public class AdherenceCalculationServiceMonarch{
 					patientCompliance.isHmrCompliant(),
 					patientCompliance.isSettingsDeviated(),
 					patientCompliance.getMissedTherapyCount(),
-					patientCompliance.getLatestTherapyDate(),
+					Objects.nonNull(lastestTransmissionDate) ? lastestTransmissionDate : patientCompliance.getLatestTherapyDate(),
 					patientCompliance.getSettingsDeviatedDaysCount(),
 					patientCompliance.getGlobalHMRNonAdherenceCounter(),
 					patientCompliance.getGlobalSettingsDeviationCounter(),
@@ -2950,6 +3091,9 @@ public class AdherenceCalculationServiceMonarch{
 					patientCompliance.getHmrVest());
 				
 				complianceListToSave.add(compliance);
+			}else if(Objects.nonNull(lastestTransmissionDate) && !lastestTransmissionDate.equals(patientCompliance.getLatestTherapyDate())){
+				patientCompliance.setLatestTherapyDate(lastestTransmissionDate);
+				complianceListToSave.add(patientCompliance);
 			}
 		}
 		
@@ -2987,6 +3131,7 @@ public class AdherenceCalculationServiceMonarch{
 		notificationMonarchService.saveAll(notificationListToSave);
 		
 		// Getting the therapy details of the shell patient
+		/*
 		List<TherapySessionMonarch> therapySessionMonarchList = therapySessionMonarchRepository.findByPatientUserId(userOld.getId());
 		
 		List<TherapySessionMonarch> therapySessionMonarchListExist = therapySessionMonarchRepository.findByPatientUserId(user.getId());
@@ -2994,7 +3139,7 @@ public class AdherenceCalculationServiceMonarch{
 		SortedMap<LocalDate,List<TherapySessionMonarch>> sortedExistTherapy = null;
 		if(Objects.nonNull(therapySessionMonarchListExist) && !therapySessionMonarchListExist.isEmpty())
 			sortedExistTherapy = groupTherapySessionsByDate(therapySessionMonarchListExist);
-		
+		*/
 		List <TherapySessionMonarch> therapySessionListToSave = new LinkedList<>();
 		
 		for(TherapySessionMonarch patientTherapySession : therapySessionMonarchList){

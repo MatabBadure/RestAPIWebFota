@@ -97,11 +97,11 @@ public class CityStateZipMapResource {
 	}
 	
 	//To get unique states from country code
-	@RequestMapping(value = "/stateByCountryCode", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/stateByCountryCode", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 
-	public ResponseEntity<?> getStateValuesByCountryCode(
-			@RequestParam(required = true, value = "country") String country) {
+	public ResponseEntity<?> getStateValuesByCountryCode(@RequestBody CountryStateDTO countryStateDTO){
 		try {
+			List<String> country = countryStateDTO.getCountry();
 			return new ResponseEntity<>(cityStateZipMapService.getStateVOByCountryCode(country), HttpStatus.OK);
 		} catch (HillromException e) {
 			JSONObject json = new JSONObject();

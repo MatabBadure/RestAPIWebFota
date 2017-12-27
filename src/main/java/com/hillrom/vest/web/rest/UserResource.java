@@ -68,6 +68,7 @@ import com.hillrom.vest.domain.PatientDevicesAssoc;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientProtocolData;
 import com.hillrom.vest.domain.PatientProtocolDataMonarch;
+import com.hillrom.vest.domain.PatientTestResult;
 import com.hillrom.vest.domain.PatientVestDeviceData;
 import com.hillrom.vest.domain.PatientVestDeviceDataMonarch;
 import com.hillrom.vest.domain.PatientVestDeviceHistory;
@@ -91,6 +92,7 @@ import com.hillrom.vest.security.SecurityUtils;
 import com.hillrom.vest.service.AdherenceCalculationService;
 import com.hillrom.vest.service.ExcelOutputService;
 import com.hillrom.vest.service.GraphService;
+import com.hillrom.vest.service.PateintTestResultService;
 import com.hillrom.vest.service.PatientComplianceService;
 import com.hillrom.vest.service.PatientHCPService;
 import com.hillrom.vest.service.PatientProtocolService;
@@ -193,11 +195,16 @@ public class UserResource {
 	@Inject
 	private GraphService adherenceTrendGraphServiceMonarch;
     
-	
 	@Qualifier("complianceGraphService")
 	@Inject
-	private GraphService complianceGraphService;
-
+	private GraphService complianceGraphService;	
+	
+	//Gimp-14
+	@Qualifier("testResultsGraphService")
+	@Inject
+	private GraphService testResultsGraphService;
+	//Gimp-14
+	
 	@Qualifier("cumulativeStatsGraphService")
 	@Inject
 	private GraphService cumulativeStatsGraphService;
@@ -225,16 +232,17 @@ public class UserResource {
 	
 	@Inject
     private PatientProtocolMonarchService patientProtocolMonarchService;
-  @Inject
+	@Inject
     private ClinicRepository clinicRepository;
 	
-
   	@Inject
   	private 
   	PatientInfoRepository patientInfoRepository;
   	
   	@Inject
   	private PatientNoEventMonarchService patientNoEventMonarchService;
+	@Inject
+	private PateintTestResultService pateintTestResultService;
 
 	/**
 	 * GET /users -> get all users.
@@ -1643,6 +1651,35 @@ public class UserResource {
     }
     //hill-1847
     
+    //Gimp-14
+    /**
+     * Get the Patient test results graphs in Hill-Rom users
+     * @param id
+     * @param from
+     * @param to
+     * @return
+     */
+    @RequestMapping(value = "/users/{id}/testResultsGraph",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getTestResultsGraph(@PathVariable Long id,
+    		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
+    		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to){
+    	try{    
+    		List<PatientTestResult> patientTestResults;
+    		patientTestResults = pateintTestResultService.getPatientTestResultByUserId(id, from,to); //Get the test results of patient
+    		if(patientTestResults.size() > 0){
+    			Graph testResultsGraph = testResultsGraphService.populateGraphData(patientTestResults, new Filter(from,to,null,null)); //to populate the data for graph
+    			return new ResponseEntity<>(testResultsGraph,HttpStatus.OK); 
+    		}    		
+    		return new ResponseEntity<>(HttpStatus.OK);
+    	} catch(Exception ex){
+    		JSONObject jsonObject = new JSONObject();
+        	jsonObject.put("ERROR", ExceptionConstants.HR_717);
+    		return new ResponseEntity<>(jsonObject, HttpStatus.INTERNAL_SERVER_ERROR);
+    	}
+    }    
+   //Gimp-14
     
     /**
      * GET  /users/:userId/clinics/:clinicId/statistics -> get the patient statistics for clinic Badge associated with user.
@@ -1717,5 +1754,21 @@ public class UserResource {
         JSONObject jsonObject = new JSONObject();        
 		adherenceCalculationServiceMonarch.processMergeSwapDeviceDetails();        	
 		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
-    }  
+    }
+    
+    /**
+     * GET  /users/:userId/clinics/:clinicId/statistics -> get the patient statistics for clinic Badge associated with user.
+     */
+    @RequestMapping(value = "/testing18YrsReRegister",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP, AuthoritiesConstants.CLINIC_ADMIN})
+    public ResponseEntity<?> processPatientReRegister() throws HillromException {
+        log.debug("REST request for testing 18 Yrs reregister");
+        JSONObject jsonObject = new JSONObject();        
+		userService.processPatientReRegister();        	
+		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+    }
+    
 }

@@ -10,6 +10,7 @@ import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_PARTNUMBER;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_SN;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.No;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.SOFT_VER_DATE;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.INPROGRESS_LIST;
 
 import java.math.BigInteger;
 import java.util.Random;
@@ -85,7 +86,7 @@ public class FOTAServiceUtil {
 			// Get FOTADevice
 			fotaDeviceFWareUpdate = fotaDeviceRepository
 					.getFOTADeviceFWwareDetailsByDevSN(holder
-							.getDeviceSerialNumber());
+							.getDeviceSerialNumber(),INPROGRESS_LIST);
 			if (fotaDeviceFWareUpdate != null) {
 				fotaDeviceFWareUpdate.setDownloadStartDateTime(holder
 						.getDownloadStartDateTime());

@@ -319,5 +319,65 @@ public class AdherenceResource {
 		}
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+    
+    /**
+     * GET  /testingVestMissedTherapyCron -> to Initiate the daily missed therapy CRON.
+     */
+    @RequestMapping(value = "/testingVestMissedTherapyCron",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN})
+    public ResponseEntity<?> initiateVestMissedTherapyCron() throws HillromException {
+    	log.debug("REST request to initiate vest missed therapy cron");
+    	JSONObject jsonObject = new JSONObject();
+		adherenceCalculationService.processMissedTherapySessions();
+		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+    }
+    
+    /**
+     * GET  /testingBothOrMonarchMissedTherapyCron -> to Initiate the daily missed therapy CRON.
+     */
+    @RequestMapping(value = "/testingBothOrMonarchMissedTherapyCron",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN})
+    public ResponseEntity<?> initiateBothOrMonarchMissedTherapyCron() throws HillromException {
+    	log.debug("REST request to initiate both or Monarch missed therapy cron");
+    	JSONObject jsonObject = new JSONObject();
+		adherenceCalculationServiceMonarch.processMissedTherapySessionsMonarch();
+		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+    }
+    
+    /**
+     * GET  /testingVestProcessNotificationCron -> to Initiate the daily notification CRON.
+     */
+    @RequestMapping(value = "/testingVestProcessNotificationCron",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN})
+    public ResponseEntity<?> initiateVestNotificationCron() throws HillromException {
+    	log.debug("REST request to initiate notification cron");
+    	JSONObject jsonObject = new JSONObject();
+		adherenceCalculationService.processPatientNotifications();
+		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+    }
+    
+    /**
+     * GET  /testingVestProcessNotificationCron -> to Initiate the daily notification CRON.
+     */
+    @RequestMapping(value = "/testingBothOrMonarchProcessNotificationCron",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN})
+    public ResponseEntity<?> initiateBothOrMonarchNotificationCron() throws HillromException {
+    	log.debug("REST request to initiate notification cron");
+    	JSONObject jsonObject = new JSONObject();
+		adherenceCalculationServiceMonarch.processPatientNotificationsMonarch();
+		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+    }
 
 }

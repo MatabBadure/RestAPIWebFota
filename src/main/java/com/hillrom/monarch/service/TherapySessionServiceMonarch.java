@@ -97,9 +97,7 @@ public class TherapySessionServiceMonarch {
 			}else if(deviceType.equals("BOTH")){
 				adherenceCalculationServiceMonarch.processAdherenceScore(patientNoEvent, existingTherapySessionMap, 
 						receivedTherapySessionMapMonarch, existingComplianceMapMonarch,protocol,patientUser.getId());
-					
 			}
-			
 		}
 		return therapySessionsMonarch;
 	}

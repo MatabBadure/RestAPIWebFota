@@ -104,6 +104,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/optimusdevicedatalist").permitAll()
             .antMatchers("/api/validateActivationKey").permitAll()
             .antMatchers("/api/validateResetKey").permitAll()
+            .antMatchers("/api/account/re_register").permitAll()
              //FOTA API
             .antMatchers("/api/FOTA").permitAll()
             //Adherence cronjob

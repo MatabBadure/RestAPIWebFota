@@ -1045,5 +1045,11 @@ public class QueryConstants {
 	                
 	
 		//	)kt
+	public static String QUERY_PATIENT_TEST_RESULT = "select id, patient_id, user_id, cast(test_result_date as DATE) as resDate, FVC_L, FEV1_L, PEF_L_Min, AVG(FVC_P), AVG(FEV1_P), PEF_P, "			
+	+ "FEV1_TO_FVC_RATIO, Comments, last_updated_by "
+	+ "from TEST_RESULTS patientTestResult where patientTestResult.user_id = ";
+	
+	
+	
 	
 }

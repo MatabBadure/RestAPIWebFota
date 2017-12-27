@@ -5,6 +5,7 @@ import static com.hillrom.vest.security.AuthoritiesConstants.HCP;
 import static com.hillrom.vest.config.Constants.VEST;
 import static com.hillrom.vest.config.Constants.MONARCH;
 
+
 //import static com.hillrom.vest.config.Constants.ALL;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -111,6 +112,7 @@ import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.Filter;
 import com.hillrom.vest.web.rest.dto.Graph;
 import com.hillrom.vest.web.rest.dto.PatientComplianceVO;
+import com.hillrom.vest.web.rest.dto.PatientTestResultVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.ProtocolDTO;
 import com.hillrom.vest.web.rest.dto.ProtocolRevisionVO;
@@ -1636,8 +1638,8 @@ public class UserResource {
     		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
     		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to){
     	try{    
-    		List<PatientTestResult> patientTestResults;
-    		patientTestResults = pateintTestResultService.getPatientTestResultByUserId(id, from,to); //Get the test results of patient
+    		List<PatientTestResultVO> patientTestResults;
+    		patientTestResults = pateintTestResultService.getPatientTestResultAvgByUserId(id, from,to); //Get the test results of patient
     		if(patientTestResults.size() > 0){
     			Graph testResultsGraph = testResultsGraphService.populateGraphData(patientTestResults, new Filter(from,to,null,null)); //to populate the data for graph
     			return new ResponseEntity<>(testResultsGraph,HttpStatus.OK); 

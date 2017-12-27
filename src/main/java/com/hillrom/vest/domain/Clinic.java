@@ -85,6 +85,9 @@ public class Clinic implements Serializable,Comparable<Clinic> {
     @Column(name = "adherence_setting")
     private Integer adherenceSetting;
     
+    @Column(name="is_message_opted")
+    private Boolean isMessageOpted = false;
+    
     //start: HILL-2004
   	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
   	@Column(name="adherenceSetting_modified_date")
@@ -329,6 +332,14 @@ public class Clinic implements Serializable,Comparable<Clinic> {
 		return result;
 	}
 
+	public Boolean getIsMessageOpted() {
+		return isMessageOpted;
+	}
+
+	public void setIsMessageOpted(Boolean isMessageOpted) {
+		this.isMessageOpted = isMessageOpted;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -347,28 +358,22 @@ public class Clinic implements Serializable,Comparable<Clinic> {
 	}
 
 	@Override
-    public String toString() {
-        return "Clinic{" +
-                "id=" + id +
-                ", name='" + name + "'" +
-                ", address='" + address + "'" +
-                ", address2='" + address2 + "'" +
-                ", zipcode='" + zipcode + "'" +
-                ", city='" + city + "'" +
-                ", state='" + state + "'" +
-                ", phoneNumber='" + phoneNumber + "'" +
-                ", faxNumber='" + faxNumber + "'" +
-                ", speciality='" + speciality + "'" +                
-                ", hillromId='" + hillromId + "'" +
-                ", parentClinic='" + parentClinic + "'" +
-                ", deleted='" + deleted + "'" +
-                ", isParent='" + parent + "'" +
-                ", adherenceSetting='" + adherenceSetting + "'" +
-                //start: HILL-2004
-                ", adherenceSetting_modified_date='" + adherenceSettingModifiedDte + "'" +
-                //end: HILL-2004
-                '}';
-    }
+	public String toString() {
+		return "Clinic [id=" + id + ", name=" + name + ", address=" + address
+				+ ", address2=" + address2 + ", zipcode=" + zipcode + ", city="
+				+ city + ", state=" + state + ", phoneNumber=" + phoneNumber
+				+ ", faxNumber=" + faxNumber + ", speciality=" + speciality
+				+ ", hillromId=" + hillromId + ", clinicAdminId="
+				+ clinicAdminId + ", adherenceSetting=" + adherenceSetting
+				+ ", isMessageOpted=" + isMessageOpted
+				+ ", adherenceSettingModifiedDte="
+				+ adherenceSettingModifiedDte + ", parentClinic="
+				+ parentClinic + ", childClinics=" + childClinics
+				+ ", clinicPatientAssoc=" + clinicPatientAssoc
+				+ ", clinicUserAssoc=" + clinicUserAssoc + ", users=" + users
+				+ ", deleted=" + deleted + ", parent=" + parent
+				+ ", createdAt=" + createdAt + "]";
+	}
 	
 
 	

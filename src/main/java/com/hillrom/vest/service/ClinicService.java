@@ -502,8 +502,10 @@ public class ClinicService {
 			}
 			String[] strArray = strVal.split(",");
 			for(String s: strArray){
-				if(s.contains("1")) 
+				if(s.contains("1")){ 
 					boolValue = true;
+					break;
+				}
 			}
 			return boolValue;
 		} catch (Exception e) {

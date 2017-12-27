@@ -179,6 +179,7 @@ public class AdherenceCalculationService {
 	private PatientInfoRepository patientInfoRepository;
 
 	@Inject
+	@Lazy
 	private TherapySessionService therapySessionService;
 	
 	@Inject
@@ -199,14 +200,6 @@ public class AdherenceCalculationService {
 		return userIdProtolConstantsMap.get(patientUserId);
 	}
 
-	public ProtocolConstants getMergedProtocolByPatientUserId(
-			Long patientUserId) throws Exception{
-		List<Long> patientUserIds = new LinkedList<>();
-		patientUserIds.add(patientUserId);
-		Map<Long,ProtocolConstants> userIdProtolConstantsMap = protocolService.getMergedProtocolByPatientUserIds(patientUserIds);		
-		return userIdProtolConstantsMap.get(patientUserId);
-	}
-	
 	/**
 	 * Checks whether HMR Compliance violated(minHMRReading < actual < maxHMRReading)
 	 * @param protocolConstant
@@ -1916,15 +1909,14 @@ public class AdherenceCalculationService {
 				existingTherapySessionMapMonarch = 
 						therapySessionServiceMonarch.getAllTherapySessionsMapByPatientUserId(patientUser.getId());
 				
-				//ProtocolConstantsMonarch protocolConstantVest = adherenceCalculationServiceMonarch.getProtocolByPatientUserId(patientUser.getId()); 
+				ProtocolConstantsMonarch protocolConstantVest = adherenceCalculationServiceMonarch.getProtocolByPatientUserId(patientUser.getId()); 
 			
 				List<TherapySessionMonarch> latestSettingDaysTherapySessionsMonarch = adherenceCalculationServiceMonarch.prepareTherapySessionsForLastSettingdays(latestCompliance.getDate(),
 						existingTherapySessionMapMonarch,adherenceSettingDay);
 				
 				therapyMetricsMonarch = adherenceCalculationServiceMonarch.calculateTherapyMetricsPerSettingDays(latestSettingDaysTherapySessionsMonarch);
+				isHMRCompliantMonarch = adherenceCalculationServiceMonarch.isHMRCompliant(protocolConstantVest, therapyMetricsMonarch.get(TOTAL_DURATION),adherenceSettingDay);
 				
-				//isHMRCompliantMonarch = adherenceCalculationServiceMonarch.isHMRCompliant(protocolConstantVest, therapyMetricsMonarch.get(TOTAL_DURATION),adherenceSettingDay);
-				isHMRCompliantMonarch = isHMRCompliant(protocolConstant, therapyMetricsMonarch.get(TOTAL_DURATION), adherenceSettingDay);
 				
 				
 				
@@ -1953,10 +1945,9 @@ public class AdherenceCalculationService {
 					List<TherapySessionMonarch> latestSettingDaysTherapySessionsMonarch = adherenceCalculationServiceMonarch.prepareTherapySessionsForLastSettingdays(latestCompliance.getDate(),
 							existingTherapySessionMapMonarch,adherenceSettingDay);
 					
-					//ProtocolConstantsMonarch protocolConstantMonarch = adherenceCalculationServiceMonarch.getProtocolByPatientUserId(patientUser.getId());
+					ProtocolConstantsMonarch protocolConstantMonarch = adherenceCalculationServiceMonarch.getProtocolByPatientUserId(patientUser.getId());
 					
-					//isSettingsDeviatedMonarch = adherenceCalculationServiceMonarch.isSettingsDeviatedForSettingDays(latestSettingDaysTherapySessionsMonarch, protocolConstantMonarch, adherenceSettingDay);
-					isSettingsDeviatedMonarch = adherenceCalculationServiceMonarch.isSettingsDeviatedForSettingDays(latestSettingDaysTherapySessionsMonarch, protocolConstant, adherenceSettingDay);
+					isSettingsDeviatedMonarch = adherenceCalculationServiceMonarch.isSettingsDeviatedForSettingDays(latestSettingDaysTherapySessionsMonarch, protocolConstantMonarch, adherenceSettingDay);
 				}
 				
 				adherenceCalculationServiceMonarch.applySettingsDeviatedDaysCount(latestCompliance, complianceMap,
@@ -2368,14 +2359,6 @@ public class AdherenceCalculationService {
 		if(Objects.nonNull(therapySessionListExist) && !therapySessionListExist.isEmpty())
 			sortedExistTherapy = groupTherapySessionsByDate(therapySessionListExist);		
 
-		//SortedMap<LocalDate,List<TherapySession>> sortedTherapyToValidate = null;
-		
-		//if(Objects.nonNull(therapySessionList) && !therapySessionList.isEmpty()){
-			//therapySessionListExist.addAll(therapySessionList);
-			//sortedTherapyToValidate = groupTherapySessionsByDate(therapySessionListExist);			
-		//}
-		
-		//LocalDate lastestTransmissionDate = Objects.nonNull(sortedTherapyToValidate) ? sortedTherapyToValidate.lastKey() : null;
 		
 		// Getting compliance list of old patient
 		List<PatientCompliance> patientComplianceList = patientComplianceRepository.findByPatientUserId(userOld.getId());
@@ -2388,21 +2371,6 @@ public class AdherenceCalculationService {
 		SortedMap<LocalDate,List<PatientCompliance>> sortedComplianceToUpdate = 
 				new TreeMap<>(existpatientCompliance.stream().collect(Collectors.groupingBy(PatientCompliance :: getDate)));
 		
-		//List <PatientCompliance> existComplianceListToUpdate = new LinkedList<>();
-		
-		/*for(PatientCompliance tmpPatientCompliance : existpatientCompliance){
-			
-			sortedComplianceToUpdate.put(tmpPatientCompliance.getDate(), tmpPatientCompliance);
-			// Update and Adding of patient compliance latest transmission date to store
-			tmpPatientCompliance.setLatestTherapyDate(lastestTransmissionDate);
-			//existComplianceListToUpdate.add(tmpPatientCompliance);
-			
-			// Adding the date for the existing patient compliance dates
-			existComplianceDate.add(tmpPatientCompliance.getDate());
-		}*/
-		
-		// Updating all the patient compliance with the latest transmission date		
-		//complianceService.saveAll(existComplianceListToUpdate);
 		
 		List <PatientCompliance> complianceListToSave = new LinkedList<>();			
 		for(PatientCompliance patientCompliance : patientComplianceList){
@@ -2425,7 +2393,6 @@ public class AdherenceCalculationService {
 					patientCompliance.getHmr());
 				
 				complianceListToSave.add(compliance);
-			//}else if(Objects.nonNull(lastestTransmissionDate) && !lastestTransmissionDate.equals(patientCompliance.getLatestTherapyDate())){
 			}else{	
 				PatientCompliance existPatientComplianceToUpdate = sortedComplianceToUpdate.get(patientCompliance.getDate()).get(0);
 				/*existPatientComplianceToUpdate
@@ -2435,8 +2402,6 @@ public class AdherenceCalculationService {
 					existPatientComplianceToUpdate.setMissedTherapyCount(patientCompliance.getMissedTherapyCount());
 					complianceListToSave.add(existPatientComplianceToUpdate);
 				}
-				/*patientCompliance.setLatestTherapyDate(lastestTransmissionDate);
-				complianceListToSave.add(patientCompliance);*/
 			}
 		}
 		

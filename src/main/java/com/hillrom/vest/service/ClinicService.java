@@ -498,7 +498,7 @@ public class ClinicService {
 			Boolean boolValue = false;
 			String strVal = "";
 			for(Object[] result : results){
-				strVal = String.valueOf(result[36]);
+				strVal = String.valueOf(result[(result.length)-1]);
 			}
 			String[] strArray = strVal.split(",");
 			for(String s: strArray){

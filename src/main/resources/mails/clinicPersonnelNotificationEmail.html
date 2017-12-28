@@ -11,7 +11,8 @@
 		<div>
 			<p style="font-size: 14px; ">You are being notified a patient has missed a therapy goal in their airway clearance protocol. <br /><br />
 			To review the details of the notification, click the link below to review the details in your VisiView® Portal clinic dashboard. <br /><br /><br /><br />
-		<!-- 	<a style="font-size: 14px;" th:href="@{|${baseUrl}/#/${messageURLStr}|}">Review clinic dashboard</a>.  -->
+		 	<!-- <a style="font-size: 14px;" th:href="@{|${baseUrl}/#/{messageURLStr}|}">Review clinic dashboard</a>.  -->
+		 	<a style="font-size: 14px;" th:href="@{|${notificationUrl}/#/login|}">Review clinic dashboard</a>
 		</p>
 		</div>
 		

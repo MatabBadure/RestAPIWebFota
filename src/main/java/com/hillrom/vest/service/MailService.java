@@ -740,7 +740,7 @@ public class MailService {
     public void sendNotificationMailToPatientBasedOnFreq(User user,String notificationType){
         log.debug("Sending password reset e-mail to '{}'", user.getEmail());
         Context context = new Context();
-        context.setVariable("user", user);
+        context.setVariable("user", user.getFirstName());
         context.setVariable("notificationUrl", patientDashboardUrl);
         String content = "";
         String subject = "";
@@ -752,7 +752,7 @@ public class MailService {
     public void sendNotificationMailToHCPAndClinicAdminBasedOnFreq(User user){
     	log.debug("Sending Notification shall have a frequency for HCP and Clinic Admin '{}'", user.getEmail());
         Context context = new Context();
-        context.setVariable("user", user);
+        context.setVariable("user", user.getFirstName());
     //    context.setVariable("clinicStatisticsMap",statistics);
         context.setVariable("today", DateUtil.convertLocalDateToStringFromat(org.joda.time.LocalDate.now().minusDays(1), "MMM dd,yyyy"));
         context.setVariable("notificationUrl", hcpOrClinicAdminDashboardUrl);
@@ -767,7 +767,7 @@ public class MailService {
     public void sendNotificationMailToHCPAndClinicAdminMonarchBasedOnFreq(User user){
     	log.debug("Sending password reset e-mail to '{}'", user.getEmail());
         Context context = new Context();
-        context.setVariable("user", user);
+        context.setVariable("user", user.getFirstName());
   //      context.setVariable("clinicStatisticsMap",statistics);
         context.setVariable("today", DateUtil.convertLocalDateToStringFromat(org.joda.time.LocalDate.now().minusDays(1), "MMM dd,yyyy"));
         context.setVariable("notificationUrl", hcpOrClinicAdminDashboardUrl);
@@ -786,7 +786,7 @@ public class MailService {
         context.setVariable("careGiverStatsNotificationVO", careGiverStatsNotificationVO.getCareGiverName());
         
         context.setVariable("today", DateUtil.convertLocalDateToStringFromat(org.joda.time.LocalDate.now().minusDays(1), "MMM dd,yyyy"));
- //       context.setVariable("notificationUrl", careGiverDashboardUrl);
+        context.setVariable("notificationUrl", careGiverDashboardUrl);
         String content = "";
         String subject = "";
 

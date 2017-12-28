@@ -107,6 +107,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/account/re_register").permitAll()
              //FOTA API
             .antMatchers("/api/FOTA").permitAll()
+            //Adherence cronjob
+            .antMatchers("/api/testingAdherenceTraningDateCron").permitAll()
             .antMatchers("/api/users/{id}/exportVestDeviceData").authenticated()
             .antMatchers("/api/users/{id}/exportVestDeviceDataCSV").authenticated()
             .antMatchers("/api/users/{id}/exportTherapyData").authenticated()

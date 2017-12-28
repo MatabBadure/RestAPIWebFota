@@ -89,6 +89,17 @@ public class HcpClinicsVO implements Serializable{
 		build(hcp);
 	}
 	
+	public HcpClinicsVO(UserExtension hcp, Set<Clinic> clinicsHcpAssociated,String role) {
+		super();
+		hcp.setPrimaryPhone(hcp.getMobilePhone());
+		this.hcpUsers = hcp;
+		Set<Clinic> associatedClinics = clinicsHcpAssociated;
+		for(Clinic clinic: associatedClinics){
+			this.clinics.add(ClinicVOBuilder.build(clinic));
+		}
+		build(hcp);
+	}
+	
 	public void build(UserExtension hcp){
 		this.id = hcp.getId();
 		this.title = hcp.getTitle();

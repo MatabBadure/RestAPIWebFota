@@ -2,7 +2,6 @@ package com.hillrom.monarch.service;
 
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateWeightedAvg;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,19 +26,18 @@ import org.springframework.stereotype.Service;
 import com.hillrom.monarch.repository.PatientMonarchDeviceDataRepository;
 import com.hillrom.monarch.repository.PatientNoEventsMonarchRepository;
 import com.hillrom.monarch.repository.TherapySessionMonarchRepository;
-import com.hillrom.monarch.service.util.PatientVestDeviceTherapyUtilMonarch;
 import com.hillrom.monarch.web.rest.dto.TherapyDataMonarchVO;
 import com.hillrom.vest.domain.NoteMonarch;
 import com.hillrom.vest.domain.PatientComplianceMonarch;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEventMonarch;
 import com.hillrom.vest.domain.PatientVestDeviceDataMonarch;
-import com.hillrom.vest.domain.ProtocolConstants;
 import com.hillrom.vest.domain.ProtocolConstantsMonarch;
 import com.hillrom.vest.domain.TherapySessionMonarch;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.service.AdherenceCalculationService;
 import com.hillrom.vest.service.util.DateUtil;
+import com.hillrom.vest.service.util.GraphUtils;
 import com.hillrom.vest.web.rest.dto.TreatmentStatisticsVO;
 
 @Service
@@ -96,23 +94,12 @@ public class TherapySessionServiceMonarch {
 			if(deviceType.equals("MONARCH")){
 				adherenceCalculationServiceMonarch.processAdherenceScore(patientNoEvent, existingTherapySessionMap, 
 					receivedTherapySessionMapMonarch, existingComplianceMapMonarch,protocol);
-			}else if(deviceType.equals("BOTH")){				
-				// Merged Protocol for the both device patients
-				ProtocolConstants protocolMergedVest = adherenceCalculationService.getProtocolByPatientUserId(patientUser.getId());
-				// Convert Merged protocol with Vest object to monarch object
-				ProtocolConstantsMonarch protocolMergedMonarch = convertVestToMonarchProtocol(protocolMergedVest);
-				
+			}else if(deviceType.equals("BOTH")){
 				adherenceCalculationServiceMonarch.processAdherenceScore(patientNoEvent, existingTherapySessionMap, 
-						receivedTherapySessionMapMonarch, existingComplianceMapMonarch,protocolMergedMonarch,patientUser.getId());
+						receivedTherapySessionMapMonarch, existingComplianceMapMonarch,protocol,patientUser.getId());
 			}
 		}
 		return therapySessionsMonarch;
-	}
-	
-	public ProtocolConstantsMonarch convertVestToMonarchProtocol(ProtocolConstants protocol){
-		ProtocolConstantsMonarch convertFromVestProtocol = new ProtocolConstantsMonarch(protocol.getMaxFrequency(), protocol.getMinFrequency(),
-				protocol.getMaxPressure(), protocol.getMinPressure(),protocol.getTreatmentsPerDay(),protocol.getMinDuration());  
-		return convertFromVestProtocol;
 	}
 	
 	/*public void removeExistingTherapySessions(
@@ -213,8 +200,17 @@ public class TherapySessionServiceMonarch {
 		
 		// This is to discard the records if the user requested data beyond his/her first transmission date.
 		PatientNoEventMonarch patientNoEvent = patientNoEventMonarchService.findByPatientUserId(patientUserId);
-		if(Objects.nonNull(patientNoEvent) && Objects.nonNull(patientNoEvent.getFirstTransmissionDate()))
-			from = from.isAfter(patientNoEvent.getFirstTransmissionDate()) ? from : patientNoEvent.getFirstTransmissionDate();
+		/*if(Objects.nonNull(patientNoEvent) && Objects.nonNull(patientNoEvent.getFirstTransmissionDate()))
+			from = from.isAfter(patientNoEvent.getFirstTransmissionDate()) ? from : patientNoEvent.getFirstTransmissionDate();*/
+		//Start GIMP 11
+		if(Objects.nonNull(patientNoEvent)){
+			LocalDate firstTransmissionDateByType = GraphUtils.getFirstTransmissionDateMonarchByType(patientNoEvent);
+			if(Objects.nonNull(firstTransmissionDateByType)){
+				from = from.isAfter(patientNoEvent.getFirstTransmissionDate()) ? from : patientNoEvent.getFirstTransmissionDate();
+			}
+		}
+		//End GIMP 11
+		
 		// Prepare the list of dates to which data has to be shown
 		List<LocalDate> dates = DateUtil.getAllLocalDatesBetweenDates(from, to);
 		List<TherapyDataMonarchVO> processedTherapies = new LinkedList<>();

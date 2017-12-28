@@ -168,6 +168,9 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Column(name = "expiration_date", nullable = true)
     private DateTime expirationDate = null;
     
+    @Column(name="re_registered")
+    private Boolean reRegister = false;
+    
   //Garment changes
     @Transient
     @JsonSerialize
@@ -200,6 +203,16 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @JsonDeserialize
 	private String monarchGarmentType;
     
+    @Transient
+    @JsonSerialize
+    @JsonDeserialize
+    private String deactivationReason;
+    
+    @Transient
+    @JsonSerialize
+    @JsonDeserialize
+    private String userPreferenceTimezone;
+    
 	public User() {
 		super();
 	}
@@ -217,7 +230,13 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	}
 
 
-	
+	public String getDeactivationReason() {
+		return deactivationReason;
+	}
+
+	public void setDeactivationReason(String deactivationReason) {
+		this.deactivationReason = deactivationReason;
+	}
 	
 	public String getVestGarmentColor() {
 		return vestGarmentColor;
@@ -500,6 +519,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		this.expirationDate = expirationDate;
 	}
 
+	public Boolean isReRegister() {
+		return reRegister;
+	}
+
+	public void setReRegister(Boolean reRegister) {
+		this.reRegister = reRegister;
+	}
+
 	@Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -518,7 +545,22 @@ public class User extends AbstractAuditingEntity implements Serializable {
         return true;
     }
 
-    @Override
+	
+    /**
+	 * @return the userPreferenceTimezone
+	 */
+	public String getUserPreferenceTimezone() {
+		return userPreferenceTimezone;
+	}
+
+	/**
+	 * @param userPreferenceTimezone the userPreferenceTimezone to set
+	 */
+	public void setUserPreferenceTimezone(String userPreferenceTimezone) {
+		this.userPreferenceTimezone = userPreferenceTimezone;
+	}
+
+	@Override
     public int hashCode() {
         if(email != null) return email.hashCode();
         else {
@@ -532,9 +574,28 @@ public class User extends AbstractAuditingEntity implements Serializable {
 				+ ", firstName=" + firstName + ", middleName=" + middleName
 				+ ", lastName=" + lastName + ", email=" + email + ", gender="
 				+ gender + ", zipcode=" + zipcode + ", activated=" + activated
-				+ ", langKey=" + langKey + ", termsConditionAccepted="
-				+ termsConditionAccepted + ", deleted=" + deleted
-				+ ", lastLoggedInAt=" + lastLoggedInAt + "]";
+				+ ", langKey=" + langKey + ", activationKey=" + activationKey
+				+ ", resetKey=" + resetKey + ", resetDate=" + resetDate
+				+ ", termsConditionAccepted=" + termsConditionAccepted
+				+ ", termsConditionAcceptedDate=" + termsConditionAcceptedDate
+				+ ", authorities=" + authorities + ", deleted=" + deleted
+				+ ", lastLoggedInAt=" + lastLoggedInAt + ", userPatientAssoc="
+				+ userPatientAssoc + ", dob=" + dob + ", hillromId="
+				+ hillromId + ", missedTherapyNotification="
+				+ missedTherapyNotification + ", nonHMRNotification="
+				+ nonHMRNotification + ", settingDeviationNotification="
+				+ settingDeviationNotification + ", messageNotification="
+				+ messageNotification + ", activationLinkSentDate="
+				+ activationLinkSentDate + ", expired=" + expired
+				+ ", expirationDate=" + expirationDate + ", reRegister="
+				+ reRegister + ", vestGarmentColor=" + vestGarmentColor
+				+ ", vestGarmentSize=" + vestGarmentSize + ", vestGarmentType="
+				+ vestGarmentType + ", monarchGarmentColor="
+				+ monarchGarmentColor + ", monarchGarmentSize="
+				+ monarchGarmentSize + ", monarchGarmentType="
+				+ monarchGarmentType + ", deactivationReason="
+				+ deactivationReason + ", userPreferenceTimezone="
+				+ userPreferenceTimezone + "]";
 	}
 
 }

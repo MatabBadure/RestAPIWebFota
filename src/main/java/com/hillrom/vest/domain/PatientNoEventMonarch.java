@@ -47,6 +47,22 @@ public class PatientNoEventMonarch {
     @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
 	private LocalDate userCreatedDate;
 	
+	@Column(name="first_transmission_date_before_update")
+	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDate")
+	@JsonSerialize(using = CustomLocalDateSerializer.class)
+    @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
+	private LocalDate firstTransmissionDateBeforeUpdate;
+	
+	@Column(name="date_first_transmission_date_updated")
+	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDate")
+	@JsonSerialize(using = CustomLocalDateSerializer.class)
+    @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
+	private LocalDate dateFirstTransmissionDateUpdated;
+	
+	@Column(name="first_trans_date_type")
+	private String firstTransDateType;
+	
+	
 	public PatientNoEventMonarch() {
 		super();
 	}
@@ -58,6 +74,16 @@ public class PatientNoEventMonarch {
 		this.firstTransmissionDate = firstTransmissionDate;
 		this.patient = patient;
 		this.patientUser = patientUser;
+	}
+
+	
+	
+	public String getFirstTransDateType() {
+		return firstTransDateType;
+	}
+
+	public void setFirstTransDateType(String firstTransDateType) {
+		this.firstTransDateType = firstTransDateType;
 	}
 
 	public Long getId() {
@@ -115,6 +141,25 @@ public class PatientNoEventMonarch {
 		return this.userCreatedDate.getMonthOfYear();
 	}
 	
+	
+	public LocalDate getFirstTransmissionDateBeforeUpdate() {
+		return firstTransmissionDateBeforeUpdate;
+	}
+
+	public void setFirstTransmissionDateBeforeUpdate(
+			LocalDate firstTransmissionDateBeforeUpdate) {
+		this.firstTransmissionDateBeforeUpdate = firstTransmissionDateBeforeUpdate;
+	}
+
+	public LocalDate getDateFirstTransmissionDateUpdated() {
+		return dateFirstTransmissionDateUpdated;
+	}
+
+	public void setDateFirstTransmissionDateUpdated(
+			LocalDate dateFirstTransmissionDateUpdated) {
+		this.dateFirstTransmissionDateUpdated = dateFirstTransmissionDateUpdated;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

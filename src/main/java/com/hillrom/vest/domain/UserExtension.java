@@ -11,6 +11,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.envers.AuditJoinTable;
@@ -59,9 +60,41 @@ public class UserExtension extends User implements Serializable {
 	@JoinTable(name = "CLINIC_USER_ASSOC", joinColumns = { @JoinColumn(name = "users_id", referencedColumnName = "user_id") }, inverseJoinColumns = { @JoinColumn(name = "clinics_id", referencedColumnName = "id") })
 	@AuditJoinTable
 	private Set<Clinic> clinics = new HashSet<>();
+	
+	@ManyToMany
+	@JoinTable(name = "ENTITY_USER_ASSOC", joinColumns = { @JoinColumn(name = "user_id", referencedColumnName = "user_id") }, inverseJoinColumns = { @JoinColumn(name = "entity_id", referencedColumnName = "id") })
+	@AuditJoinTable
+	private Set<Clinic> clinicsAdmin = new HashSet<>();
+
 
 	@Column(name = "is_deleted", nullable = false)
 	private boolean deleted = false;
+	
+	//adding column for user deactivation reason
+	@Size(max=255)
+	@Column(name="deactivation_reason", length=255)
+	private String deactivationReason;
+	
+	@Size(max=255)
+	@Column(name="time_zone", length=255)
+	private String timeZone;
+
+	public String getDeactivationReason() {
+		return deactivationReason;
+	}
+
+	public void setDeactivationReason(String deactivationReason) {
+		this.deactivationReason = deactivationReason;
+	}
+
+	
+	public Set<Clinic> getClinicsAdmin() {
+		return clinicsAdmin;
+	}
+
+	public void setClinicsAdmin(Set<Clinic> clinicsAdmin) {
+		this.clinicsAdmin = clinicsAdmin;
+	}
 
 	public String getSpeciality() {
 		return speciality;
@@ -151,13 +184,20 @@ public class UserExtension extends User implements Serializable {
 		this.clinics = clinics;
 	}
 
+	public String getTimeZone() {
+		return timeZone;
+	}
+
+	public void setTimeZone(String timeZone) {
+		this.timeZone = timeZone;
+	}
+
 	@Override
 	public String toString() {
-		return "UserExtension [speciality=" + speciality + ", credentials="
-				+ credentials + ", primaryPhone=" + primaryPhone
-				+ ", mobilePhone=" + mobilePhone + ", faxNumber=" + faxNumber
-				+ ", address=" + address + ", city=" + city + ", state="
-				+ state + ", npiNumber=" + npiNumber + "]";
+		return "UserExtension [speciality=" + speciality + ", credentials=" + credentials + ", primaryPhone="
+				+ primaryPhone + ", mobilePhone=" + mobilePhone + ", faxNumber=" + faxNumber + ", address=" + address
+				+ ", city=" + city + ", state=" + state + ", npiNumber=" + npiNumber + ", clinics=" + clinics
+				+ ", deleted=" + deleted + ", deactivationReason=" + deactivationReason + ", timeZone=" + timeZone + "]";
 	}
 
 }

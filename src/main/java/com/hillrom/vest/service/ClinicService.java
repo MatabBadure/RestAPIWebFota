@@ -4,6 +4,7 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,6 +43,7 @@ import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
+import com.hillrom.vest.web.rest.dto.CareGiverStatsNotificationVO;
 import com.hillrom.vest.web.rest.dto.ClinicDTO;
 import com.hillrom.vest.web.rest.dto.ClinicVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
@@ -125,38 +127,60 @@ public class ClinicService {
     			}
     		}
     		assignUpdatedValues(clinicDTO, clinic);
-    		if(Objects.nonNull(clinicDTO.getParent()) && clinicDTO.getParent()) {
-    			List<String> existingChildClinicIds = new ArrayList<String>();
-    			List<String> newChildClinicIds = new ArrayList<String>();
-    			for(Clinic childClinic : clinic.getChildClinics()) {
-    				existingChildClinicIds.add(childClinic.getId().toString());
-    			}
-    			for(Map<String, String> childClinic : clinicDTO.getChildClinicList()) {
-    				newChildClinicIds.add(childClinic.get("id"));
-    			}
-    			List<String> clinicsToBeRemoved = RandomUtil.getDifference(existingChildClinicIds, newChildClinicIds);
-    			
-    			//TODO : to be refactored with clinicRepository.findAll(clinicsToBeRemoved)
-    			for(String clinicId : clinicsToBeRemoved) {
-    				Clinic childClinic = clinicRepository.getOne(clinicId);
-    				
-    				childClinic.setParentClinic(null);
-    				clinicRepository.save(childClinic);
-    				clinic.getChildClinics().remove(childClinic);
-    			}
-    		} else if(Objects.nonNull(clinicDTO.getParentClinic()) && StringUtils.isNotBlank(clinicDTO.getParentClinic().get("id"))) {
-        		if(!id.equals(clinicDTO.getParentClinic().get("id"))) {
-        			Clinic parentClinic = clinicRepository.getOne(clinicDTO.getParentClinic().get("id"));
-        			parentClinic.setParent(true);
-        			clinicRepository.save(parentClinic);
-        			clinic.setParentClinic(parentClinic);       			
-        		} else {
-        			throw new HillromException(ExceptionConstants.HR_542);
-        		} 
-        	} else {
-       			clinicRepository.save(clinic);
-        	} 
-    		clinicRepository.save(clinic);
+
+    		if((clinicDTO.getMakeParent()) || (clinicDTO.getMakeChild())){
+	    		if(clinicDTO.getMakeParent()){
+	    			clinic.setParent(true);
+	    			clinic.setParentClinic(null);
+	    			clinicRepository.save(clinic);
+	    		}
+	    		
+	    		if(clinicDTO.getMakeChild()){
+	    			clinic.setParent(false);
+	    			Clinic parentClinic = clinicRepository.getOne(clinicDTO.getParentClinic().get("id"));
+	    			clinic.setParentClinic(parentClinic);
+	    			List<Clinic> existingChildClinicsList = parentClinic.getChildClinics();
+	    			existingChildClinicsList.add(clinic);
+	    			existingChildClinicsList.addAll(clinic.getChildClinics());
+	    			parentClinic.setChildClinics(existingChildClinicsList);
+	    			clinicRepository.save(parentClinic);
+	    			clinicRepository.save(clinic);
+	    		}
+    		}else {
+    		
+	    		if(Objects.nonNull(clinicDTO.getParent()) && clinicDTO.getParent()) {
+	    			List<String> existingChildClinicIds = new ArrayList<String>();
+	    			List<String> newChildClinicIds = new ArrayList<String>();
+	    			for(Clinic childClinic : clinic.getChildClinics()) {
+	    				existingChildClinicIds.add(childClinic.getId().toString());
+	    			}
+	    			for(Map<String, String> childClinic : clinicDTO.getChildClinicList()) {
+	    				newChildClinicIds.add(childClinic.get("id"));
+	    			}
+	    			List<String> clinicsToBeRemoved = RandomUtil.getDifference(existingChildClinicIds, newChildClinicIds);
+	    			
+	    			//TODO : to be refactored with clinicRepository.findAll(clinicsToBeRemoved)
+	    			for(String clinicId : clinicsToBeRemoved) {
+	    				Clinic childClinic = clinicRepository.getOne(clinicId);
+	    				
+	    				childClinic.setParentClinic(null);
+	    				clinicRepository.save(childClinic);
+	    				clinic.getChildClinics().remove(childClinic);
+	    			}
+	    		} else if(Objects.nonNull(clinicDTO.getParentClinic()) && StringUtils.isNotBlank(clinicDTO.getParentClinic().get("id"))) {
+	        		if(!id.equals(clinicDTO.getParentClinic().get("id"))) {
+	        			Clinic parentClinic = clinicRepository.getOne(clinicDTO.getParentClinic().get("id"));
+	        			parentClinic.setParent(true);
+	        			clinicRepository.save(parentClinic);
+	        			clinic.setParentClinic(parentClinic);       			
+	        		} else {
+	        			throw new HillromException(ExceptionConstants.HR_542);
+	        		} 
+	        	} else {
+	       			clinicRepository.save(clinic);
+	        	} 
+	    		clinicRepository.save(clinic);
+    		}
         } else {
 	      	throw new HillromException(ExceptionConstants.HR_543);
 	    }
@@ -252,6 +276,8 @@ public class ClinicService {
 			clinic.setDeleted(clinicDTO.getDeleted());
 		if (clinicDTO.getAdherenceSetting() != null)
 			clinic.setAdherenceSetting(clinicDTO.getAdherenceSetting());
+		if (clinicDTO.getIsMessageOpted() != null)
+			clinic.setIsMessageOpted(clinicDTO.getIsMessageOpted());
 		//start: HILL-2004
 		if (clinicDTO.getAdherenceSettingFlag() != null && clinicDTO.getAdherenceSettingFlag().equals(Boolean.TRUE))
 		{
@@ -486,5 +512,28 @@ public class ClinicService {
 	public List<Clinic> getActiveClinicsWithPatients(boolean isDeleted) {
 		List<Clinic> clinics = clinicRepository.findByDeletedAndClinicPatientAssocIsNotEmpty(isDeleted);
 		return clinics;
+	}
+	
+	public Boolean isMessagesOpted(String userId){
+		try {
+			List<Object[]> results = clinicRepository.findByUserId(userId);
+			Boolean boolValue = false;
+			String strVal = "";
+			for(Object[] result : results){
+				strVal = String.valueOf(result[(result.length)-1]);
+			}
+			String[] strArray = strVal.split(",");
+			for(String s: strArray){
+				if(s.contains("1")){ 
+					boolValue = true;
+					break;
+				}
+			}
+			return boolValue;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

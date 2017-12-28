@@ -16,10 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hillrom.monarch.repository.NoteMonarchRepository;
-import com.hillrom.vest.domain.Note;
 import com.hillrom.vest.domain.NoteMonarch;
 import com.hillrom.vest.domain.PatientInfo;
-import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.PatientNoEventMonarch;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserPatientAssoc;
@@ -27,6 +25,7 @@ import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.UserPatientRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.service.UserService;
+import com.hillrom.vest.service.util.GraphUtils;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.RelationshipLabelConstants;
 
@@ -79,9 +78,11 @@ public class NoteServiceMonarch {
 		
 		if(Objects.isNull(patientNoEvent))
 			throw new HillromException(ExceptionConstants.HR_585);
-		if(Objects.isNull(patientNoEvent.getFirstTransmissionDate()) ||  date.isBefore(patientNoEvent.getFirstTransmissionDate()))
+		//Start GIMP 11
+		LocalDate firstTransmissionDateByType = GraphUtils.getFirstTransmissionDateMonarchByType(patientNoEvent);
+		if(Objects.isNull(firstTransmissionDateByType) ||  date.isBefore(firstTransmissionDateByType))
 			throw new HillromException(ExceptionConstants.HR_701);
-			
+		//Ends GIMP 11	
 		NoteMonarch existingNote = findOneByUserIdAndDate(userId,date);
 		if(Objects.isNull(existingNote)){
 			existingNote = new NoteMonarch();
@@ -113,8 +114,11 @@ public class NoteServiceMonarch {
 		PatientNoEventMonarch patientNoEvent = patientNoEventMonarchService.findByPatientId(patientId);
 		if(Objects.nonNull(patientNoEvent))
 			throw new HillromException(ExceptionConstants.HR_585);
-		if(Objects.isNull(patientNoEvent.getFirstTransmissionDate()) ||  date.isBefore(patientNoEvent.getFirstTransmissionDate()))
+		//Start GIMP 11
+		LocalDate firstTransmissionDateByType = GraphUtils.getFirstTransmissionDateMonarchByType(patientNoEvent);
+		if(Objects.isNull(firstTransmissionDateByType) ||  date.isBefore(firstTransmissionDateByType))
 			throw new HillromException(ExceptionConstants.HR_701);
+		//Ends GIMP 11
 		if(StringUtils.isBlank(note))
 			return null;
 		NoteMonarch existingNote = findOneByPatientIdAndDate(patientId,date);

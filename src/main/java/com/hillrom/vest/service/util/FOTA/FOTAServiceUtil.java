@@ -10,6 +10,7 @@ import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_PARTNUMBER;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.DEVICE_SN;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.No;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.SOFT_VER_DATE;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.INPROGRESS_LIST;
 
 import java.math.BigInteger;
 import java.util.Random;
@@ -85,7 +86,7 @@ public class FOTAServiceUtil {
 			// Get FOTADevice
 			fotaDeviceFWareUpdate = fotaDeviceRepository
 					.getFOTADeviceFWwareDetailsByDevSN(holder
-							.getDeviceSerialNumber());
+							.getDeviceSerialNumber(),INPROGRESS_LIST);
 			if (fotaDeviceFWareUpdate != null) {
 				fotaDeviceFWareUpdate.setDownloadStartDateTime(holder
 						.getDownloadStartDateTime());
@@ -101,6 +102,7 @@ public class FOTAServiceUtil {
 
 	public void saveInprogressDeviceDetails(HandleHolder holder) {
 		try {
+			
 			FOTADeviceFWareUpdate fotaDeviceFWareUpdate = new FOTADeviceFWareUpdate();
 			fotaDeviceFWareUpdate.setFotaInfoId(holder.getFotaInfoId());
 			fotaDeviceFWareUpdate.setDeviceSerialNumber(holder
@@ -115,6 +117,8 @@ public class FOTAServiceUtil {
 					.getCheckupdateDateTime());
 			fotaDeviceFWareUpdate.setConnectionType(holder.getConnectionType());
 			fotaDeviceFWareUpdate.setDownloadStatus("In progress");
+			fotaDeviceFWareUpdate.setDownloadStartDateTime(holder.getDownloadStartDateTime());
+			
 			fotaDeviceRepository.save(fotaDeviceFWareUpdate);
 
 		} catch (Exception ex) {
@@ -143,12 +147,12 @@ public class FOTAServiceUtil {
 			if (fotaJsonData.get(PREV_REQ_STATUS).equals(INIT)) 
 			{
 				//Get current chunk count from handle holder object
-				int chunkCount = Integer.parseInt(holder.getCurrentChunk());
+				int chunkCount = 0;
 				
 				//Get the particular chunk from the based chunk count
 				String zeroChunk = partNoHolder.getFileChunks().get(chunkCount);
 				
-				holder.setCurrentChunk(holder.getCurrentChunk());
+				holder.setCurrentChunk(String.valueOf(chunkCount));
 				holder.setPreviousChunkTransStatus(INIT);
 				holder.setDownloadStartDateTime(new DateTime());
 
@@ -341,15 +345,17 @@ public class FOTAServiceUtil {
 							// Initially
 							HandleHolder holder = coUtil.getHandleHolderValuesFromPartNo(partNoHolder,fotaJsonData,fotaInfo,reqDev,reqReleaseDate);
 							
-							//Get Old Handle Id
+							/*//Get Old Handle Id
 							handleId = coUtil.getOldHandle(handleHolderBin,fotaJsonData
 									.get(DEVICE_SN));
 							if(handleId == null){
 								handleId = getHandleNumber();
 								//Save device details to DB
 								saveInprogressDeviceDetails(holder);
-							}
-							holder.setHandleId(handleId);
+								holder.setHandleId(handleId);
+								handleHolderBin.put(handleId, holder);
+							}*/
+							handleId = getHandleNumber();
 							handleHolderBin.put(handleId, holder);
 							log.debug("New handleId="+handleId+": Same SoftwareVersion="+fotaInfo.getSoftVersion()+":same chunksize="+partNoHolder.getChunkSize());
 						} else {
@@ -373,15 +379,20 @@ public class FOTAServiceUtil {
 							// Initially
 							HandleHolder holder = coUtil.getHandleHolderValuesForNewPartNo(chunkSize,fotaJsonData,fotaInfo,reqDev,reqReleaseDate);
 							//Get Old Handle Id
-							handleId = coUtil.getOldHandle(handleHolderBin,fotaJsonData
+							/*handleId = coUtil.getOldHandle(handleHolderBin,fotaJsonData
 									.get(DEVICE_SN));
 							if(handleId == null){
 								handleId = getHandleNumber();
 								//Save device details to DB
 								saveInprogressDeviceDetails(holder);
+								holder.setHandleId(handleId);
+								handleHolderBin.put(handleId, holder);
 							}
-							holder.setHandleId(handleId);
+							*/
+							
+							handleId = getHandleNumber();
 							handleHolderBin.put(handleId, holder);
+							
 							//To capture chunk size
 							log.debug("New handleId="+handleId+":New software version="+fotaInfo.getSoftVersion()+":New chunksize="+partNoHolder.getChunkSize());
 						} else {
@@ -510,8 +521,13 @@ public class FOTAServiceUtil {
 			fwareDtoObj.setProductType((String)fwareObj[12]);
 			fwareDtoObj.setDevicePartNumber(Long.valueOf((String)fwareObj[11]));
 			//Calculate Download Time
-			String totalDownloadTime = coUtil.getDownLoadTime(new DateTime(fwareObj[9]),new DateTime(fwareObj[8]));
-			fwareDtoObj.setDownloadTime(totalDownloadTime);
+			if(Objects.nonNull(fwareObj[8]) && Objects.nonNull(fwareObj[9])){
+				String totalDownloadTime = coUtil.getDownLoadTime(new DateTime(fwareObj[9]),new DateTime(fwareObj[8]));
+				fwareDtoObj.setDownloadTime(totalDownloadTime);
+			}else{
+				fwareDtoObj.setDownloadTime("");
+			}
+			
 			FOTADeviceDtoList.add(fwareDtoObj);
 		}
 		return FOTADeviceDtoList;

@@ -52,6 +52,8 @@ public class ClinicDTO {
 	
 	private Boolean deleted;
 	
+	private Boolean isMessageOpted;
+	
 	@Size(max = 50)
     private Integer adherenceSetting;
 
@@ -63,6 +65,10 @@ public class ClinicDTO {
     private DateTime adherenceSettingModifiedDte;
     private Boolean adherenceSettingFlag;
 	//end: HILL-2004
+    
+    private Boolean makeParent=false;
+    
+    private Boolean makeChild=false;
     
 	public ClinicDTO() {
 		super();
@@ -220,8 +226,16 @@ public class ClinicDTO {
 	public void setAdherenceSetting(Integer adherenceSetting) {
 		this.adherenceSetting = adherenceSetting;
 	}
-	
-	//start: HILL-2004
+		
+	public Boolean getIsMessageOpted() {
+		return isMessageOpted;
+	}
+
+	public void setIsMessageOpted(Boolean isMessageOpted) {
+		this.isMessageOpted = isMessageOpted;
+	}
+
+		//start: HILL-2004
 		public DateTime getAdherenceSettingModifiedDte() {
 			return adherenceSettingModifiedDte;
 		}
@@ -236,6 +250,36 @@ public class ClinicDTO {
 		public void setAdherenceSettingFlag(Boolean adherenceSettingFlag) {
 			this.adherenceSettingFlag = adherenceSettingFlag;
 		}
+
+		/**
+		 * @return the makeParent
+		 */
+		public Boolean getMakeParent() {
+			return makeParent;
+		}
+
+		/**
+		 * @param makeParent the makeParent to set
+		 */
+		public void setMakeParent(Boolean makeParent) {
+			this.makeParent = makeParent;
+		}
+
+		/**
+		 * @return the makeChild
+		 */
+		public Boolean getMakeChild() {
+			return makeChild;
+		}
+
+		/**
+		 * @param makeChild the makeChild to set
+		 */
+		public void setMakeChild(Boolean makeChild) {
+			this.makeChild = makeChild;
+		}
 			
 		//end: HILL-2004
+		
+		
 }

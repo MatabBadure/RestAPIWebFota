@@ -4,6 +4,7 @@ import static com.hillrom.vest.config.Constants.VEST;
 import static com.hillrom.vest.config.Constants.MONARCH;
 
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hillrom.monarch.service.PatientNoEventMonarchService;
 import com.hillrom.vest.config.Constants;
+import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.User;
 import com.hillrom.vest.domain.UserExtension;
@@ -205,17 +207,19 @@ public class UserExtensionResource {
      */
     @RequestMapping(value = "/user/{id}",
             method = RequestMethod.DELETE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
     
     //hill-1845
     @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.ACCT_SERVICES, AuthoritiesConstants.CUSTOMER_SERVICES, AuthoritiesConstants.FOTA_ADMIN,AuthoritiesConstants.FOTA_APPROVER})
     //hill-1845
-    public ResponseEntity<JSONObject> delete(@PathVariable Long id, HttpServletRequest request) {
+    public ResponseEntity<JSONObject> delete(@PathVariable Long id, HttpServletRequest request,@RequestBody JSONObject reasonCode) {
         log.debug("REST request to delete UserExtension : {}", id);
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
         JSONObject jsonObject = new JSONObject();
 		try {
-			jsonObject = userService.deleteUser(id, baseUrl);
+			String reason = reasonCode.get("reasonCode").toString();
+			jsonObject = userService.deleteUser(id, baseUrl,reason);
 			 if (jsonObject.containsKey("ERROR")) {
 		        	return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.FORBIDDEN);
 		        } else {
@@ -300,19 +304,25 @@ public class UserExtensionResource {
             @RequestParam(value = "sort_by", required = false) String sortBy,
             @RequestParam(value = "asc",required = false) Boolean isAscending)
         throws URISyntaxException {
-    	if(searchString.endsWith("_")){
-    		   searchString = searchString.replace("_", "\\\\_");
+    	if(!StringUtils.isBlank(searchString)) {
+    		if(searchString.endsWith("_")){
+    			searchString = searchString.replace("_", "\\\\_");
+    		}
+    		String queryString = new StringBuilder("'%").append(searchString).append("%'").toString();
+    		Map<String,Boolean> sortOrder = new HashMap<>();
+    		if(sortBy != null  && !sortBy.equals("")) {
+    			isAscending =  (isAscending != null) ?  isAscending : true;
+    			sortOrder.put(sortBy, isAscending);
+    		}
+    		Page<HcpVO> page = userSearchRepository.findHCPBy(queryString,filter,
+    				PaginationUtil.generatePageRequest(offset, limit),sortOrder, associatedToClinicId);
+    		HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/user/hcp/search", offset, limit);
+    		return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     	}
-    	String queryString = new StringBuilder("'%").append(searchString).append("%'").toString();
-    	Map<String,Boolean> sortOrder = new HashMap<>();
-    	if(sortBy != null  && !sortBy.equals("")) {
-    		isAscending =  (isAscending != null) ?  isAscending : true;
-    		sortOrder.put(sortBy, isAscending);
+    	else{
+    		List<Clinic> emptyList = new ArrayList<Clinic>();
+    		return new ResponseEntity<>(emptyList,HttpStatus.OK); 
     	}
-    	Page<HcpVO> page = userSearchRepository.findHCPBy(queryString,filter,
-    			PaginationUtil.generatePageRequest(offset, limit),sortOrder, associatedToClinicId);
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/user/hcp/search", offset, limit);
-        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
     
     /**
@@ -1014,7 +1024,12 @@ public class UserExtensionResource {
     		return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.BAD_REQUEST);
         }
     }
-    
+    /**
+     * Modified for GIMP 11
+     * @param patientUserId
+     * @param deviceType
+     * @return
+     */
     @RequestMapping(value = "/patient/{patientUserId}/firsttrasmissiondate",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)

@@ -258,7 +258,7 @@ public class UserSearchRepository {
 
 		String patientId = userPatientAssoc.getPatient().getId();
 
-		String findHcpQuery = "select * from"
+		String findHcpQuery1 = "select * from"
 				+ " (select user.id,user.email,user.first_name as firstName,user.last_name as lastName,user.is_deleted as isDeleted, "
 				+ " user.zipcode,userExt.address,userExt.city as hcity,userExt.credentials,userExt.fax_number,userExt.primary_phone,"
 				+ " userExt.mobile_phone,"
@@ -275,6 +275,26 @@ public class UserSearchRepository {
 				+ " left outer join CLINIC clinic on user_clinic.clinics_id = clinic.id and user_clinic.users_id = user.id ) "
 				+ " as t,CLINIC_PATIENT_ASSOC cpasso "
 				+ " where cpasso.patient_id = ':patientId' and t.clinicId = cpasso.clinic_id";
+		String findHcpQuery2 = "select * from"
+				+ " (select user.id,user.email,user.first_name as firstName,user.last_name as lastName,user.is_deleted as isDeleted, "
+				+ " user.zipcode,userExt.address,userExt.city as hcity,userExt.credentials,userExt.fax_number,userExt.primary_phone,"
+				+ " userExt.mobile_phone,"
+				+ " userExt.speciality,userExt.state as hstate,clinic.id as clinicId,clinic.name as clinicName,"
+				+ " user.created_date as createdAt,user.activated isActivated,userExt.npi_number as npiNumber  FROM USER user "
+				+ " join USER_EXTENSION userExt on user.id = userExt.user_id  and (lower(user.first_name) "
+				+ " like lower(:queryString) or lower(user.last_name) like lower(:queryString) or  "
+				+ " lower(CONCAT(user.first_name,' ',user.last_name)) like lower(:queryString) "
+				+ " or lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:queryString) "
+				+ " or lower(user.email) like lower(:queryString))  "
+				+ " join USER_AUTHORITY user_authority on user_authority.user_id = user.id "
+				+ " and user_authority.authority_name = '" + CLINIC_ADMIN + "' left outer "
+				+ " join ENTITY_USER_ASSOC user_clinic on user_clinic.user_id = user.id  "
+				+ " left outer join CLINIC clinic on user_clinic.entity_id = clinic.id and user_clinic.user_id = user.id ) "
+				+ " as t,CLINIC_PATIENT_ASSOC cpasso "
+				+ " where cpasso.patient_id = ':patientId' and t.clinicId = cpasso.clinic_id";
+		
+		String findHcpQuery = new String();
+		findHcpQuery = findHcpQuery.concat(findHcpQuery1).concat(" union ").concat(findHcpQuery2);
 
 		StringBuilder filterQuery = new StringBuilder();
 
@@ -283,7 +303,7 @@ public class UserSearchRepository {
 			Map<String, String> filterMap = getSearchParams(filter);
 
 			filterQuery.append("select * from (");
-
+			log.debug("findHcpQuery:"+findHcpQuery);
 			applyIsDeletedFilter(findHcpQuery, filterQuery, filterMap);
 
 			findHcpQuery = filterQuery.toString();
@@ -297,7 +317,7 @@ public class UserSearchRepository {
 		Query countQuery = entityManager.createNativeQuery(countSqlQuery);
 		
 		BigInteger count = (BigInteger) countQuery.getSingleResult();
-
+		log.debug("findHcpQuery sorting:"+findHcpQuery);
 		Query query = getOrderedByQuery(findHcpQuery, sortOrder);
 
 		List<HcpVO> hcpUsers = new ArrayList<>();

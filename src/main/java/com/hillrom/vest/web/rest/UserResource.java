@@ -1,10 +1,9 @@
 package com.hillrom.vest.web.rest;
 
+import static com.hillrom.vest.config.Constants.MONARCH;
+import static com.hillrom.vest.config.Constants.VEST;
 import static com.hillrom.vest.security.AuthoritiesConstants.CLINIC_ADMIN;
 import static com.hillrom.vest.security.AuthoritiesConstants.HCP;
-import static com.hillrom.vest.config.Constants.VEST;
-import static com.hillrom.vest.config.Constants.MONARCH;
-
 
 //import static com.hillrom.vest.config.Constants.ALL;
 import java.io.BufferedOutputStream;
@@ -28,15 +27,16 @@ import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 
+import net.minidev.json.JSONObject;
+
 import org.apache.commons.lang.StringUtils;
-import org.joda.time.LocalDate;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.DefaultEvaluationContextProvider;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -47,9 +47,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.CsvBeanWriter;
 import org.supercsv.io.ICsvBeanWriter;
@@ -60,6 +58,7 @@ import com.hillrom.monarch.repository.PatientMonarchDeviceDataRepository;
 import com.hillrom.monarch.service.AdherenceCalculationServiceMonarch;
 import com.hillrom.monarch.service.PatientComplianceMonarchService;
 import com.hillrom.monarch.service.PatientHCPMonarchService;
+import com.hillrom.monarch.service.PatientNoEventMonarchService;
 import com.hillrom.monarch.service.PatientProtocolMonarchService;
 import com.hillrom.monarch.service.PatientVestDeviceMonarchService;
 import com.hillrom.monarch.service.TherapySessionServiceMonarch;
@@ -120,8 +119,7 @@ import com.hillrom.vest.web.rest.dto.StatisticsVO;
 import com.hillrom.vest.web.rest.dto.TherapyDataVO;
 import com.hillrom.vest.web.rest.dto.TreatmentStatisticsVO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
-
-import net.minidev.json.JSONObject;
+//import static com.hillrom.vest.config.Constants.ALL;
 /**
  * REST controller for managing users.
  */
@@ -247,6 +245,8 @@ public class UserResource {
   	private 
   	PatientInfoRepository patientInfoRepository;
   	
+  	@Inject
+  	private PatientNoEventMonarchService patientNoEventMonarchService;
 	@Inject
 	private PateintTestResultService pateintTestResultService;
 
@@ -1131,34 +1131,54 @@ public class UserResource {
 			List<PatientVestDeviceData>	vestdeviceData = new LinkedList<>();
 			List<PatientVestDeviceDataMonarch> monarchdeviceData = new LinkedList<>();
 
-			if(Objects.nonNull(checkPatientTypeMonarch) && Objects.nonNull(checkPatientTypeMonarch.getOldPatientId())){
+			if (Objects.nonNull(checkPatientTypeMonarch)
+					&& Objects.nonNull(checkPatientTypeMonarch
+							.getOldPatientId())
+					&& !checkPatientTypeMonarch.getOldPatientId().equals(
+							checkPatientTypeMonarch.getPatientId())) {
 				patientId = checkPatientTypeMonarch.getOldPatientId();
 				PatientInfo patientInfoOld = patientInfoRepository.findOneById(patientId);
 				monarchdeviceData.addAll(monarchdeviceDataRepository.findByPatientIdAndTimestampBetween(patientInfoOld.getId(), fromTimestamp, toTimestamp));
 
-			}else if(Objects.nonNull(checkPatientTypeVest) && Objects.nonNull(checkPatientTypeVest.getOldPatientId())){
+			} else if (Objects.nonNull(checkPatientTypeVest)
+					&& Objects.nonNull(checkPatientTypeVest.getOldPatientId())
+					&& !checkPatientTypeVest.getOldPatientId().equals(
+							checkPatientTypeVest.getPatientId())) {
 				patientId = checkPatientTypeVest.getOldPatientId();
 				PatientInfo patientInfoOld = patientInfoRepository.findOneById(patientId);
 				vestdeviceData.addAll(deviceDataRepository.findByPatientIdAndTimestampBetween(patientInfoOld.getId(), fromTimestamp, toTimestamp));
 			}
 			
-			if(Objects.nonNull(checkPatientTypeMonarch) && Objects.nonNull(checkPatientTypeMonarch.getSwappedPatientId())){
+			if (Objects.nonNull(checkPatientTypeMonarch)
+					&& Objects.nonNull(checkPatientTypeMonarch
+							.getSwappedPatientId()) && !checkPatientTypeMonarch
+							.getSwappedPatientId().equals(checkPatientTypeMonarch
+							.getPatientId())) {
 				patientId = checkPatientTypeMonarch.getSwappedPatientId();
 				PatientInfo patientInfoOld = patientInfoRepository.findOneById(patientId);
 				monarchdeviceData.addAll(monarchdeviceDataRepository.findByPatientIdAndTimestampBetween(patientInfoOld.getId(), fromTimestamp, toTimestamp));
 
-			}else if(Objects.nonNull(checkPatientTypeVest) && Objects.nonNull(checkPatientTypeVest.getSwappedPatientId())){
+			} else if (Objects.nonNull(checkPatientTypeVest)
+					&& Objects.nonNull(checkPatientTypeVest
+							.getSwappedPatientId()) && !checkPatientTypeVest
+							.getSwappedPatientId().equals(checkPatientTypeVest
+							.getPatientId())) {
 				patientId = checkPatientTypeVest.getSwappedPatientId();
 				PatientInfo patientInfoOld = patientInfoRepository.findOneById(patientId);
 				vestdeviceData.addAll(deviceDataRepository.findByPatientIdAndTimestampBetween(patientInfoOld.getId(), fromTimestamp, toTimestamp));
 			}
-			
+			StringBuilder dateRangeReport = new StringBuilder();
+        	//Get Date Range Report
+        	dateRangeReport = excelOutputService.getDateRangeReport(dateRangeReport,from,to);
 			if(deviceType.equals("VEST")){
 				vestdeviceData.addAll(deviceDataRepository.findByPatientUserIdAndTimestampBetween(id, fromTimestamp, toTimestamp));
 
 				if(!vestdeviceData.isEmpty() ){
 
-	            	excelOutputService.createExcelOutputExcel(response, vestdeviceData);
+	            	//excelOutputService.createExcelOutputExcel(response, vestdeviceData);
+	            	//New excel format for vest
+	            	excelOutputService.createExcelOutputExcel_Vest(response, vestdeviceData,checkPatientTypeVest,deviceType,dateRangeReport.toString());
+	            	
 	            }else{
 	            	response.setStatus(204);
 	            }
@@ -1168,7 +1188,10 @@ public class UserResource {
 
 				if(!monarchdeviceData.isEmpty() ){
 
-	            	excelOutputService.createExcelOutputExcelForMonarch(response, monarchdeviceData);
+					//excelOutputService.createExcelOutputExcelForMonarch(response, monarchdeviceData);
+					//New excel format for Monarch
+					excelOutputService.createExcelOutputNewExcelForMonarch(response, monarchdeviceData,checkPatientTypeMonarch,patient,deviceType,dateRangeReport.toString());
+	            	
 	            }else{
 	            	response.setStatus(204);
 	            }
@@ -1179,11 +1202,22 @@ public class UserResource {
 				vestdeviceData.addAll(deviceDataRepository.findByPatientIdAndTimestampBetween(patient.getId(), fromTimestamp, toTimestamp));
 				
 				if(!vestdeviceData.isEmpty() && monarchdeviceData.isEmpty() ){
-	            	excelOutputService.createExcelOutputExcel(response, vestdeviceData);
+	            	//excelOutputService.createExcelOutputExcel(response, vestdeviceData);
+	            	
+	            	//excelOutputService.createExcelOutputExcel(response, vestdeviceData);
+	            	//New excel format for vest
+	            	excelOutputService.createExcelOutputExcel_Vest(response, vestdeviceData,checkPatientTypeVest,deviceType,dateRangeReport.toString());
+	            	
 	            }else if(vestdeviceData.isEmpty() && !monarchdeviceData.isEmpty() ){
-	            	excelOutputService.createExcelOutputExcelForMonarch(response, monarchdeviceData);
+	            	//excelOutputService.createExcelOutputExcelForMonarch(response, monarchdeviceData);
+	            	//New excel format for Monarch
+					excelOutputService.createExcelOutputNewExcelForMonarch(response, monarchdeviceData,checkPatientTypeMonarch,patient,deviceType,dateRangeReport.toString());
 	            }else if(!vestdeviceData.isEmpty() && !monarchdeviceData.isEmpty() ){
-	            	excelOutputService.createExcelOutputExcelForAll(response, vestdeviceData, monarchdeviceData);
+	            	
+	            	//excelOutputService.createExcelOutputExcelForAll(response, vestdeviceData, monarchdeviceData);
+	            	//New excel format for Monarch
+	            	excelOutputService.createExcelOutputNewExcelForAll(response, vestdeviceData,checkPatientTypeVest, monarchdeviceData,checkPatientTypeMonarch,patient,dateRangeReport.toString());
+	            	
 	            }else{
 	            	response.setStatus(204);
 	            }
@@ -1697,6 +1731,22 @@ public class UserResource {
 		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
     }
     
+    
+    /**
+     * GET  Cron job for Adherence recalculation.
+     */
+    @RequestMapping(value = "/testingAdherenceTraningDateCron",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    public ResponseEntity<?> getAdherenceTraningDateCron() throws HillromException {
+        log.debug("REST request to getAdherenceTraningDateCron");
+        JSONObject jsonObject = new JSONObject();        
+        patientNoEventMonarchService.processAdherenceScoreForVestMonarchByTrainingDate();        	
+		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+    }
+    
+    
     /**
      * GET  /users/:userId/clinics/:clinicId/statistics -> get the patient statistics for clinic Badge associated with user.
      */
@@ -1710,5 +1760,21 @@ public class UserResource {
         JSONObject jsonObject = new JSONObject();        
 		adherenceCalculationServiceMonarch.processMergeSwapDeviceDetails();        	
 		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
-    }  
+    }
+    
+    /**
+     * GET  /users/:userId/clinics/:clinicId/statistics -> get the patient statistics for clinic Badge associated with user.
+     */
+    @RequestMapping(value = "/testing18YrsReRegister",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN, AuthoritiesConstants.HCP, AuthoritiesConstants.CLINIC_ADMIN})
+    public ResponseEntity<?> processPatientReRegister() throws HillromException {
+        log.debug("REST request for testing 18 Yrs reregister");
+        JSONObject jsonObject = new JSONObject();        
+		userService.processPatientReRegister();        	
+		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+    }
+    
 }

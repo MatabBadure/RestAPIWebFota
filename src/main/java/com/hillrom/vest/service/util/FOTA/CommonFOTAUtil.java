@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang.StringUtils;
@@ -47,6 +48,10 @@ public class CommonFOTAUtil {
 
 	private static final Logger log = LoggerFactory
 			.getLogger(CommonFOTAUtil.class);
+	
+	
+	@Inject
+	private FOTAServiceUtil utilService;
 
 	public boolean validateCRC(String rawMessage) {
 
@@ -441,7 +446,8 @@ public class CommonFOTAUtil {
 				throw new Exception("Invalid checksum (" + recordIdx + ")");
 			}
 
-			record_length = hexRecord[0];
+			//record_length = hexRecord[0];
+			record_length = (int)(hexRecord[0]&0xFF);
 			if ((record_length + 5) != hexRecord.length) {
 				throw new Exception("Invalid record length (" + recordIdx + ")");
 			}
@@ -680,8 +686,6 @@ public class CommonFOTAUtil {
 	    return handleId;
 	}
 	
-	
-
 	//FOTA CR
 	public String getChunkWithChunkNumber(String rawMessage, String handleId, Map<String, HandleHolder> handleHolderBin, Map<String, PartNoHolder> partNosBin) {
 		
@@ -723,8 +727,11 @@ public class CommonFOTAUtil {
 				//Get the particular chunk from the based chunk count
 				String zeroChunk = partNoHolder.getFileChunks().get(chunkNumber);
 				//Start time for only when 0th chunk number
-				if(chunkNumber == 0){
+				if(chunkNumber == 0 && (holder.getSendChunkReq() == false)){
 					holder.setDownloadStartDateTime(new DateTime());
+					//Save device details to DB
+					utilService.saveInprogressDeviceDetails(holder);
+					holder.setSendChunkReq(true);
 					handleHolderBin.put(handleId, holder);
 				}
 				log.debug("Send  Chunk with chunk number Handle Id ="+handleId);
@@ -830,6 +837,8 @@ public class CommonFOTAUtil {
 		holder.setPreviousChunkTransStatus("CheckUpdate");
 		//added new stmt
 		holder.setSoftwareVersion(fotaInfo.getSoftVersion());
+		//holder.setInitialReq(true);
+		
 		return holder;
 	}
 
@@ -860,5 +869,6 @@ public class CommonFOTAUtil {
 		holder.setSoftwareVersion(fotaInfo.getSoftVersion());
 		return holder;
 	}
+	
 	
 }

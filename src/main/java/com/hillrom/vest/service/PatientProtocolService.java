@@ -5,6 +5,7 @@ import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calcula
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -62,7 +63,7 @@ public class PatientProtocolService {
 	
 	@Inject
 	private MailService mailService;
-    
+	
     public List<PatientProtocolData> addProtocolToPatient(Long patientUserId, ProtocolDTO protocolDTO) throws HillromException {
     	if(Constants.CUSTOM_PROTOCOL.equals(protocolDTO.getType())){
     		if(protocolDTO.getProtocolEntries().size() < 1 || protocolDTO.getProtocolEntries().size() > 7){
@@ -299,8 +300,7 @@ public class PatientProtocolService {
 			}
 		}
 		return userIdProtocolConstantsMap;
-	}
-	
+	}	
 	
 	/**
 	 * Get Protocol Constants by loading Protocol data for user Id
@@ -418,6 +418,10 @@ public class PatientProtocolService {
 		patientProtocolAssoc.setLastModifiedDate(DateTime.now().plusSeconds(1));
 		patientProtocolRepository.saveAndFlush(patientProtocolAssoc);
 		protocolList.add(patientProtocolAssoc);
+	}
+	
+	public void saveAll(Collection<PatientProtocolData> patientProtocolList){
+		patientProtocolRepository.save(patientProtocolList);
 	}
 }
 

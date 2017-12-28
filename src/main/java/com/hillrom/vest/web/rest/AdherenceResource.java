@@ -3,25 +3,22 @@ package com.hillrom.vest.web.rest;
 import static com.hillrom.vest.config.Constants.YYYY_MM_DD;
 
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
-import javax.persistence.EntityNotFoundException;
+
+import net.minidev.json.JSONObject;
 
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -40,40 +37,26 @@ import com.hillrom.monarch.service.AdherenceResetServiceMonarch;
 import com.hillrom.monarch.service.PatientNoEventMonarchService;
 import com.hillrom.vest.domain.AdherenceReset;
 import com.hillrom.vest.domain.AdherenceResetMonarch;
-import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientComplianceMonarch;
 import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.PatientNoEventMonarch;
 import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.TherapySessionMonarch;
-import com.hillrom.vest.domain.User;
-import com.hillrom.vest.domain.UserExtension;
 import com.hillrom.vest.exceptionhandler.HillromException;
 import com.hillrom.vest.repository.AdherenceResetRepository;
 import com.hillrom.vest.repository.AdhrenceResetHistoryRepository;
 import com.hillrom.vest.repository.PatientComplianceRepository;
-import com.hillrom.vest.repository.PredicateBuilder;
 import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.AdherenceCalculationService;
 import com.hillrom.vest.service.AdherenceResetService;
-import com.hillrom.vest.service.NoteService;
 import com.hillrom.vest.service.PatientNoEventService;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.util.ExceptionConstants;
-import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.AdherenceResetDTO;
 import com.hillrom.vest.web.rest.dto.AdherenceResetHistoryVO;
-import com.hillrom.vest.web.rest.dto.ClinicVO;
-import com.hillrom.vest.web.rest.dto.HillRomUserVO;
-import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.util.PaginationUtil;
-import com.mysema.query.types.expr.BooleanExpression;
-
-import net.minidev.json.JSONObject;
-
-import org.joda.time.DateTime;
 
 /**
  * REST controller for managing Clinic.
@@ -335,6 +318,66 @@ public class AdherenceResource {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+    
+    /**
+     * GET  /testingVestMissedTherapyCron -> to Initiate the daily missed therapy CRON.
+     */
+    @RequestMapping(value = "/testingVestMissedTherapyCron",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN})
+    public ResponseEntity<?> initiateVestMissedTherapyCron() throws HillromException {
+    	log.debug("REST request to initiate vest missed therapy cron");
+    	JSONObject jsonObject = new JSONObject();
+		adherenceCalculationService.processMissedTherapySessions();
+		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+    }
+    
+    /**
+     * GET  /testingBothOrMonarchMissedTherapyCron -> to Initiate the daily missed therapy CRON.
+     */
+    @RequestMapping(value = "/testingBothOrMonarchMissedTherapyCron",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN})
+    public ResponseEntity<?> initiateBothOrMonarchMissedTherapyCron() throws HillromException {
+    	log.debug("REST request to initiate both or Monarch missed therapy cron");
+    	JSONObject jsonObject = new JSONObject();
+		adherenceCalculationServiceMonarch.processMissedTherapySessionsMonarch();
+		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+    }
+    
+    /**
+     * GET  /testingVestProcessNotificationCron -> to Initiate the daily notification CRON.
+     */
+    @RequestMapping(value = "/testingVestProcessNotificationCron",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN})
+    public ResponseEntity<?> initiateVestNotificationCron() throws HillromException {
+    	log.debug("REST request to initiate notification cron");
+    	JSONObject jsonObject = new JSONObject();
+		adherenceCalculationService.processPatientNotifications();
+		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+    }
+    
+    /**
+     * GET  /testingVestProcessNotificationCron -> to Initiate the daily notification CRON.
+     */
+    @RequestMapping(value = "/testingBothOrMonarchProcessNotificationCron",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.ADMIN})
+    public ResponseEntity<?> initiateBothOrMonarchNotificationCron() throws HillromException {
+    	log.debug("REST request to initiate notification cron");
+    	JSONObject jsonObject = new JSONObject();
+		adherenceCalculationServiceMonarch.processPatientNotificationsMonarch();
+		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
     }
 
 }

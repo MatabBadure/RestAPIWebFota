@@ -81,7 +81,13 @@ public class PatientDevicesAssoc implements Serializable {
 	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDate")
 	@JsonSerialize(using = CustomLocalDateSerializer.class)
     @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
-	private LocalDate swappedDate;    
+	private LocalDate swappedDate;  
+    
+    @Column(name="training_date")
+   	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDate")
+   	@JsonSerialize(using = CustomLocalDateSerializer.class)
+       @JsonDeserialize(using = ISO8601LocalDateDeserializer.class)
+   	private LocalDate trainingDate;
     
     @Column(name = "swapped_patient_id")
     private String swappedPatientId;
@@ -130,6 +136,14 @@ public class PatientDevicesAssoc implements Serializable {
 	}
     
 	
+	public LocalDate getTrainingDate() {
+		return trainingDate;
+	}
+
+	public void setTrainingDate(LocalDate trainingDate) {
+		this.trainingDate = trainingDate;
+	}
+
 	public String getGarmentType() {
 		return garmentType;
 	}

@@ -745,7 +745,7 @@ public class MailService {
         String content = "";
         String subject = "";
  	   content = templateEngine.process("patientNotificationEmail", context);
-        subject = messageSource.getMessage("email.therapynotification.title", null, null);
+        subject = messageSource.getMessage("email.notificationEmail.subject", null, null);
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
      }
     
@@ -760,7 +760,7 @@ public class MailService {
         String subject = "";
 
         content = templateEngine.process("clinicPersonnelNotificationEmail", context);
-        subject = messageSource.getMessage("email.clinicPersonnelNotificationEmail.subject", null, null);
+        subject = messageSource.getMessage("email.notificationEmail.subject", null, null);
         
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
     }
@@ -771,11 +771,12 @@ public class MailService {
   //      context.setVariable("clinicStatisticsMap",statistics);
         context.setVariable("today", DateUtil.convertLocalDateToStringFromat(org.joda.time.LocalDate.now().minusDays(1), "MMM dd,yyyy"));
         context.setVariable("notificationUrl", hcpOrClinicAdminDashboardUrl);
+        log.debug("sendNotificationMailToHCPAndClinicAdminMonarchBasedOnFreq notificationUrl", hcpOrClinicAdminDashboardUrl);
         String content = "";
         String subject = "";
 
         content = templateEngine.process("clinicPersonnelNotificationEmail", context);
-        subject = messageSource.getMessage("email.statisticsnotification.subject", null, null);
+        subject = messageSource.getMessage("email.notificationEmail.subject", null, null);
         
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
     }

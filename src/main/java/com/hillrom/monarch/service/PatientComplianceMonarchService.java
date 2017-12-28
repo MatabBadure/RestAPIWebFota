@@ -1,7 +1,6 @@
 package com.hillrom.monarch.service;
 
 import static com.hillrom.vest.config.AdherenceScoreConstants.BONUS_POINTS;
-import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_COMPLIANCE_SCORE;
 import static com.hillrom.vest.config.AdherenceScoreConstants.HMR_NON_COMPLIANCE_POINTS;
 import static com.hillrom.vest.config.AdherenceScoreConstants.MISSED_THERAPY_POINTS;
 import static com.hillrom.vest.config.AdherenceScoreConstants.SETTING_DEVIATION_POINTS;
@@ -15,7 +14,9 @@ import static com.hillrom.vest.config.NotificationTypeConstants.HMR_MONARCH_AND_
 import static com.hillrom.vest.config.NotificationTypeConstants.HMR_MONARCH_AND_SETTINGS_DEVIATION_VEST;
 import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE;
 import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE_DISPLAY_VALUE;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE_MONARCH;
 import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE_MONARCH_DISPLAY_VALUE;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE_VEST;
 import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE_VEST_DISPLAY_VALUE;
 import static com.hillrom.vest.config.NotificationTypeConstants.HMR_VEST_AND_SETTINGS_DEVIATION;
 import static com.hillrom.vest.config.NotificationTypeConstants.HMR_VEST_AND_SETTINGS_DEVIATION_MONARCH;
@@ -24,16 +25,12 @@ import static com.hillrom.vest.config.NotificationTypeConstants.MISSED_THERAPY;
 import static com.hillrom.vest.config.NotificationTypeConstants.MISSED_THERAPY_DISPLAY_VALUE;
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION;
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_DISPLAY_VALUE;
-import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_MONARCH_DISPLAY_VALUE;
-import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_VEST_DISPLAY_VALUE;
-import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE_VEST;
-import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE_MONARCH;
-import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_VEST;
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_MONARCH;
+import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_MONARCH_DISPLAY_VALUE;
+import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_VEST;
+import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_VEST_DISPLAY_VALUE;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,34 +46,19 @@ import javax.transaction.Transactional;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.hillrom.monarch.audit.service.PatientProtocolDataAuditMonarchService;
-import com.hillrom.monarch.repository.AdherenceResetMonarchRepository;
 import com.hillrom.monarch.repository.PatientComplianceMonarchRepository;
+import com.hillrom.monarch.repository.PatientNoEventsMonarchRepository;
 import com.hillrom.monarch.repository.TherapySessionMonarchRepository;
 import com.hillrom.monarch.web.rest.dto.AdherenceTrendMonarchVO;
 import com.hillrom.monarch.web.rest.dto.ProtocolRevisionMonarchVO;
-import com.hillrom.vest.audit.service.PatientProtocolDataAuditService;
-import com.hillrom.vest.config.Constants;
-import com.hillrom.vest.domain.AdherenceReset;
-import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.NotificationMonarch;
-import com.hillrom.vest.domain.PatientCompliance;
 import com.hillrom.vest.domain.PatientComplianceMonarch;
-import com.hillrom.vest.domain.PatientProtocolData;
-import com.hillrom.vest.domain.ProtocolConstants;
-import com.hillrom.vest.domain.TherapySession;
+import com.hillrom.vest.domain.PatientNoEventMonarch;
 import com.hillrom.vest.domain.TherapySessionMonarch;
 import com.hillrom.vest.exceptionhandler.HillromException;
-import com.hillrom.vest.repository.AdherenceResetRepository;
-import com.hillrom.vest.repository.PatientComplianceRepository;
-import com.hillrom.vest.repository.ProtocolConstantsRepository;
-import com.hillrom.vest.repository.TherapySessionRepository;
-import com.hillrom.vest.web.rest.dto.AdherenceTrendVO;
-import com.hillrom.vest.web.rest.dto.ProtocolRevisionVO;
-import com.hillrom.vest.web.rest.util.ProtocolDataVOBuilder;
 
 @Service
 @Transactional
@@ -94,6 +76,9 @@ public class PatientComplianceMonarchService {
 	@Inject
 	@Qualifier("patientProtocolDataAuditMonarchService")
 	private PatientProtocolDataAuditMonarchService protocolAuditMonarchService;
+	
+	@Inject
+	private PatientNoEventsMonarchRepository patientNoEventsMonarchRepository;
 	
 	
 	/**
@@ -155,6 +140,18 @@ public class PatientComplianceMonarchService {
 		} else if(!to.equals(therapySession.getDate()) && !from.equals(to) ){
 			toDate = to.minusDays(1);
 		}
+		
+		// Starts GIMP 11
+		PatientNoEventMonarch patientNoEventMonarch = patientNoEventsMonarchRepository
+				.findByPatientUserId(patientUserId);
+
+		if (Objects.nonNull(patientNoEventMonarch) && Objects.nonNull(fromDate)) {
+			if (patientNoEventMonarch.getFirstTransmissionDate().isAfter(
+					fromDate)) {
+				fromDate = patientNoEventMonarch.getFirstTransmissionDate();
+			}
+		}
+		// Ends GIMP 11
 		List<PatientComplianceMonarch> complianceList = complianceMonarchRepository.findByDateBetweenAndPatientUserIdIn(fromDate, toDate, patientUserIds);
 		if(complianceList.isEmpty()){
 			throw new HillromException("No Data Available");

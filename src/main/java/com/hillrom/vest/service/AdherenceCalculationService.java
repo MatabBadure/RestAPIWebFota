@@ -1078,7 +1078,10 @@ public class AdherenceCalculationService {
 		if(Objects.nonNull(patientUser)){
 			return(patientUser.getMissedTherapyNotificationFreq().equalsIgnoreCase(dayOfWeek) ||
 					patientUser.getNonHMRNotificationFreq().equalsIgnoreCase(dayOfWeek)	||
-					patientUser.getSettingDeviationNotificationFreq().equalsIgnoreCase(dayOfWeek));
+					patientUser.getSettingDeviationNotificationFreq().equalsIgnoreCase(dayOfWeek)||
+					patientUser.getMissedTherapyNotificationFreq().equalsIgnoreCase(DAILY) ||
+					patientUser.getNonHMRNotificationFreq().equalsIgnoreCase(DAILY)	||
+					patientUser.getSettingDeviationNotificationFreq().equalsIgnoreCase(DAILY));
 		}
 		return false;
 	}

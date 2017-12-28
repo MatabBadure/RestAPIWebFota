@@ -1513,7 +1513,7 @@ public class AdherenceCalculationServiceMonarch{
 					if(Objects.nonNull(patientUser.getEmail())){
 						// integrated Accepting mail notifications
 						String notificationType = notification.getNotificationType();
-						int missedTherapyCount = complianceMap.get(patientUser);
+			//			int missedTherapyCount = complianceMap.get(patientUser);
 						if(isPatientUserAcceptNotification(patientUser,
 								notificationType) && isPatientUserAcceptNotificationFreq(patientUser))
 							mailService.sendNotificationMailToPatientBasedOnFreq(patientUser,notificationType);		
@@ -1534,7 +1534,10 @@ public class AdherenceCalculationServiceMonarch{
 		
 		return(patientUser.getMissedTherapyNotificationFreq().equalsIgnoreCase(dayOfWeek) ||
 				patientUser.getNonHMRNotificationFreq().equalsIgnoreCase(dayOfWeek)	||
-				patientUser.getSettingDeviationNotificationFreq().equalsIgnoreCase(dayOfWeek));	
+				patientUser.getSettingDeviationNotificationFreq().equalsIgnoreCase(dayOfWeek) ||
+				patientUser.getMissedTherapyNotificationFreq().equalsIgnoreCase(DAILY) ||
+				patientUser.getNonHMRNotificationFreq().equalsIgnoreCase(DAILY)	||
+				patientUser.getSettingDeviationNotificationFreq().equalsIgnoreCase(DAILY));	
 	}
 	
 	private boolean isPatientUserAcceptNotification(User patientUser,

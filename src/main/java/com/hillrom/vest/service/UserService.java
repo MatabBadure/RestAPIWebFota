@@ -2046,9 +2046,9 @@ public class UserService {
 			user.setNonHMRNotification(Boolean.parseBoolean(paramsMap.get("isNonHMRNotification")));
 			user.setSettingDeviationNotification(Boolean.parseBoolean(paramsMap.get("isSettingDeviationNotification")));			
 			user.setMessageNotification(Boolean.parseBoolean(paramsMap.get("isMessageNotification")));
-			user.setMissedTherapyNotificationFreq(paramsMap.get("missedTherapyNotificationFreq"));
-			user.setNonHMRNotificationFreq(paramsMap.get("nonHMRNotificationFreq"));
-			user.setSettingDeviationNotificationFreq(paramsMap.get("settingDeviationNotificationFreq"));	
+			user.setMissedTherapyNotificationFreq(paramsMap.get("MissedTherapyNotificationFreq"));
+			user.setNonHMRNotificationFreq(paramsMap.get("NonHMRNotificationFreq"));
+			user.setSettingDeviationNotificationFreq(paramsMap.get("SettingDeviationNotificationFreq"));	
 			userRepository.save(user);
 			return user;
 		} else {

@@ -9,6 +9,7 @@ import static com.hillrom.vest.config.Constants.YYYY_MM_DD;
 
 import java.security.InvalidParameterException;
 import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -244,8 +245,11 @@ public class DateUtil {
 	}
 	
 	public static String formatDate(Date date, String pattern) {
-		DateTimeFormatter formatter = DateTimeFormat.forPattern(Objects.nonNull(pattern)?pattern:MMddyyyy);
-		return date.toString();
+		String datePat = null;
+		
+		if(Objects.nonNull(date)){
+		datePat = new SimpleDateFormat(pattern).format(date);}
+		return datePat;
 	}
 	/**
 	 * return formatted date string as per pattern, default pattern is dd-MMM-yy

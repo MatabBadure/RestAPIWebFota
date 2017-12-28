@@ -15,6 +15,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -242,6 +243,10 @@ public class DateUtil {
 		return date.toString(formatter);
 	}
 	
+	public static String formatDate(Date date, String pattern) {
+		DateTimeFormatter formatter = DateTimeFormat.forPattern(Objects.nonNull(pattern)?pattern:MMddyyyy);
+		return date.toString();
+	}
 	/**
 	 * return formatted date string as per pattern, default pattern is dd-MMM-yy
 	 * @param dates
@@ -328,10 +333,5 @@ public class DateUtil {
 
 			return(result);
 	   }
-	   
-
-
-
-
 
 }

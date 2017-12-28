@@ -98,7 +98,10 @@ private final Logger log = LoggerFactory.getLogger(AdvancedSearchResource.class)
  	}
 
 
+
+
 @RequestMapping(value = "/advancedSearch/hcp", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE) 	
+
 	public ResponseEntity<?> searchHcpsAssociated(@RequestBody AdvancedHcpDTO advancedHcpDTO,
     		@RequestParam(value = "page" , required = false) Integer offset,
             @RequestParam(value = "per_page", required = false) Integer limit,
@@ -121,5 +124,7 @@ private final Logger log = LoggerFactory.getLogger(AdvancedSearchResource.class)
 		} catch (HillromException e) {
 			return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
 		}
+
 	}
+
 }

@@ -8,7 +8,7 @@ import static com.hillrom.vest.config.Constants.FEV1_P;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
-import com.hillrom.vest.domain.PatientTestResult;
+import com.hillrom.vest.web.rest.dto.PatientTestResultVO;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.service.util.GraphUtils;
 import com.hillrom.vest.web.rest.dto.Filter;
@@ -50,9 +50,9 @@ public class TestResultsGraphService extends AbstractGraphService {
 		String[] seriesNames = new String[] { FVC_P, FEV1_P };
 		Graph patientTestResultsGraph = GraphUtils
 				.buildGraphObectWithXAxisType(XAXIS_TYPE_DATE);
-		List<PatientTestResult> patientTestResultList = (List<PatientTestResult>) data;
+		List<PatientTestResultVO> patientTestResultList = (List<PatientTestResultVO>) data;
 		String datePattern = MMddyyyy;
-		for (PatientTestResult patientTestResult : patientTestResultList) {
+		for (PatientTestResultVO patientTestResult : patientTestResultList) {
 			patientTestResultsGraph
 					.getxAxis()
 					.getCategories()
@@ -62,7 +62,7 @@ public class TestResultsGraphService extends AbstractGraphService {
 		for (String seriesname : seriesNames) {
 			Series durationSeries = GraphUtils
 					.createSeriesObjectWithName(seriesname);
-			for (PatientTestResult patientTestRes : patientTestResultList) {
+			for (PatientTestResultVO patientTestRes : patientTestResultList) {
 				GraphDataVO point = createSeriesData(filter,
 						patientTestRes, seriesname);
 				durationSeries.getData().add(point);
@@ -79,7 +79,7 @@ public class TestResultsGraphService extends AbstractGraphService {
 	 * @return
 	 */
 	private GraphDataVO createSeriesData(Filter filter,
-			PatientTestResult patientTestResult, String seriesName) {
+			PatientTestResultVO patientTestResult, String seriesName) {
 		GraphDataVO point;		
 		if(seriesName.equalsIgnoreCase(FVC_P)){
 			point = new GraphDataVO(DateUtil.formatDate(

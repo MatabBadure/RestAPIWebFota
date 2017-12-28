@@ -5,8 +5,10 @@ import java.util.List;
 import org.joda.time.LocalDate;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.hillrom.vest.domain.PatientTestResult;
+import com.hillrom.vest.web.rest.dto.PatientTestResultVO;
 
 public interface PatientTestResultRepository extends JpaRepository<PatientTestResult, Long> {
 	

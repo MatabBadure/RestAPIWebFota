@@ -52,6 +52,8 @@ public class ClinicDTO {
 	
 	private Boolean deleted;
 	
+	private Boolean isMessageOpted;
+	
 	@Size(max = 50)
     private Integer adherenceSetting;
 
@@ -224,8 +226,16 @@ public class ClinicDTO {
 	public void setAdherenceSetting(Integer adherenceSetting) {
 		this.adherenceSetting = adherenceSetting;
 	}
-	
-	//start: HILL-2004
+		
+	public Boolean getIsMessageOpted() {
+		return isMessageOpted;
+	}
+
+	public void setIsMessageOpted(Boolean isMessageOpted) {
+		this.isMessageOpted = isMessageOpted;
+	}
+
+		//start: HILL-2004
 		public DateTime getAdherenceSettingModifiedDte() {
 			return adherenceSettingModifiedDte;
 		}

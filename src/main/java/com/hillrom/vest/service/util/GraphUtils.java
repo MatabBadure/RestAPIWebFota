@@ -1,8 +1,17 @@
 package com.hillrom.vest.service.util;
 
+import java.util.Objects;
+
+import org.joda.time.LocalDate;
+
+import com.hillrom.vest.domain.PatientNoEvent;
+import com.hillrom.vest.domain.PatientNoEventMonarch;
 import com.hillrom.vest.web.rest.dto.Graph;
 import com.hillrom.vest.web.rest.dto.Series;
 import com.hillrom.vest.web.rest.dto.XaxisData;
+
+import static com.hillrom.vest.config.AdherenceScoreConstants.FIRST_TRANSMISSION_FIRTS_TYPE;
+import static com.hillrom.vest.config.AdherenceScoreConstants.FIRST_TRANSMISSION_TRAINING_TYPE;;
 
 public class GraphUtils {
 
@@ -28,5 +37,28 @@ public class GraphUtils {
 		Series seriesData = new Series();
 		seriesData.setName(seriesName);
 		return seriesData;
+	}
+
+	public static LocalDate getFirstTransmissionDateVestByType(
+			PatientNoEvent patientNoEvent) {
+		if(Objects.nonNull(patientNoEvent.getFirstTransDateType()) && (patientNoEvent.getFirstTransDateType().equals(FIRST_TRANSMISSION_FIRTS_TYPE))){
+			return patientNoEvent.getFirstTransmissionDate();
+		}else if(Objects.nonNull(patientNoEvent.getFirstTransDateType()) && (patientNoEvent.getFirstTransDateType().equals(FIRST_TRANSMISSION_TRAINING_TYPE))){
+			return patientNoEvent.getFirstTransmissionDateBeforeUpdate();
+		}else{
+			return patientNoEvent.getFirstTransmissionDate();
+		}
+	
+	}
+
+	public static LocalDate getFirstTransmissionDateMonarchByType(
+			PatientNoEventMonarch patientNoEvent) {
+		if(Objects.nonNull(patientNoEvent.getFirstTransDateType()) && (patientNoEvent.getFirstTransDateType().equals(FIRST_TRANSMISSION_FIRTS_TYPE))){
+			return patientNoEvent.getFirstTransmissionDate();
+		}else if(Objects.nonNull(patientNoEvent.getFirstTransDateType()) && (patientNoEvent.getFirstTransDateType().equals(FIRST_TRANSMISSION_TRAINING_TYPE))){
+			return patientNoEvent.getFirstTransmissionDateBeforeUpdate();
+		}else{
+			return patientNoEvent.getFirstTransmissionDate();
+		}
 	}
 }

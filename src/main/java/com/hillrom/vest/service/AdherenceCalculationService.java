@@ -276,6 +276,13 @@ public class AdherenceCalculationService {
 						Collectors.groupingBy(PatientDevicesAssoc::getPatientId));
 	}
 	
+	public Map<Long, List<PatientDevicesAssoc>> getVestOnlyDevicePatientsMapData(){
+		List<PatientDevicesAssoc> patientDevicesList = patientDevicesAssocRepository.findAllByDeviceTypeAndPatientType(VEST,"SD");
+		return patientDevicesList
+				.stream().collect(
+						Collectors.groupingBy(PatientDevicesAssoc::getId));
+	}
+	
 	/**
 	 * Runs every midnight deducts the compliance score by 5 if therapy hasn't been done for adherence setting day(s)
 	 */
@@ -1005,56 +1012,40 @@ public class AdherenceCalculationService {
 		LocalDate weekTime = LocalDate.now().minusDays(7);
 		
 		List<Notification> notifications = notificationRepository.findByDate(yesterday);
+		System.out.println("notifications.size() ::"+notifications.size());
 		if(notifications.size() > 0){
 			List<Long> patientUserIds = new LinkedList<>();
 			for(Notification notification : notifications){
 				patientUserIds.add(notification.getPatientUser().getId());
 			}
 						
+			List<PatientCompliance> complianceList = patientComplianceRepository.findByDateBetweenAndPatientUserIdIn(weekTime,
+					yesterday,patientUserIds);
+			Map<User,Integer> complianceMap = new HashMap<>();
+			for(PatientCompliance compliance : complianceList){
+				complianceMap.put(compliance.getPatientUser(), compliance.getMissedTherapyCount());
+			}			
 			
-			Map<String, List<PatientDevicesAssoc>> vestOnlyDevicesPatientsMap = getVestOnlyDevicePatientsMap();
+			Map<Long, List<PatientDevicesAssoc>> vestOnlyDevicesPatientsMap = getVestOnlyDevicePatientsMapData();
 			try{
 				for(Long patientUserId : patientUserIds){
 					List<Notification> existingNotifications = notificationService.findNotificationsByUserIdAndDateRange(patientUserId,weekTime,yesterday);				
 					existingNotifications.forEach(existingNotification -> {
 						User patientUser = existingNotification.getPatientUser();
+						System.out.println(patientUser.getMissedTherapyNotificationFreq());
 						if(Objects.nonNull(patientUser.getEmail())){
 						// integrated Accepting mail notifications
 						String notificationType = existingNotification.getNotificationType();
 						if(vestOnlyDevicesPatientsMap.containsKey(patientUser.getId())){
-							if(isPatientUserAcceptNotificationFreq(patientUser) && (isPatientUserAcceptNotification(patientUser, notificationType ))){
+							if(isPatientUserAcceptNotification(patientUser, notificationType ) && isPatientUserAcceptNotificationFreq(patientUser)){
 								mailService.sendNotificationMailToPatientBasedOnFreq(patientUser,notificationType);								
 							}
 								
 						}
 					}
 				});
-			 			
-			}	
-				
-			/*List<PatientCompliance> complianceList = patientComplianceRepository.findByDateBetweenAndPatientUserIdIn(yesterday,
-						yesterday,patientUserIds);
+			 }			
 			
-			
-			
-			Map<User,Integer> complianceMap = new HashMap<>();
-			for(PatientCompliance compliance : complianceList){
-				complianceMap.put(compliance.getPatientUser(), compliance.getMissedTherapyCount());
-			}
-			try{
-				notifications.forEach(notification -> {
-					User patientUser = notification.getPatientUser();
-					if(Objects.nonNull(patientUser.getEmail())){
-						// integrated Accepting mail notifications
-						String notificationType = notification.getNotificationType();
-						int missedTherapyCount = complianceMap.get(patientUser);
-						if(vestOnlyDevicesPatientsMap.containsKey(patientUser.getId())){
-							if(isPatientUserAcceptNotificationFreq(patientUser) && (isPatientUserAcceptNotification(patientUser, notificationType ))){
-								mailService.sendNotificationMailToPatientBasedOnFreq(patientUser,notificationType);								
-							}							
-					}
-				}
-			});*/
 			}catch(Exception ex){
 				StringWriter writer = new StringWriter();
 				PrintWriter printWriter = new PrintWriter( writer );
@@ -1076,12 +1067,15 @@ public class AdherenceCalculationService {
 	private boolean isPatientUserAcceptNotificationFreq(User patientUser) {
 		String dayOfWeek = DateUtil.getDayOfTheWeek();
 		if(Objects.nonNull(patientUser)){
+			if(Objects.nonNull(patientUser.getMissedTherapyNotificationFreq())){
+					
 			return(patientUser.getMissedTherapyNotificationFreq().equalsIgnoreCase(dayOfWeek) ||
 					patientUser.getNonHMRNotificationFreq().equalsIgnoreCase(dayOfWeek)	||
 					patientUser.getSettingDeviationNotificationFreq().equalsIgnoreCase(dayOfWeek)||
 					patientUser.getMissedTherapyNotificationFreq().equalsIgnoreCase(DAILY) ||
 					patientUser.getNonHMRNotificationFreq().equalsIgnoreCase(DAILY)	||
 					patientUser.getSettingDeviationNotificationFreq().equalsIgnoreCase(DAILY));
+			}
 		}
 		return false;
 	}

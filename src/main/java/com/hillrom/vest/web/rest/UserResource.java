@@ -1759,7 +1759,7 @@ public class UserResource {
    public ResponseEntity<?> processHcpClinicAdminNotificationsFreq() throws HillromException {
    	        log.debug("REST request to get testing Device Cron");
    	        JSONObject jsonObject = new JSONObject();        
-   	       adherenceCalculationService.processHcpClinicAdminNotifications();   
+   	       adherenceCalculationServiceMonarch.processPatientNotificationsMonarch();   
    	 //       adherenceCalculationServiceMonarch.processPatientNotificationsMonarch();
    			return new ResponseEntity<>(jsonObject, HttpStatus.OK);
    	    }   

@@ -2273,7 +2273,22 @@ public class AdherenceCalculationService {
 		boolean isSettingsDeviated = false;
 		// This is for checking settings deviation, settings deviation should be calculated for consecutive adherence setting days
 		//(exclusive missed therapy)
-		if(lastSettingDaysTherapySessionMap.keySet().size() == adherenceSettingDay){
+		//if(lastSettingDaysTherapySessionMap.keySet().size() == adherenceSettingDay){
+		/*if(protocol.getMinFrequency() == adherenceSettingDay){
+			for(LocalDate d : lastSettingDaysTherapySessionMap.keySet()){
+				List<TherapySession> therapySeesionsPerDay = lastSettingDaysTherapySessionMap.get(d);
+				double weightedFrequency = calculateTherapyMetricsPerSettingDays(therapySeesionsPerDay).get(WEIGHTED_AVG_FREQUENCY);
+				if(!isSettingsDeviated(protocol, weightedFrequency)){
+					isSettingsDeviated = false;
+					break;
+				}else{
+					isSettingsDeviated = true;
+				}
+			}
+		}else{
+			return false;
+		}*/	
+		if(Objects.nonNull(lastSettingDaysTherapySessionMap)){
 			for(LocalDate d : lastSettingDaysTherapySessionMap.keySet()){
 				List<TherapySession> therapySeesionsPerDay = lastSettingDaysTherapySessionMap.get(d);
 				double weightedFrequency = calculateTherapyMetricsPerSettingDays(therapySeesionsPerDay).get(WEIGHTED_AVG_FREQUENCY);
@@ -2287,6 +2302,8 @@ public class AdherenceCalculationService {
 		}else{
 			return false;
 		}
+		
+		
 		return isSettingsDeviated;
 	}
 	

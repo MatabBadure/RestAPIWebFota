@@ -2587,7 +2587,22 @@ public class AdherenceCalculationServiceMonarch{
 		boolean isSettingsDeviated = false;
 		// This is for checking settings deviation, settings deviation should be calculated for consecutive adherence setting days
 		//(exclusive missed therapy)
-		if(lastSettingDaysTherapySessionMap.keySet().size() == adherenceSettingDay){
+		/*if(lastSettingDaysTherapySessionMap.keySet().size() == adherenceSettingDay){
+			for(LocalDate d : lastSettingDaysTherapySessionMap.keySet()){
+				List<TherapySessionMonarch> therapySeesionsPerDay = lastSettingDaysTherapySessionMap.get(d);
+				double weightedFrequency = calculateTherapyMetricsPerSettingDays(therapySeesionsPerDay).get(WEIGHTED_AVG_FREQUENCY);
+				if(!isSettingsDeviated(protocol, weightedFrequency)){
+					isSettingsDeviated = false;
+					break;
+				}else{
+					isSettingsDeviated = true;
+				}
+			}
+		}else{
+			return false;
+		}*/
+		//Starts Gimp 41
+		if(Objects.nonNull(lastSettingDaysTherapySessionMap)){
 			for(LocalDate d : lastSettingDaysTherapySessionMap.keySet()){
 				List<TherapySessionMonarch> therapySeesionsPerDay = lastSettingDaysTherapySessionMap.get(d);
 				double weightedFrequency = calculateTherapyMetricsPerSettingDays(therapySeesionsPerDay).get(WEIGHTED_AVG_FREQUENCY);
@@ -2601,6 +2616,8 @@ public class AdherenceCalculationServiceMonarch{
 		}else{
 			return false;
 		}
+		//Ends Gimp 41
+		
 		return isSettingsDeviated;
 	}
 

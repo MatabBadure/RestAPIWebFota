@@ -99,6 +99,7 @@ import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.PatientNoEventsRepository;
 import com.hillrom.vest.repository.PatientProtocolRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
+import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.service.AdherenceCalculationService;
 import com.hillrom.vest.service.ClinicPatientService;
 import com.hillrom.vest.service.MailService;
@@ -240,6 +241,9 @@ public class AdherenceCalculationServiceMonarch{
 	
 	@Inject
     private PatientProtocolRepository patientProtocolRepository;
+	
+	@Inject
+    private UserRepository userRepository;
 	
 	private final Logger log = LoggerFactory.getLogger(AdherenceCalculationServiceMonarch.class);
 	
@@ -1511,11 +1515,12 @@ public class AdherenceCalculationServiceMonarch{
 				notifications.forEach(notification -> {
 					User patientUser = notification.getPatientUser();
 					if(Objects.nonNull(patientUser.getEmail())){
+						User existingUser = userRepository.findUserOneByEmail(patientUser.getEmail());
 						// integrated Accepting mail notifications
 						String notificationType = notification.getNotificationType();
 			//			int missedTherapyCount = complianceMap.get(patientUser);
 						if(isPatientUserAcceptNotification(patientUser,
-								notificationType) && isPatientUserAcceptNotificationFreq(patientUser))
+								notificationType) && isPatientUserAcceptNotificationFreq(existingUser))
 							mailService.sendNotificationMailToPatientBasedOnFreq(patientUser,notificationType);		
 					}
 				});		

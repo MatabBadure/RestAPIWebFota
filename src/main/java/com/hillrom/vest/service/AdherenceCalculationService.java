@@ -82,6 +82,7 @@ import com.hillrom.vest.repository.PatientDevicesAssocRepository;
 import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.PatientNoEventsRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
+import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
@@ -187,6 +188,9 @@ public class AdherenceCalculationService {
 	
 	@Inject
 	private PatientNoEventsRepository noEventRepository;
+	
+	@Inject
+	private UserRepository userRepository;
 	
 	private final Logger log = LoggerFactory.getLogger(AdherenceCalculationService.class);
 	
@@ -1029,15 +1033,16 @@ public class AdherenceCalculationService {
 			Map<Long, List<PatientDevicesAssoc>> vestOnlyDevicesPatientsMap = getVestOnlyDevicePatientsMapData();
 			try{
 				for(Long patientUserId : patientUserIds){
-					List<Notification> existingNotifications = notificationService.findNotificationsByUserIdAndDateRange(patientUserId,weekTime,yesterday);				
+					List<Notification> existingNotifications = notificationService.findNotificationsByUserIdAndDateRange(patientUserId,weekTime,yesterday);
 					existingNotifications.forEach(existingNotification -> {
 						User patientUser = existingNotification.getPatientUser();
 						System.out.println(patientUser.getMissedTherapyNotificationFreq());
 						if(Objects.nonNull(patientUser.getEmail())){
 						// integrated Accepting mail notifications
+						User existingUser = userRepository.findUserOneByEmail(patientUser.getEmail());
 						String notificationType = existingNotification.getNotificationType();
 						if(vestOnlyDevicesPatientsMap.containsKey(patientUser.getId())){
-							if(isPatientUserAcceptNotification(patientUser, notificationType ) && isPatientUserAcceptNotificationFreq(patientUser)){
+							if(isPatientUserAcceptNotification(patientUser, notificationType ) && isPatientUserAcceptNotificationFreq(existingUser)){
 								mailService.sendNotificationMailToPatientBasedOnFreq(patientUser,notificationType);								
 							}
 								

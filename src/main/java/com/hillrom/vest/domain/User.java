@@ -48,8 +48,7 @@ import com.hillrom.vest.domain.util.MMDDYYYYLocalDateSerializer;
 @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class,property= "id")
 public class User extends AbstractAuditingEntity implements Serializable {
 
-    
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
 	@Id
     @Column(name = "id")
@@ -167,10 +166,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     @Column(name = "expiration_date", nullable = true)
     private DateTime expirationDate = null;
-    
-    @Column(name="re_registered")
-    private Boolean reRegister = false;
-    
+
     @Column(name="non_hmr_notification_freq")
     private String nonHMRNotificationFreq;
     
@@ -179,6 +175,10 @@ public class User extends AbstractAuditingEntity implements Serializable {
     
     @Column(name="setting_deviation_notification_freq")
     private String settingDeviationNotificationFreq;
+    
+   //Garment changes
+    @Column(name="re_registered")
+    private Boolean reRegister = false;
     
   //Garment changes
     @Transient
@@ -237,7 +237,8 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		this.nonHMRNotification = nonHMRNotification;
 		this.settingDeviationNotification = settingDeviationNotification;
 	}
-	public User(String firstName, String lastName, String email,
+
+  public User(String firstName, String lastName, String email,
 			boolean missedTherapyNotification, boolean nonHMRNotification,
 			boolean settingDeviationNotification,
 			String nonHMRNotificationFreq,
@@ -543,6 +544,32 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	public void setExpirationDate(DateTime expirationDate) {
 		this.expirationDate = expirationDate;
 	}
+	
+	public String getNonHMRNotificationFreq() {
+		return nonHMRNotificationFreq;
+	}
+
+	public void setNonHMRNotificationFreq(String nonHMRNotificationFreq) {
+		this.nonHMRNotificationFreq = nonHMRNotificationFreq;
+	}
+
+	public String getMissedTherapyNotificationFreq() {
+		return missedTherapyNotificationFreq;
+	}
+
+	public void setMissedTherapyNotificationFreq(
+			String missedTherapyNotificationFreq) {
+		this.missedTherapyNotificationFreq = missedTherapyNotificationFreq;
+	}
+
+	public String getSettingDeviationNotificationFreq() {
+		return settingDeviationNotificationFreq;
+	}
+
+	public void setSettingDeviationNotificationFreq(
+			String settingDeviationNotificationFreq) {
+		this.settingDeviationNotificationFreq = settingDeviationNotificationFreq;
+	}
 
 	public Boolean isReRegister() {
 		return reRegister;
@@ -551,7 +578,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	public void setReRegister(Boolean reRegister) {
 		this.reRegister = reRegister;
 	}
-
+  
 	@Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -569,7 +596,6 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
         return true;
     }
-
 	
     /**
 	 * @return the userPreferenceTimezone
@@ -583,6 +609,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	 */
 	public void setUserPreferenceTimezone(String userPreferenceTimezone) {
 		this.userPreferenceTimezone = userPreferenceTimezone;
+	}
+	
+	public Boolean isReRegister() {
+		return reRegister;
+	}
+
+	public void setReRegister(Boolean reRegister) {
+		this.reRegister = reRegister;
 	}
 
 	public String getNonHMRNotificationFreq() {
@@ -638,6 +672,12 @@ public class User extends AbstractAuditingEntity implements Serializable {
 				+ settingDeviationNotification + ", messageNotification="
 				+ messageNotification + ", activationLinkSentDate="
 				+ activationLinkSentDate + ", expired=" + expired
+				+ ", expirationDate=" + expirationDate
+				+ ", nonHMRNotificationFreq=" + nonHMRNotificationFreq
+				+ ", missedTherapyNotificationFreq="
+				+ missedTherapyNotificationFreq
+				+ ", settingDeviationNotificationFreq="
+				+ settingDeviationNotificationFreq + ", reRegister="
 				+ ", expirationDate=" + expirationDate + ", reRegister="
 				+ reRegister + ", nonHMRNotificationFreq="
 				+ nonHMRNotificationFreq + ", missedTherapyNotificationFreq="
@@ -654,3 +694,4 @@ public class User extends AbstractAuditingEntity implements Serializable {
 	}
 
 }
+

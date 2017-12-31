@@ -18,6 +18,7 @@ import javax.validation.constraints.Size;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.envers.AuditJoinTable;
 import org.hibernate.envers.Audited;
+import org.springframework.context.annotation.Lazy;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -58,8 +59,7 @@ public class UserExtension extends User implements Serializable {
 	@Column(name = "npi_number")
 	private String npiNumber;
 
-	//@ManyToMany
-	@ManyToMany(fetch = FetchType.EAGER)
+	@ManyToMany
 	@JoinTable(name = "CLINIC_USER_ASSOC", joinColumns = { @JoinColumn(name = "users_id", referencedColumnName = "user_id") }, inverseJoinColumns = { @JoinColumn(name = "clinics_id", referencedColumnName = "id") })
 	@AuditJoinTable
 	private Set<Clinic> clinics = new HashSet<>();

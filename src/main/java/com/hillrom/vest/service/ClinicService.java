@@ -274,6 +274,8 @@ public class ClinicService {
 			clinic.setDeleted(clinicDTO.getDeleted());
 		if (clinicDTO.getAdherenceSetting() != null)
 			clinic.setAdherenceSetting(clinicDTO.getAdherenceSetting());
+		if (clinicDTO.getIsMessageOpted() != null)
+			clinic.setIsMessageOpted(clinicDTO.getIsMessageOpted());
 		//start: HILL-2004
 		if (clinicDTO.getAdherenceSettingFlag() != null && clinicDTO.getAdherenceSettingFlag().equals(Boolean.TRUE))
 		{

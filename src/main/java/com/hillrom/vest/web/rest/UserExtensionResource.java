@@ -388,13 +388,27 @@ public class UserExtensionResource {
     		isAscending =  (isAscending != null) ?  isAscending : true;
     		sortOrder.put(sortBy, isAscending);
     	}
-    	Page<HcpVO> page = userSearchRepository.findHCPByClinicAdmin(id,clincId,queryString,filter,PaginationUtil.generatePageRequest(offset, limit),sortOrder);
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "user/clinicadmin/"+id+"/hcp/search", offset, limit);
-        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
-    }
-    /**
-     * GET  /user/:id/hcp -> get the "id" HCP user.
-     */
+    	
+		Page<HcpVO> page;
+		HttpHeaders headers;
+
+		if (StringUtils.isNotBlank(filter)) {
+			page = userSearchRepository.findHCPByClinicAdmin(id, clincId,
+					queryString, filter,
+					PaginationUtil.generatePageRequest(offset, limit),
+					sortOrder);
+			headers = PaginationUtil.generatePaginationHttpHeaders(page,
+					"user/clinicadmin/" + id + "/hcp/search", offset, limit);
+			return new ResponseEntity<>(page.getContent(), headers,
+					HttpStatus.OK);
+		}
+		List<HcpVO> emptyList = new ArrayList<HcpVO>();
+		return new ResponseEntity<>(emptyList, HttpStatus.OK);
+	}
+
+	/**
+	 * GET /user/:id/hcp -> get the "id" HCP user.
+	 */
     @RequestMapping(value = "/user/{id}/hcp",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)

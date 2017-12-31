@@ -1753,14 +1753,4 @@ public class UserResource {
 		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
     }
     
-    @RequestMapping(value = "/processHcpClinicAdminNotification",
-   	     method = RequestMethod.GET,
-   	     produces = MediaType.APPLICATION_JSON_VALUE)	
-   public ResponseEntity<?> processHcpClinicAdminNotificationsFreq() throws HillromException {
-   	        log.debug("REST request to get testing Device Cron");
-   	        JSONObject jsonObject = new JSONObject();        
-   	       adherenceCalculationServiceMonarch.processPatientNotificationsMonarch();   
-   	 //       adherenceCalculationServiceMonarch.processPatientNotificationsMonarch();
-   			return new ResponseEntity<>(jsonObject, HttpStatus.OK);
-   	    }   
 }

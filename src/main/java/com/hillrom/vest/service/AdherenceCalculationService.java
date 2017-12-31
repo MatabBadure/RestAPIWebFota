@@ -1014,11 +1014,12 @@ public class AdherenceCalculationService {
 	public void processPatientNotifications(){
 		LocalDate yesterday = LocalDate.now().minusDays(1);
 		LocalDate weekTime = LocalDate.now().minusDays(7);
+		Set<User> patientEmailSent = new HashSet<User>();
 		
 		List<Notification> notifications = notificationRepository.findByDate(yesterday);
-		System.out.println("notifications.size() ::"+notifications.size());
 		if(notifications.size() > 0){
 			List<Long> patientUserIds = new LinkedList<>();
+			
 			for(Notification notification : notifications){
 				patientUserIds.add(notification.getPatientUser().getId());
 			}
@@ -1036,14 +1037,13 @@ public class AdherenceCalculationService {
 					List<Notification> existingNotifications = notificationService.findNotificationsByUserIdAndDateRange(patientUserId,weekTime,yesterday);
 					existingNotifications.forEach(existingNotification -> {
 						User patientUser = existingNotification.getPatientUser();
-						System.out.println(patientUser.getMissedTherapyNotificationFreq());
 						if(Objects.nonNull(patientUser.getEmail())){
 						// integrated Accepting mail notifications
 						User existingUser = userRepository.findUserOneByEmail(patientUser.getEmail());
 						String notificationType = existingNotification.getNotificationType();
 						if(vestOnlyDevicesPatientsMap.containsKey(patientUser.getId())){
 							if(isPatientUserAcceptNotification(patientUser, notificationType ) && isPatientUserAcceptNotificationFreq(existingUser)){
-								mailService.sendNotificationMailToPatientBasedOnFreq(patientUser,notificationType);								
+								patientEmailSent.add(existingUser);										
 							}
 								
 						}
@@ -1051,6 +1051,9 @@ public class AdherenceCalculationService {
 				});
 			 }			
 			
+				for(User emailPatient : patientEmailSent) {
+					mailService.sendNotificationMailToPatientBasedOnFreq(emailPatient);	
+				}
 			}catch(Exception ex){
 				StringWriter writer = new StringWriter();
 				PrintWriter printWriter = new PrintWriter( writer );

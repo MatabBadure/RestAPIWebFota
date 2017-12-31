@@ -737,8 +737,8 @@ public class MailService {
 				+ userName.substring(1).toLowerCase();
 	}
 	
-    public void sendNotificationMailToPatientBasedOnFreq(User user,String notificationType){
-        log.debug("Sending password reset e-mail to '{}'", user.getEmail());
+    public void sendNotificationMailToPatientBasedOnFreq(User user){
+        log.debug("Sending Notification Mail To Patient email to '{}'", user.getEmail());
         Context context = new Context();
         context.setVariable("user", user.getFirstName());
         context.setVariable("notificationUrl", patientDashboardUrl);
@@ -753,7 +753,6 @@ public class MailService {
     	log.debug("Sending Notification shall have a frequency for HCP and Clinic Admin '{}'", user.getEmail());
         Context context = new Context();
         context.setVariable("user", user.getFirstName());
-    //    context.setVariable("clinicStatisticsMap",statistics);
         context.setVariable("today", DateUtil.convertLocalDateToStringFromat(org.joda.time.LocalDate.now().minusDays(1), "MMM dd,yyyy"));
         context.setVariable("notificationUrl", hcpOrClinicAdminDashboardUrl);
         String content = "";

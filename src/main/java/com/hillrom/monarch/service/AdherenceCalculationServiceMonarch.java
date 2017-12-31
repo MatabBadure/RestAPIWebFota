@@ -1496,6 +1496,8 @@ public class AdherenceCalculationServiceMonarch{
 	public void processPatientNotificationsMonarch(){
 		LocalDate yesterday = LocalDate.now().minusDays(1);
 		LocalDate weekTime = LocalDate.now().minusDays(7);
+		Set<User> patientEmailSent = new HashSet<User>();
+		
 		List<NotificationMonarch> notifications = notificationMonarchRepository.findByDate(yesterday);
 		if(notifications.size() > 0){
 			
@@ -1521,9 +1523,13 @@ public class AdherenceCalculationServiceMonarch{
 			//			int missedTherapyCount = complianceMap.get(patientUser);
 						if(isPatientUserAcceptNotification(patientUser,
 								notificationType) && isPatientUserAcceptNotificationFreq(existingUser))
-							mailService.sendNotificationMailToPatientBasedOnFreq(patientUser,notificationType);		
+							patientEmailSent.add(existingUser);			
 					}
-				});		
+				});	
+
+				for(User emailPatient : patientEmailSent) {
+					mailService.sendNotificationMailToPatientBasedOnFreq(emailPatient);	
+				}
 			}catch(Exception ex){
 				StringWriter writer = new StringWriter();
 				PrintWriter printWriter = new PrintWriter( writer );

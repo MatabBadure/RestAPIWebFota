@@ -397,4 +397,57 @@ public class AdherenceResource {
 		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
     }
 
+    /**
+     *  GET  /processHcpClinicAdminNotificationCron -> to Initiate the daily notification CRON.
+     * @return
+     * @throws HillromException
+     */
+	@RequestMapping(value = "/processHcpClinicAdminNotification", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> processHcpClinicAdminNotificationsFreqCron() throws HillromException {
+		log.debug("REST request to get testing Device Cron");
+		JSONObject jsonObject = new JSONObject();
+		adherenceCalculationService.processHcpClinicAdminNotifications();
+		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+	}
+
+	/**
+	 *  GET  /processHcpClinicAdminMonarchNotification -> to Initiate the daily notification CRON.
+	 * @return
+	 * @throws HillromException
+	 */
+	@RequestMapping(value = "/processHcpClinicAdminMonarchNotification", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> processHcpClinicAdminMonarchNotificationsFreqCron() throws HillromException {
+		log.debug("REST request to get testing Device Cron");
+		JSONObject jsonObject = new JSONObject();
+		adherenceCalculationServiceMonarch.processHcpClinicAdminNotificationsMonarch();
+		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+	}
+	
+	/**
+	 * GET  /processCaregiverVestNotificationCron -> to Initiate the daily notification CRON.
+	 * @return
+	 * @throws HillromException
+	 */
+	
+	@RequestMapping(value = "/processCaregiverVestNotificationCron", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> processCaregiverVestNotificationCron() throws HillromException {
+		log.debug("REST request to get testing Device Cron");
+		JSONObject jsonObject = new JSONObject();
+		adherenceCalculationService.processCareGiverNotifications();
+		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+	}
+
+	/**
+	 * GET  /processCaregiverMonarchNotificationCron -> to Initiate the daily notification CRON.
+	 * @return
+	 * @throws HillromException
+	 */
+	@RequestMapping(value = "/processCaregiverMonarchNotificationCron", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> processCaregiverMonarchNotificationCron() throws HillromException {
+		log.debug("REST request to get testing Device Cron");
+		JSONObject jsonObject = new JSONObject();
+		adherenceCalculationServiceMonarch.processCareGiverNotificationsMonarch();
+		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+	}
+	
 }

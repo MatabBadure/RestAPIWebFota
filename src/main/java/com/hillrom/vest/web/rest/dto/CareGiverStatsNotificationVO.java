@@ -7,7 +7,9 @@ public class CareGiverStatsNotificationVO {
 	public CareGiverStatsNotificationVO(BigInteger patientUserid, String patientFirstname, String patientLastname,
 			BigInteger careGiverId, String careGiverName, int missedTherapyCount, boolean isSettingsDeviated,
 			boolean isHMRCompliant, String cGEmail, boolean isHcpAcceptHMRNotification,
-			boolean isHcpAcceptSettingsNotification, boolean isHcpAcceptTherapyNotification) {
+			boolean isHcpAcceptSettingsNotification, boolean isHcpAcceptTherapyNotification,
+			String nonHMRNotificationFreq, String missedTherapyNotificationFreq, 
+			String settingDeviationNotificationFreq){
 		this.patientUserid = patientUserid;
 		this.patientFirstname = patientFirstname;
 		this.patientLastname = patientLastname;
@@ -20,6 +22,9 @@ public class CareGiverStatsNotificationVO {
 		this.isHcpAcceptHMRNotification = isHcpAcceptHMRNotification;
 		this.isHcpAcceptSettingsNotification = isHcpAcceptSettingsNotification;
 		this.isHcpAcceptTherapyNotification = isHcpAcceptTherapyNotification;
+		this.nonHMRNotificationFreq= nonHMRNotificationFreq;		
+		this.missedTherapyNotificationFreq= missedTherapyNotificationFreq;
+		this.settingDeviationNotificationFreq= settingDeviationNotificationFreq;
 	}
 	
 	private BigInteger patientUserid;
@@ -38,7 +43,10 @@ public class CareGiverStatsNotificationVO {
 	private boolean isHcpAcceptSettingsNotification;
 	private boolean isHcpAcceptTherapyNotification;
 	
-	
+	private String nonHMRNotificationFreq;
+	private String missedTherapyNotificationFreq;
+	private String settingDeviationNotificationFreq;
+			
 	public BigInteger getPatientUserid() {
 		return patientUserid;
 	}
@@ -111,5 +119,29 @@ public class CareGiverStatsNotificationVO {
 	public void setCGEmail(String cGEmail) {
 		CGEmail = cGEmail;
 	}
-	
+	public String getNonHMRNotificationFreq() {
+		return nonHMRNotificationFreq;
+	}
+
+	public void setNonHMRNotificationFreq(String nonHMRNotificationFreq) {
+		this.nonHMRNotificationFreq = nonHMRNotificationFreq;
+	}
+
+	public String getMissedTherapyNotificationFreq() {
+		return missedTherapyNotificationFreq;
+	}
+
+	public void setMissedTherapyNotificationFreq(
+			String missedTherapyNotificationFreq) {
+		this.missedTherapyNotificationFreq = missedTherapyNotificationFreq;
+	}
+
+	public String getSettingDeviationNotificationFreq() {
+		return settingDeviationNotificationFreq;
+	}
+
+	public void setSettingDeviationNotificationFreq(
+			String settingDeviationNotificationFreq) {
+		this.settingDeviationNotificationFreq = settingDeviationNotificationFreq;
+	}	
 }

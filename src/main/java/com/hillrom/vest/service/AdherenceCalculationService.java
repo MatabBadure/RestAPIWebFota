@@ -33,6 +33,7 @@ import java.io.StringWriter;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -81,6 +82,7 @@ import com.hillrom.vest.repository.PatientDevicesAssocRepository;
 import com.hillrom.vest.repository.PatientInfoRepository;
 import com.hillrom.vest.repository.PatientNoEventsRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
+import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.service.util.DateUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
@@ -110,6 +112,9 @@ public class AdherenceCalculationService {
 	private static final String WEIGHTED_AVG_FREQUENCY = "weightedAvgFrequency";
 
 	private static volatile int adherenceResetProgressUpdate = 0;
+	
+	private static final String DAILY = "daily";
+	
 	private static volatile HashMap<String, String> adherenceResetProgressTotalCurrent = new HashMap<String, String>();
 	
 	@Inject
@@ -183,6 +188,9 @@ public class AdherenceCalculationService {
 	
 	@Inject
 	private PatientNoEventsRepository noEventRepository;
+	
+	@Inject
+	private UserRepository userRepository;
 	
 	private final Logger log = LoggerFactory.getLogger(AdherenceCalculationService.class);
 	
@@ -270,6 +278,13 @@ public class AdherenceCalculationService {
 		return patientDevicesList
 				.stream().collect(
 						Collectors.groupingBy(PatientDevicesAssoc::getPatientId));
+	}
+	
+	public Map<Long, List<PatientDevicesAssoc>> getVestOnlyDevicePatientsMapData(){
+		List<PatientDevicesAssoc> patientDevicesList = patientDevicesAssocRepository.findAllByDeviceTypeAndPatientType(VEST,"SD");
+		return patientDevicesList
+				.stream().collect(
+						Collectors.groupingBy(PatientDevicesAssoc::getId));
 	}
 	
 	/**
@@ -998,35 +1013,47 @@ public class AdherenceCalculationService {
 	@Scheduled(cron="0 15 0 * * *")
 	public void processPatientNotifications(){
 		LocalDate yesterday = LocalDate.now().minusDays(1);
+		LocalDate weekTime = LocalDate.now().minusDays(7);
+		Set<User> patientEmailSent = new HashSet<User>();
+		
 		List<Notification> notifications = notificationRepository.findByDate(yesterday);
 		if(notifications.size() > 0){
 			List<Long> patientUserIds = new LinkedList<>();
+			
 			for(Notification notification : notifications){
 				patientUserIds.add(notification.getPatientUser().getId());
 			}
-			List<PatientCompliance> complianceList = patientComplianceRepository.findByDateBetweenAndPatientUserIdIn(yesterday,
+						
+			List<PatientCompliance> complianceList = patientComplianceRepository.findByDateBetweenAndPatientUserIdIn(weekTime,
 					yesterday,patientUserIds);
-			
-			Map<String, List<PatientDevicesAssoc>> vestOnlyDevicesPatientsMap = getVestOnlyDevicePatientsMap();
-			
 			Map<User,Integer> complianceMap = new HashMap<>();
 			for(PatientCompliance compliance : complianceList){
 				complianceMap.put(compliance.getPatientUser(), compliance.getMissedTherapyCount());
-			}
+			}			
+			
+			Map<Long, List<PatientDevicesAssoc>> vestOnlyDevicesPatientsMap = getVestOnlyDevicePatientsMapData();
 			try{
-				notifications.forEach(notification -> {
-					User patientUser = notification.getPatientUser();
-					if(Objects.nonNull(patientUser.getEmail())){
+				for(Long patientUserId : patientUserIds){
+					List<Notification> existingNotifications = notificationService.findNotificationsByUserIdAndDateRange(patientUserId,weekTime,yesterday);
+					existingNotifications.forEach(existingNotification -> {
+						User patientUser = existingNotification.getPatientUser();
+						if(Objects.nonNull(patientUser.getEmail())){
 						// integrated Accepting mail notifications
-						String notificationType = notification.getNotificationType();
-						int missedTherapyCount = complianceMap.get(patientUser);
+						User existingUser = userRepository.findUserOneByEmail(patientUser.getEmail());
+						String notificationType = existingNotification.getNotificationType();
 						if(vestOnlyDevicesPatientsMap.containsKey(patientUser.getId())){
-							if(isPatientUserAcceptNotification(patientUser,
-									notificationType))
-								mailService.sendNotificationMailToPatient(patientUser,notificationType,missedTherapyCount);
+							if(isPatientUserAcceptNotification(patientUser, notificationType ) && isPatientUserAcceptNotificationFreq(existingUser)){
+								patientEmailSent.add(existingUser);										
+							}
+								
 						}
 					}
 				});
+			 }			
+			
+				for(User emailPatient : patientEmailSent) {
+					mailService.sendNotificationMailToPatientBasedOnFreq(emailPatient);	
+				}
 			}catch(Exception ex){
 				StringWriter writer = new StringWriter();
 				PrintWriter printWriter = new PrintWriter( writer );
@@ -1044,6 +1071,22 @@ public class AdherenceCalculationService {
 				(HMR_AND_SETTINGS_DEVIATION.equalsIgnoreCase(notificationType) && 
 						(patientUser.isNonHMRNotification() || patientUser.isSettingDeviationNotification())));
 	}
+	
+	private boolean isPatientUserAcceptNotificationFreq(User patientUser) {
+		String dayOfWeek = DateUtil.getDayOfTheWeek();
+		if(Objects.nonNull(patientUser)){
+			if(Objects.nonNull(patientUser.getMissedTherapyNotificationFreq())){
+					
+			return(patientUser.getMissedTherapyNotificationFreq().equalsIgnoreCase(dayOfWeek) ||
+					patientUser.getNonHMRNotificationFreq().equalsIgnoreCase(dayOfWeek)	||
+					patientUser.getSettingDeviationNotificationFreq().equalsIgnoreCase(dayOfWeek)||
+					patientUser.getMissedTherapyNotificationFreq().equalsIgnoreCase(DAILY) ||
+					patientUser.getNonHMRNotificationFreq().equalsIgnoreCase(DAILY)	||
+					patientUser.getSettingDeviationNotificationFreq().equalsIgnoreCase(DAILY));
+			}
+		}
+		return false;
+	}
 
 	/**
 	 * Runs every midnight , sends the statistics notifications to Clinic Admin and HCP.
@@ -1055,19 +1098,19 @@ public class AdherenceCalculationService {
 			List<ClinicStatsNotificationVO> statsNotificationVOs = getPatientStatsWithHcpAndClinicAdminAssociation();
 			Map<BigInteger, User> idUserMap = getIdUserMapFromPatientStats(statsNotificationVOs);
 			Map<String, String> clinicIdNameMap = getClinicIdNameMapFromPatientStats(statsNotificationVOs);
-			Map<BigInteger, Map<String, Map<String, Integer>>> adminClinicStats = getPatientStatsWithClinicAdminClinicAssociation(statsNotificationVOs);
-			Map<BigInteger, Map<String, Map<String, Integer>>> hcpClinicStats = getPatientStatsWithHcpClinicAssociation(statsNotificationVOs);
+			Map<BigInteger, Map<String, Map<String, Integer>>> adminOrHcpClinicStats = getPatientStatsWithClinicAdminClinicAssociation(statsNotificationVOs);
 
-			Map<User, Map<String, Map<String, Integer>>> hcpClinicStatsMap = getProcessedUserClinicStatsMap(idUserMap,
-					clinicIdNameMap, hcpClinicStats);
-			Map<User, Map<String, Map<String, Integer>>> adminClinicStatsMap = getProcessedUserClinicStatsMap(idUserMap,
-					clinicIdNameMap, adminClinicStats);
-			for(User hcpUser : hcpClinicStatsMap.keySet()){
-				mailService.sendNotificationMailToHCPAndClinicAdmin(hcpUser, hcpClinicStatsMap.get(hcpUser));
-			}
-			for(User adminUser : adminClinicStatsMap.keySet()){
-				mailService.sendNotificationMailToHCPAndClinicAdmin(adminUser, adminClinicStatsMap.get(adminUser));
-			}
+			Map<User, Map<String, Map<String, Integer>>> adminOrHcpClinicStatsMap = getProcessedUserClinicStatsMap(idUserMap,
+					clinicIdNameMap, adminOrHcpClinicStats);
+			
+			Set<User> userHcpsOrAdmins = mailServiceNotificationForHcpandAdmin(adminOrHcpClinicStatsMap);
+				
+			if (Objects.nonNull(userHcpsOrAdmins)) {
+				for (User usrHcpOrAdmin : userHcpsOrAdmins) {
+
+				mailService.sendNotificationMailToHCPAndClinicAdminBasedOnFreq(usrHcpOrAdmin);
+				}
+			}	
 			
 		}catch(Exception ex){
 			StringWriter writer = new StringWriter();
@@ -1102,14 +1145,12 @@ public class AdherenceCalculationService {
 				cgIdPatientStatsMap.put(statsNotificationVO.getCGEmail(), patientStatsList);
 			}
 			
-			for(String cgEmail : cgIdNameMap.keySet()){
-				CareGiverStatsNotificationVO careGiverStatsNotificationVO = cgIdNameMap.get(cgEmail);
-				if(careGiverStatsNotificationVO.getIsHcpAcceptHMRNotification()|
-						careGiverStatsNotificationVO.getIsHcpAcceptSettingsNotification()|
-						careGiverStatsNotificationVO.getIsHcpAcceptTherapyNotification())
-					mailService.sendNotificationCareGiver(cgIdNameMap.get(cgEmail), cgIdPatientStatsMap.get(cgEmail));
+			if(careGiverStatsNotification(cgIdNameMap))
+			{
+				for(CareGiverStatsNotificationVO careGiverStatsNotificationFreqStatus :careGiverStatsNotificationFreq(cgIdNameMap)){
+					mailService.sendNotificationCareGiverBasedOnFreq(careGiverStatsNotificationFreqStatus);
+				}
 			}
-			
 			
 		}catch(Exception ex){
 			StringWriter writer = new StringWriter();
@@ -1117,6 +1158,95 @@ public class AdherenceCalculationService {
 			ex.printStackTrace( printWriter );
 			mailService.sendJobFailureNotification("processHcpClinicAdminNotifications",writer.toString());
 		}
+	}
+	
+	public static boolean careGiverStatsNotification(Map<String,CareGiverStatsNotificationVO> cgIdNameMap){
+
+		for(String cgEmail : cgIdNameMap.keySet()){
+			CareGiverStatsNotificationVO careGiverStatsNotificationVO = cgIdNameMap.get(cgEmail);
+			return(careGiverStatsNotificationVO.getIsHcpAcceptHMRNotification()|
+					careGiverStatsNotificationVO.getIsHcpAcceptSettingsNotification()|
+					careGiverStatsNotificationVO.getIsHcpAcceptTherapyNotification());
+		}
+		return false;
+	}
+
+	public static Set<CareGiverStatsNotificationVO> careGiverStatsNotificationFreq(Map<String,CareGiverStatsNotificationVO> cgIdNameMap){
+
+		String dayOfWeek = DateUtil.getDayOfTheWeek();
+		Set<CareGiverStatsNotificationVO> UserList = new HashSet<CareGiverStatsNotificationVO>();
+
+		if(Objects.nonNull(cgIdNameMap)){
+			for(String cgEmail : cgIdNameMap.keySet()){
+				CareGiverStatsNotificationVO careGiverStatsNotificationVO = cgIdNameMap.get(cgEmail);
+
+				if(Objects.nonNull(careGiverStatsNotificationVO.getMissedTherapyNotificationFreq()))
+				{
+					if(careGiverStatsNotificationVO.getMissedTherapyNotificationFreq().equalsIgnoreCase(dayOfWeek)){
+						UserList.add(careGiverStatsNotificationVO);
+					}else if(careGiverStatsNotificationVO.getMissedTherapyNotificationFreq().equalsIgnoreCase(DAILY)){
+						UserList.add(careGiverStatsNotificationVO);
+					}
+				}
+				if(Objects.nonNull(careGiverStatsNotificationVO.getNonHMRNotificationFreq()))
+				{
+					if(careGiverStatsNotificationVO.getNonHMRNotificationFreq().equalsIgnoreCase(dayOfWeek)){
+						UserList.add(careGiverStatsNotificationVO);
+					}else if(careGiverStatsNotificationVO.getNonHMRNotificationFreq().equalsIgnoreCase(DAILY)){
+						UserList.add(careGiverStatsNotificationVO);
+					}
+				}
+				if(Objects.nonNull(careGiverStatsNotificationVO.getSettingDeviationNotificationFreq()))
+				{
+					if(careGiverStatsNotificationVO.getSettingDeviationNotificationFreq().equalsIgnoreCase(dayOfWeek)){
+						UserList.add(careGiverStatsNotificationVO);
+					}else if(careGiverStatsNotificationVO.getSettingDeviationNotificationFreq().equalsIgnoreCase(DAILY)){
+						UserList.add(careGiverStatsNotificationVO);
+					}
+				}
+
+			}
+			return UserList;
+		}
+		return null;
+	}	
+	
+public static Set<User> mailServiceNotificationForHcpandAdmin(Map<User, Map<String, Map<String, Integer>>> hcpOrAdminClinicStatsMap){
+		
+		String dayOfWeek = DateUtil.getDayOfTheWeek();
+		Set<User> UserList = new HashSet<User>();
+		if(Objects.nonNull(hcpOrAdminClinicStatsMap)){
+			for(User hcpOrAdminUser : hcpOrAdminClinicStatsMap.keySet()){
+				if(Objects.nonNull(hcpOrAdminUser.getMissedTherapyNotificationFreq()))
+				{
+					if(hcpOrAdminUser.getMissedTherapyNotificationFreq().equalsIgnoreCase(dayOfWeek)){
+						UserList.add(hcpOrAdminUser);
+					}else if(hcpOrAdminUser.getMissedTherapyNotificationFreq().equalsIgnoreCase(DAILY)){
+						UserList.add(hcpOrAdminUser);
+					}
+				}
+				if(Objects.nonNull(hcpOrAdminUser.getNonHMRNotificationFreq()))
+				{
+					if(hcpOrAdminUser.getNonHMRNotificationFreq().equalsIgnoreCase(dayOfWeek)){
+						UserList.add(hcpOrAdminUser);
+					}else if(hcpOrAdminUser.getNonHMRNotificationFreq().equalsIgnoreCase(DAILY)){
+						UserList.add(hcpOrAdminUser);
+					}
+				}
+				if(Objects.nonNull(hcpOrAdminUser.getSettingDeviationNotificationFreq()))
+				{
+					if(hcpOrAdminUser.getSettingDeviationNotificationFreq().equalsIgnoreCase(dayOfWeek)){
+						UserList.add(hcpOrAdminUser);
+					}else if(hcpOrAdminUser.getSettingDeviationNotificationFreq().equalsIgnoreCase(DAILY)){
+						UserList.add(hcpOrAdminUser);
+					}
+				}
+
+			}
+			return UserList;
+		}
+		return null;
+		
 	}
 
 	private Map<User, Map<String, Map<String, Integer>>> getProcessedUserClinicStatsMap(
@@ -1151,7 +1281,7 @@ public class AdherenceCalculationService {
 	private Map<BigInteger, Map<String, Map<String, Integer>>> getPatientStatsWithHcpClinicAssociation(
 			List<ClinicStatsNotificationVO> statsNotificationVOs) {
 		Map<BigInteger,List<ClinicStatsNotificationVO>> hcpClinicStatsMap = statsNotificationVOs.stream()
-				.collect(Collectors.groupingBy(ClinicStatsNotificationVO :: getHcpId));
+				.collect(Collectors.groupingBy(ClinicStatsNotificationVO :: getHcpIdOrclinicAdminId));
 		Map<BigInteger,Map<String,Map<String,Integer>>> hcpClinicStats = getClinicWiseStatistics(hcpClinicStatsMap,statsNotificationVOs);
 		return hcpClinicStats;
 	}
@@ -1159,10 +1289,10 @@ public class AdherenceCalculationService {
 	private Map<BigInteger, Map<String, Map<String, Integer>>> getPatientStatsWithClinicAdminClinicAssociation(
 			List<ClinicStatsNotificationVO> statsNotificationVOs) {
 		List<ClinicStatsNotificationVO> statsNotificationVOsForAdmin = statsNotificationVOs.stream().filter(statsNotificationVO -> 
-			Objects.nonNull(statsNotificationVO.getClinicAdminId())
+			Objects.nonNull(statsNotificationVO.getHcpIdOrclinicAdminId())
 		).collect(Collectors.toList());
 		Map<BigInteger,List<ClinicStatsNotificationVO>> adminClinicStatsMap = statsNotificationVOsForAdmin.stream()
-				.collect(Collectors.groupingBy(ClinicStatsNotificationVO :: getClinicAdminId));
+				.collect(Collectors.groupingBy(ClinicStatsNotificationVO :: getHcpIdOrclinicAdminId));
 		Map<BigInteger,Map<String,Map<String,Integer>>> adminClinicStats = getClinicWiseStatistics(adminClinicStatsMap,statsNotificationVOsForAdmin);
 		return adminClinicStats;
 	}
@@ -1180,46 +1310,42 @@ public class AdherenceCalculationService {
 			List<ClinicStatsNotificationVO> statsNotificationVOs) {
 		Map<BigInteger,User> idUserMap = new HashMap<>();
 		for(ClinicStatsNotificationVO statsNotificationVO : statsNotificationVOs){
-			idUserMap.put(statsNotificationVO.getHcpId(),new User(statsNotificationVO.getHcpFirstname(),
-					statsNotificationVO.getHcpLastname(),statsNotificationVO.getHcpEmail(),
-					statsNotificationVO.isHcpAcceptTherapyNotification(),statsNotificationVO.isHcpAcceptHMRNotification()
-					,statsNotificationVO.isHcpAcceptSettingsNotification()));
-			if(Objects.nonNull(statsNotificationVO.getClinicAdminId())){
-				idUserMap.put(statsNotificationVO.getClinicAdminId(),new User(statsNotificationVO.getCaFirstname(),
-						statsNotificationVO.getCaLastname(),statsNotificationVO.getCaEmail(),
-						statsNotificationVO.isCAAcceptTherapyNotification(),statsNotificationVO.isCAAcceptHMRNotification()
-						,statsNotificationVO.isCAAcceptSettingsNotification()));
-			}
-			
+			idUserMap.put(statsNotificationVO.getHcpIdOrclinicAdminId(),new User(statsNotificationVO.getHcpFirstnameOrCaFirstname(),
+					statsNotificationVO.getHcpLastnameOrCaLastname(),statsNotificationVO.getHcpEmailOrCaEmail(),
+					statsNotificationVO.isHcpOrIsCAAcceptTherapyNotification(),statsNotificationVO.isHcpOrIsCAAcceptHMRNotification(),
+					statsNotificationVO.isHcpOrIsCAAcceptSettingsNotification(),statsNotificationVO.getNonHmrNotificationFreq(),
+					statsNotificationVO.getMissedTherapyNotificationFreq(),statsNotificationVO.getSettingDeviationNotificationFreq()));		
 		}
 		return idUserMap;
 	}
 
 	private List<ClinicStatsNotificationVO> getPatientStatsWithHcpAndClinicAdminAssociation() {
-		List<Object[]> results =  clinicRepository.findPatientStatisticsClinicForActiveClinics();
+		List<Object[]> results =  clinicRepository.findPatientStatisticsClinicForActiveClinicsForWeek();
+		
 		List<ClinicStatsNotificationVO> statsNotificationVOs = new LinkedList<>();
 		for(Object[] result : results){			
 			Integer adherenceSetting = DEFAULT_SETTINGS_DEVIATION_COUNT;
-			if(Objects.nonNull(result[20])){
-				adherenceSetting = (Integer)result[20];
+			if(Objects.nonNull(result[19])){
+				adherenceSetting = (Integer) result[19];
 			}			
-			statsNotificationVOs.add(new ClinicStatsNotificationVO((BigInteger)result[0], (String)result[1], (String)result[2],
-					(BigInteger)result[3],(BigInteger)result[4], (String)result[5], (String)result[6],(String)result[7],
-					(BigInteger)result[8],(Integer)result[9], (Boolean)result[10],
-					(Boolean)result[11], (Boolean)result[12], (Boolean)result[13], (Boolean)result[14],
-					(String)result[15],(String)result[16],(Integer)result[17], (Integer)result[18], (Integer)result[19],
-					(String)result[20],adherenceSetting));
+			statsNotificationVOs.add(new ClinicStatsNotificationVO((BigInteger)result[1],
+					(String)result[2],(String)result[3],(BigInteger)result[4],(String)result[5],
+					(String)result[6],(String)result[7],(Integer)result[9],(Boolean)result[10], (Boolean)result[11],
+					(Boolean)result[12],(Boolean)result[13],(Boolean)result[14], (String)result[15],
+					(String)result[16],(String)result[17],(String)result[18],
+					adherenceSetting));
 		}
 		return statsNotificationVOs;
 	}
 	private List<CareGiverStatsNotificationVO> findPatientStatisticsCareGiver() {
-		List<Object[]> results =  clinicRepository.findPatientStatisticsCareGiver();
+		List<Object[]> results =  clinicRepository.findPatientStatisticsCareGiverDetails();
 		List<CareGiverStatsNotificationVO> statsNotificationVOs = new LinkedList<>();
 		for(Object[] result : results){
 			statsNotificationVOs.add(new CareGiverStatsNotificationVO((BigInteger)result[0], (String) result[1], (String)result[2],
 					(BigInteger)result[3],(String)result[4], (Integer)result[5],
 					(Boolean)result[6], (Boolean)result[7], (String)result[8],
-					(Boolean)result[9], (Boolean)result[10], (Boolean)result[11]));
+					(Boolean)result[9], (Boolean)result[10], (Boolean)result[11],
+					(String)result[12], (String)result[13], (String)result[14]));
 		}		
 		return statsNotificationVOs;
 	}

@@ -1,5 +1,10 @@
 package com.hillrom.monarch.service;
 
+import static com.hillrom.monarch.service.util.PatientVestDeviceTherapyUtilMonarch.calculateCumulativeDuration;
+import static com.hillrom.monarch.service.util.PatientVestDeviceTherapyUtilMonarch.calculateHMRRunRatePerSession;
+import static com.hillrom.monarch.service.util.PatientVestDeviceTherapyUtilMonarch.calculateHMRRunRatePerSessionBoth;
+import static com.hillrom.monarch.service.util.PatientVestDeviceTherapyUtilMonarch.calculateWeightedAvg;
+import static com.hillrom.vest.config.AdherenceScoreConstants.ADHERENCE_SETTING_DEFAULT_DAYS;
 import static com.hillrom.vest.config.AdherenceScoreConstants.BONUS_POINTS;
 import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_COMPLIANCE_SCORE;
 import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_MISSED_THERAPY_DAYS_COUNT;
@@ -9,38 +14,31 @@ import static com.hillrom.vest.config.AdherenceScoreConstants.LOWER_BOUND_VALUE;
 import static com.hillrom.vest.config.AdherenceScoreConstants.MISSED_THERAPY_DAYS_COUNT_THRESHOLD;
 import static com.hillrom.vest.config.AdherenceScoreConstants.MISSED_THERAPY_POINTS;
 import static com.hillrom.vest.config.AdherenceScoreConstants.SETTING_DEVIATION_POINTS;
-import static com.hillrom.vest.config.AdherenceScoreConstants.UPPER_BOUND_VALUE;
 import static com.hillrom.vest.config.NotificationTypeConstants.ADHERENCE_SCORE_RESET;
 import static com.hillrom.vest.config.NotificationTypeConstants.HMR_AND_SETTINGS_DEVIATION;
-import static com.hillrom.vest.config.NotificationTypeConstants.HMR_VEST_AND_SETTINGS_DEVIATION;
-import static com.hillrom.vest.config.NotificationTypeConstants.HMR_MONARCH_AND_SETTINGS_DEVIATION;
-import static com.hillrom.vest.config.NotificationTypeConstants.HMR_AND_SETTINGS_DEVIATION_VEST;
-import static com.hillrom.vest.config.NotificationTypeConstants.HMR_MONARCH_AND_SETTINGS_DEVIATION_VEST;
-import static com.hillrom.vest.config.NotificationTypeConstants.HMR_VEST_AND_SETTINGS_DEVIATION_VEST;
 import static com.hillrom.vest.config.NotificationTypeConstants.HMR_AND_SETTINGS_DEVIATION_MONARCH;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_AND_SETTINGS_DEVIATION_VEST;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_MONARCH_AND_SETTINGS_DEVIATION;
 import static com.hillrom.vest.config.NotificationTypeConstants.HMR_MONARCH_AND_SETTINGS_DEVIATION_MONARCH;
-import static com.hillrom.vest.config.NotificationTypeConstants.HMR_VEST_AND_SETTINGS_DEVIATION_MONARCH;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_MONARCH_AND_SETTINGS_DEVIATION_VEST;
 import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE;
-import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE_VEST;
 import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE_MONARCH;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE_VEST;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_VEST_AND_SETTINGS_DEVIATION;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_VEST_AND_SETTINGS_DEVIATION_MONARCH;
+import static com.hillrom.vest.config.NotificationTypeConstants.HMR_VEST_AND_SETTINGS_DEVIATION_VEST;
 import static com.hillrom.vest.config.NotificationTypeConstants.MISSED_THERAPY;
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION;
-import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_VEST;
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_MONARCH;
-import static com.hillrom.monarch.service.util.PatientVestDeviceTherapyUtilMonarch.calculateCumulativeDuration;
-import static com.hillrom.monarch.service.util.PatientVestDeviceTherapyUtilMonarch.calculateHMRRunRatePerSession;
-import static com.hillrom.monarch.service.util.PatientVestDeviceTherapyUtilMonarch.calculateHMRRunRatePerSessionBoth;
-import static com.hillrom.monarch.service.util.PatientVestDeviceTherapyUtilMonarch.calculateWeightedAvg;
-import static com.hillrom.vest.config.AdherenceScoreConstants.ADHERENCE_SETTING_DEFAULT_DAYS;
-import static com.hillrom.vest.service.util.DateUtil.getPlusOrMinusTodayLocalDate;
+import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_VEST;
 import static com.hillrom.vest.service.util.DateUtil.getDateBeforeSpecificDays;
+import static com.hillrom.vest.service.util.DateUtil.getPlusOrMinusTodayLocalDate;
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateCumulativeDuration;
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateHMRRunRatePerSession;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigInteger;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -53,7 +51,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -66,11 +63,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.hillrom.monarch.repository.AdherenceResetMonarchRepository;
+import com.hillrom.monarch.repository.ClinicMonarchRepository;
+import com.hillrom.monarch.repository.NotificationMonarchRepository;
+import com.hillrom.monarch.repository.PatientComplianceMonarchRepository;
+import com.hillrom.monarch.repository.PatientMonarchDeviceRepository;
+import com.hillrom.monarch.repository.PatientNoEventsMonarchRepository;
+import com.hillrom.monarch.repository.TherapySessionMonarchRepository;
 import com.hillrom.vest.config.Constants;
+import com.hillrom.vest.domain.AdherenceResetMonarch;
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.NotificationMonarch;
@@ -89,9 +93,7 @@ import com.hillrom.vest.domain.ProtocolConstantsMonarch;
 import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.TherapySessionMonarch;
 import com.hillrom.vest.domain.User;
-import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.exceptionhandler.HillromException;
-import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.repository.NotificationRepository;
 import com.hillrom.vest.repository.PatientComplianceRepository;
 import com.hillrom.vest.repository.PatientDevicesAssocRepository;
@@ -110,12 +112,11 @@ import com.hillrom.vest.service.PatientProtocolService;
 import com.hillrom.vest.service.TherapySessionService;
 import com.hillrom.vest.service.UserService;
 import com.hillrom.vest.service.util.DateUtil;
-import com.hillrom.vest.util.ExceptionConstants;
-import com.hillrom.vest.util.MessageConstants;
-import com.hillrom.vest.util.RelationshipLabelConstants;
+import com.hillrom.vest.service.util.GraphUtils;
 import com.hillrom.vest.web.rest.dto.CareGiverStatsNotificationVO;
 import com.hillrom.vest.web.rest.dto.ClinicStatsNotificationVO;
 import com.hillrom.vest.web.rest.dto.PatientStatsVO;
+//hill-1956
 import com.hillrom.monarch.repository.AdherenceResetMonarchRepository;
 import com.hillrom.monarch.repository.ClinicMonarchRepository;
 import com.hillrom.monarch.repository.NotificationMonarchRepository;
@@ -129,7 +130,6 @@ import com.hillrom.vest.domain.AdherenceReset;
 import com.hillrom.vest.domain.AdherenceResetMonarch;
 import com.hillrom.vest.repository.AdherenceResetRepository;
 //hill-1956
-
 
 @Service
 @Transactional
@@ -235,8 +235,8 @@ public class AdherenceCalculationServiceMonarch{
 	
 	@Inject
     private PatientNoEventService noEventService;
-	
-	@Inject
+  
+@Inject
     private PatientProtocolMonarchRepository patientProtocolMonarchRepository;
 	
 	@Inject
@@ -424,13 +424,12 @@ public class AdherenceCalculationServiceMonarch{
 			userProtocolConstantsMap = protocolMonarchService.getProtocolByPatientUserIds(patientUserIds);
 			userProtocolConstantsVestMap = protocolVestService.getProtocolByPatientUserIds(patientUserIds);
 
-			Map<Long,ProtocolConstants> userProtocolConstantsMergedMap = protocolVestService.getMergedProtocolByPatientUserIds(patientUserIds);
-			
 			if(Objects.nonNull(hmrNonComplianceMapBoth)){
 				// Update HMR for the Both device patients
 				calculateHMRComplianceForMSTBoth(today, hmrNonComplianceMapBoth,
-							userProtocolConstantsMergedMap, complianceMap, notificationMap);
+							userProtocolConstantsMap, userProtocolConstantsVestMap, complianceMap, notificationMap);
 			}
+
 			
 			calculateHMRComplianceForMST(today, hmrNonComplianceMap,
 						userProtocolConstantsMap, complianceMap, notificationMap);
@@ -465,18 +464,24 @@ public class AdherenceCalculationServiceMonarch{
 		int globalMissedTherapyCounter = compliance.getGlobalMissedTherapyCounter();
 		int globalHMRNonAdherenceCounter = compliance.getGlobalHMRNonAdherenceCounter();
 		int globalSettingsDeviationCounter = compliance.getGlobalSettingsDeviationCounter();
-		// For No transmission users , compliance shouldn't be updated until transmission happens
 		
-		if(Objects.nonNull(noEvent) && (Objects.isNull(noEvent.getFirstTransmissionDate()))){
+		// Start GIMP 11 changed to GraphUtils.getFirstTransmissionDateMonarchByType(noEvent) instead noEvent.geTransmissionDate()
+
+		// For No transmission users , compliance shouldn't be updated until transmission happens
+		if(Objects.nonNull(noEvent) && (Objects.isNull(GraphUtils
+				.getFirstTransmissionDateMonarchByType(noEvent)))){
 			PatientComplianceMonarch newCompliance = new PatientComplianceMonarch(compliance.getScore(), today,
 					compliance.getPatient(), compliance.getPatientUser(),compliance.getHmrRunRate(),true,
 					false,0);
 			newCompliance.setLatestTherapyDate(null);// since no transmission 
 			complianceMap.put(userId, newCompliance);
 			// HMR Compliance shouldn't be checked for Patients for initial adherence setting days of transmission date
-		}else if(Objects.nonNull(noEvent)&& (Objects.nonNull(noEvent.getFirstTransmissionDate()) && 
-				DateUtil.getDaysCountBetweenLocalDates(noEvent.getFirstTransmissionDate(), today) < (adherenceSettingDay-1) &&
+		}else if(Objects.nonNull(noEvent)&& (Objects.nonNull(GraphUtils
+				.getFirstTransmissionDateMonarchByType(noEvent)) && 
+				DateUtil.getDaysCountBetweenLocalDates(GraphUtils
+						.getFirstTransmissionDateMonarchByType(noEvent), today) < (adherenceSettingDay-1) &&
 				adherenceSettingDay > 1 )){
+			//Ends changes
 			// For Transmitted users no notification till earlier day of adherence Setting day(s)
 			PatientComplianceMonarch newCompliance = new PatientComplianceMonarch(today,compliance.getPatient(),compliance.getPatientUser(),
 					compliance.getHmrRunRate(),compliance.getMissedTherapyCount()+1,compliance.getLatestTherapyDate(),
@@ -527,12 +532,13 @@ public class AdherenceCalculationServiceMonarch{
 		int globalMissedTherapyCounter = compliance.getGlobalMissedTherapyCounter();
 		int globalHMRNonAdherenceCounter = compliance.getGlobalHMRNonAdherenceCounter();
 		int globalSettingsDeviationCounter = compliance.getGlobalSettingsDeviationCounter();
+		// Start GIMP 11 changed to GraphUtils.getFirstTransmissionDateMonarchByType(noEvent) instead noEvent.geTransmissionDate()
+		LocalDate firstTransmissionDateMonarch = (Objects.nonNull(noEvent) && Objects.nonNull(GraphUtils.getFirstTransmissionDateMonarchByType(noEvent))) ? 
+				GraphUtils.getFirstTransmissionDateMonarchByType(noEvent) : null; 
 		
-		LocalDate firstTransmissionDateMonarch = (Objects.nonNull(noEvent) && Objects.nonNull(noEvent.getFirstTransmissionDate())) ? 
-														noEvent.getFirstTransmissionDate() : null; 
-		
-		LocalDate firstTransmissionDateVest = (Objects.nonNull(noEventVest) && Objects.nonNull(noEventVest.getFirstTransmissionDate())) ? 
-														noEventVest.getFirstTransmissionDate() : null;
+		// Start GIMP 11 changed to GraphUtils.getFirstTransmissionDateVestByType(noEventVest) instead noEventVest.geTransmissionDate()
+		LocalDate firstTransmissionDateVest = (Objects.nonNull(noEventVest) && Objects.nonNull(GraphUtils.getFirstTransmissionDateVestByType(noEventVest))) ? 
+				GraphUtils.getFirstTransmissionDateVestByType(noEventVest) : null;
 
 		LocalDate firstTransmissionVestOrMonarch = null; 
 		if( Objects.nonNull(firstTransmissionDateVest) && Objects.nonNull(firstTransmissionDateMonarch)){
@@ -853,13 +859,7 @@ public class AdherenceCalculationServiceMonarch{
 			List<PatientComplianceMonarch> complianceListToStore = new LinkedList<>();
 			
 			// Getting the protocol constants for the user
-			//ProtocolConstantsMonarch userProtocolConstant = protocolMonarchService.getProtocolForPatientUserId(oldUserId);
-			
-			// Merged Protocol for the both device patients
-			ProtocolConstants userProtocolConstantVest = adherenceCalculationService.getProtocolByPatientUserId(userId);
-			// Convert Merged protocol with Vest object to monarch object
-			ProtocolConstantsMonarch userProtocolConstant = therapySessionMonarchService.convertVestToMonarchProtocol(userProtocolConstantVest);
-
+			ProtocolConstantsMonarch userProtocolConstant = protocolMonarchService.getProtocolForPatientUserId(oldUserId);
 			
 			// Getting all the sessions of user from the repository 
 			List<TherapySessionMonarch> therapySessionData = therapySessionMonarchRepository.findByPatientUserId(oldUserId);
@@ -871,7 +871,7 @@ public class AdherenceCalculationServiceMonarch{
 			
 			
 			// Getting the protocol constants for the user for vest
-			//ProtocolConstants userProtocolConstantVest = protocolVestService.getProtocolForPatientUserId(userId);
+			ProtocolConstants userProtocolConstantVest = protocolVestService.getProtocolForPatientUserId(userId);
 			
 			// Getting all the sessions of user from the repository for vest 
 			List<TherapySession> therapySessionDataVest = therapySessionRepository.findByPatientUserId(userId);
@@ -1134,7 +1134,8 @@ public class AdherenceCalculationServiceMonarch{
 	// calculate HMRCompliance on Missed Therapy Date
 		private void calculateHMRComplianceForMSTBoth(LocalDate today,
 				Map<Long, PatientComplianceMonarch> hmrNonComplianceMap,
-				Map<Long, ProtocolConstants> userProtocolConstantsMergedMap,
+				Map<Long, ProtocolConstantsMonarch> userProtocolConstantsMap,
+				Map<Long, ProtocolConstants> userProtocolConstantsVestMap,
 				Map<Long, PatientComplianceMonarch> complianceMap,
 				Map<Long, NotificationMonarch> notificationMap) {
 			
@@ -1165,15 +1166,17 @@ public class AdherenceCalculationServiceMonarch{
 				double durationForSettingDaysMonarch = hmrRunRateMonarch*therapySessions.size(); // runrate*totalsessions = total duration
 				double durationForSettingDaysVest = hmrRunRateVest*therapySessions.size(); // runrate*totalsessions = total duration
 				
-				ProtocolConstants protocolConstantMerged = userProtocolConstantsMergedMap.get(patientUserId);
+				ProtocolConstantsMonarch protocolConstant = userProtocolConstantsMap.get(patientUserId);
+				ProtocolConstants protocolConstantVest = userProtocolConstantsVestMap.get(patientUserId);
+
 
 				boolean isHmrCompliantVest = true; 
 				boolean isHmrCompliantMonarch = true; 
 				if(!therapySessionsVest.isEmpty()){
-					isHmrCompliantVest = adherenceCalculationService.isHMRCompliant(protocolConstantMerged, durationForSettingDaysVest, adherenceSettingDay);
+					isHmrCompliantVest = adherenceCalculationService.isHMRCompliant(protocolConstantVest, durationForSettingDaysVest, adherenceSettingDay);
 				}
 				if(!therapySessions.isEmpty()){
-					isHmrCompliantMonarch = adherenceCalculationService.isHMRCompliant(protocolConstantMerged, durationForSettingDaysMonarch, adherenceSettingDay);
+					isHmrCompliantMonarch = isHMRCompliant(protocolConstant, durationForSettingDaysMonarch, adherenceSettingDay);
 				}
 
 				
@@ -1291,7 +1294,7 @@ public class AdherenceCalculationServiceMonarch{
 		// Setting the new score with respect to the compliance deduction
 		newCompliance.setScore(score);
 		
-		if(Objects.isNull(sortedTherapy.get(complianceDate))){	
+		if(Objects.isNull(sortedTherapy.get(complianceDate))){
 			// Setting the missed therapy count to 0, since having therapy
 			newCompliance.setMissedTherapyCount(0);
 		}
@@ -1450,7 +1453,7 @@ public class AdherenceCalculationServiceMonarch{
 		newCompliance.setScore(score);
 		
 		// Setting to missed therapy count as 0 for any of the device is having therapy
-		if( (resetFlag == 3 || resetFlag == 4) ){
+		if( (resetFlag == 3 || resetFlag == 4 || resetFlag == 1) ){
 			if(( Objects.nonNull(sortedTherapy.get(complianceDate)) || Objects.nonNull(sortedTherapyVest.get(complianceDate))))
 				newCompliance.setMissedTherapyCount(0);
 			else
@@ -2146,7 +2149,7 @@ public class AdherenceCalculationServiceMonarch{
 			LocalDate currentTherapySessionDate,
 			LocalDate firstTransmittedDate, PatientInfo patient,
 			User patientUser, int totalDuration, int adherenceSettingDay) throws Exception{
-		noEventMonarchService.updatePatientFirstTransmittedDate(patientUser.getId(), currentTherapySessionDate);
+		noEventMonarchService.updatePatientFirstTransmittedDate(patientUser.getId(), currentTherapySessionDate,patient.getId());
 		PatientComplianceMonarch currentCompliance = new PatientComplianceMonarch(DEFAULT_COMPLIANCE_SCORE, currentTherapySessionDate,
 				patient, patientUser,totalDuration/adherenceSettingDay,true,false,0d);
 		existingComplianceMap.put(currentTherapySessionDate, currentCompliance);
@@ -2213,7 +2216,7 @@ public class AdherenceCalculationServiceMonarch{
 			
 			// First Transmission Date to be updated
 			if(firstTransmittedDate.isAfter(therapyDate)){
-				noEventMonarchService.updatePatientFirstTransmittedDate(patientUser.getId(),therapyDate);
+				noEventMonarchService.updatePatientFirstTransmittedDate(patientUser.getId(),therapyDate,patient.getId());
 				firstTransmittedDate = therapyDate;
 			}
 			
@@ -2341,23 +2344,45 @@ public class AdherenceCalculationServiceMonarch{
 			SortedMap<LocalDate, List<TherapySession>> existingTherapySessionMapVest,
 			SortedMap<LocalDate, List<TherapySessionMonarch>> existingTherapySessionMapMonarch,
 			LocalDate date) throws Exception{
-		LocalDate lastTransmissionDateVest = date;
-		LocalDate lastTransmissionDateMonarch = date;
+		LocalDate lastTransmissionDateVest = null;
+		LocalDate lastTransmissionDateMonarch = null;
+		
 		// Get Latest TransmissionDate for Monarch, if data has not been transmitted for the day get mostRecent date
-		if(Objects.isNull(existingTherapySessionMapMonarch.get(date))){
-			SortedMap<LocalDate,List<TherapySessionMonarch>> mostRecentTherapySessionMap = existingTherapySessionMapMonarch.headMap(date);
-			if(mostRecentTherapySessionMap.size()>0)
-				lastTransmissionDateMonarch = mostRecentTherapySessionMap.lastKey();
+		if(existingTherapySessionMapMonarch.size()>0) {
+			if(Objects.isNull(existingTherapySessionMapMonarch.get(date))){
+				SortedMap<LocalDate,List<TherapySessionMonarch>> mostRecentTherapySessionMap = existingTherapySessionMapMonarch.headMap(date);
+				if(mostRecentTherapySessionMap.size()>0)
+					lastTransmissionDateMonarch = mostRecentTherapySessionMap.lastKey();
+			}else {
+				lastTransmissionDateMonarch = date;
+			}
 		}
 		
 		// Get Latest TransmissionDate for Vest, if data has not been transmitted for the day get mostRecent date
-		if(Objects.isNull(existingTherapySessionMapVest.get(date))){
-			SortedMap<LocalDate,List<TherapySession>> mostRecentTherapySessionMap = existingTherapySessionMapVest.headMap(date);
-			if(mostRecentTherapySessionMap.size()>0)
-				lastTransmissionDateVest = mostRecentTherapySessionMap.lastKey();
+		if(existingTherapySessionMapVest.size()>0) {
+			if(Objects.isNull(existingTherapySessionMapVest.get(date))){
+				SortedMap<LocalDate,List<TherapySession>> mostRecentTherapySessionMap = existingTherapySessionMapVest.headMap(date);
+				if(mostRecentTherapySessionMap.size()>0)
+					lastTransmissionDateVest = mostRecentTherapySessionMap.lastKey();
+			}else {
+				lastTransmissionDateVest = date;
+			}
 		}
 		
-		return (lastTransmissionDateMonarch.isAfter(lastTransmissionDateVest) ? lastTransmissionDateMonarch : lastTransmissionDateVest);
+		LocalDate lastTransmissionDate = null;
+		
+		if(Objects.nonNull(lastTransmissionDateVest)) {
+			if(Objects.nonNull(lastTransmissionDateMonarch)) {
+				lastTransmissionDate = lastTransmissionDateMonarch.isAfter(lastTransmissionDateVest) ? lastTransmissionDateMonarch : lastTransmissionDateVest;
+			}
+			else {
+				lastTransmissionDate = lastTransmissionDateVest;
+			}
+		}else if(Objects.nonNull(lastTransmissionDateMonarch)) {
+			lastTransmissionDate = lastTransmissionDateMonarch;
+		}
+		return lastTransmissionDate;
+//		return (lastTransmissionDateMonarch.isAfter(lastTransmissionDateVest) ? lastTransmissionDateMonarch : lastTransmissionDateVest);
 	}
 
 	private double getLatestHMR(
@@ -2461,14 +2486,13 @@ public class AdherenceCalculationServiceMonarch{
 				existingTherapySessionMapVest = 
 						therapySessionService.getAllTherapySessionsMapByPatientUserId(patientUser.getId());
 				
-				//ProtocolConstants protocolConstantVest = adherenceCalculationService.getProtocolByPatientUserId(patientUser.getId()); 
+				ProtocolConstants protocolConstantVest = adherenceCalculationService.getProtocolByPatientUserId(patientUser.getId()); 
 			
 				List<TherapySession> latestSettingDaysTherapySessionsVest = adherenceCalculationService.prepareTherapySessionsForLastSettingdays(latestCompliance.getDate(),
 						existingTherapySessionMapVest,adherenceSettingDay);
 				
 				therapyMetricsVest = adherenceCalculationService.calculateTherapyMetricsPerSettingDays(latestSettingDaysTherapySessionsVest);
-				//isHMRCompliantVest = adherenceCalculationService.isHMRCompliant(protocolConstantVest, therapyMetricsVest.get(TOTAL_DURATION),adherenceSettingDay);
-				isHMRCompliantVest = isHMRCompliant(protocolConstant, therapyMetricsVest.get(TOTAL_DURATION),adherenceSettingDay);
+				isHMRCompliantVest = adherenceCalculationService.isHMRCompliant(protocolConstantVest, therapyMetricsVest.get(TOTAL_DURATION),adherenceSettingDay);
 				
 				/*Map<String, Object> latestSettingDaysTherapySessionsBoth = prepareTherapySessionsForLastSettingdays(latestCompliance.getDate(),
 						existingTherapySessionMap,existingTherapySessionMapVest,adherenceSettingDay);
@@ -2489,11 +2513,9 @@ public class AdherenceCalculationServiceMonarch{
 					List<TherapySession> latestSettingDaysTherapySessionsVest = adherenceCalculationService.prepareTherapySessionsForLastSettingdays(latestCompliance.getDate(),
 							existingTherapySessionMapVest,adherenceSettingDay);
 					
-					//ProtocolConstants protocolConstantVest = adherenceCalculationService.getProtocolByPatientUserId(patientUser.getId());
-					
-					//isSettingsDeviatedVest = adherenceCalculationService.isSettingsDeviatedForSettingDays(latestSettingDaysTherapySessionsVest, protocolConstantVest, adherenceSettingDay);
-					isSettingsDeviatedVest = isSettingsDeviatedForSettingDaysVest(latestSettingDaysTherapySessionsVest, protocolConstant, adherenceSettingDay);
-					
+					ProtocolConstants protocolConstantVest = adherenceCalculationService.getProtocolByPatientUserId(patientUser.getId());
+
+					isSettingsDeviatedVest = adherenceCalculationService.isSettingsDeviatedForSettingDays(latestSettingDaysTherapySessionsVest, protocolConstantVest, adherenceSettingDay);
 				}
 				
 				applySettingsDeviatedDaysCount(latestCompliance, complianceMap,
@@ -2726,58 +2748,7 @@ public class AdherenceCalculationServiceMonarch{
 		}
 		return isSettingsDeviated;
 	}
-	
-	public boolean isSettingsDeviatedForSettingDaysVest(List<TherapySession> lastSettingDaysTherapySessions,
-			ProtocolConstantsMonarch protocol, Integer adherenceSettingDay){
-		Map<LocalDate, List<TherapySession>> lastSettingDaysTherapySessionMap = lastSettingDaysTherapySessions
-				.stream().collect(
-						Collectors.groupingBy(TherapySession::getDate));
-		boolean isSettingsDeviated = false;
-		// This is for checking settings deviation, settings deviation should be calculated for consecutive adherence setting days
-		//(exclusive missed therapy)
-		if(lastSettingDaysTherapySessionMap.keySet().size() == adherenceSettingDay){
-			for(LocalDate d : lastSettingDaysTherapySessionMap.keySet()){
-				List<TherapySession> therapySeesionsPerDay = lastSettingDaysTherapySessionMap.get(d);
-				double weightedFrequency = adherenceCalculationService.calculateTherapyMetricsPerSettingDays(therapySeesionsPerDay).get(WEIGHTED_AVG_FREQUENCY);
-				if(!isSettingsDeviated(protocol, weightedFrequency)){
-					isSettingsDeviated = false;
-					break;
-				}else{
-					isSettingsDeviated = true;
-				}
-			}
-		}else{
-			return false;
-		}
-		return isSettingsDeviated;
-	}
-	
-	// Overloaded method with the protocol as Vest with Merged protocol with both the devices
-	public boolean isSettingsDeviatedForSettingDays(List<TherapySessionMonarch> lastSettingDaysTherapySessions,
-			ProtocolConstants protocol, Integer adherenceSettingDay){
-		Map<LocalDate, List<TherapySessionMonarch>> lastSettingDaysTherapySessionMap = lastSettingDaysTherapySessions
-				.stream().collect(
-						Collectors.groupingBy(TherapySessionMonarch::getDate));
-		boolean isSettingsDeviated = false;
-		// This is for checking settings deviation, settings deviation should be calculated for consecutive adherence setting days
-		//(exclusive missed therapy)
-		if(lastSettingDaysTherapySessionMap.keySet().size() == adherenceSettingDay){
-			for(LocalDate d : lastSettingDaysTherapySessionMap.keySet()){
-				List<TherapySessionMonarch> therapySeesionsPerDay = lastSettingDaysTherapySessionMap.get(d);
-				double weightedFrequency = calculateTherapyMetricsPerSettingDays(therapySeesionsPerDay).get(WEIGHTED_AVG_FREQUENCY);
-				if(!adherenceCalculationService.isSettingsDeviated(protocol, weightedFrequency)){
-					isSettingsDeviated = false;
-					break;
-				}else{
-					isSettingsDeviated = true;
-				}
-			}
-		}else{
-			return false;
-		}
-		return isSettingsDeviated;
-	}
-	
+
 	private boolean isSettingsDeviatedForSettingDays(List<TherapySessionMonarch> lastSettingDaysTherapySessions,
 			List<TherapySession> lastSettingDaysTherapySessionsVest,
 			ProtocolConstantsMonarch protocol, Integer adherenceSettingDay){
@@ -2856,6 +2827,7 @@ public class AdherenceCalculationServiceMonarch{
 		}
 	}
 
+	
 	public void executeMergingProcess(List<PatientDevicesAssoc> patDevAssList, int flag){
 		// Passing the flag 1 for device update  and 2 for cron job, merging processing
 		Map<Long,PatientNoEventMonarch> userIdNoEventMap = noEventMonarchService.findAllGroupByPatientUserId();			

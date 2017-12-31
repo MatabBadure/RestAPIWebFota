@@ -63,6 +63,12 @@ public class UserExtension extends User implements Serializable {
 	@JoinTable(name = "CLINIC_USER_ASSOC", joinColumns = { @JoinColumn(name = "users_id", referencedColumnName = "user_id") }, inverseJoinColumns = { @JoinColumn(name = "clinics_id", referencedColumnName = "id") })
 	@AuditJoinTable
 	private Set<Clinic> clinics = new HashSet<>();
+	
+	@ManyToMany
+	@JoinTable(name = "ENTITY_USER_ASSOC", joinColumns = { @JoinColumn(name = "user_id", referencedColumnName = "user_id") }, inverseJoinColumns = { @JoinColumn(name = "entity_id", referencedColumnName = "id") })
+	@AuditJoinTable
+	private Set<Clinic> clinicsAdmin = new HashSet<>();
+
 
 	@Column(name = "is_deleted", nullable = false)
 	private boolean deleted = false;
@@ -82,6 +88,15 @@ public class UserExtension extends User implements Serializable {
 
 	public void setDeactivationReason(String deactivationReason) {
 		this.deactivationReason = deactivationReason;
+	}
+
+	
+	public Set<Clinic> getClinicsAdmin() {
+		return clinicsAdmin;
+	}
+
+	public void setClinicsAdmin(Set<Clinic> clinicsAdmin) {
+		this.clinicsAdmin = clinicsAdmin;
 	}
 
 	public String getSpeciality() {

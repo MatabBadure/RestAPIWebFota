@@ -244,6 +244,13 @@ public class DateUtil {
 		return date.toString(formatter);
 	}
 	
+	public static String formatDate(Date date, String pattern) {
+		String datePat = null;
+		
+		if(Objects.nonNull(date)){
+		datePat = new SimpleDateFormat(pattern).format(date);}
+		return datePat;
+	}
 	/**
 	 * return formatted date string as per pattern, default pattern is dd-MMM-yy
 	 * @param dates
@@ -330,9 +337,8 @@ public class DateUtil {
 
 			return(result);
 	   }
-	   
 
-	   public static String getDayOfTheWeek(){
+  public static String getDayOfTheWeek(){
 		   
 		    Date now = new Date();
 		   
@@ -341,5 +347,4 @@ public class DateUtil {
 	 
 	        return dayOfTheWeek;
 	   }
-
 }

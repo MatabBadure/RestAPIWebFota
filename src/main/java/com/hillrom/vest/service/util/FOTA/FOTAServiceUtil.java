@@ -345,6 +345,7 @@ public class FOTAServiceUtil {
 							// Initially
 							HandleHolder holder = coUtil.getHandleHolderValuesFromPartNo(partNoHolder,fotaJsonData,fotaInfo,reqDev,reqReleaseDate);
 							
+
 							/*//Get Old Handle Id
 							handleId = coUtil.getOldHandle(handleHolderBin,fotaJsonData
 									.get(DEVICE_SN));
@@ -354,6 +355,7 @@ public class FOTAServiceUtil {
 								saveInprogressDeviceDetails(holder);
 								holder.setHandleId(handleId);
 								handleHolderBin.put(handleId, holder);
+
 							}*/
 							handleId = getHandleNumber();
 							handleHolderBin.put(handleId, holder);
@@ -378,6 +380,7 @@ public class FOTAServiceUtil {
 							log.debug("New Part Number Key for different chunk Size="+storePartNoKey);
 							// Initially
 							HandleHolder holder = coUtil.getHandleHolderValuesForNewPartNo(chunkSize,fotaJsonData,fotaInfo,reqDev,reqReleaseDate);
+											
 							//Get Old Handle Id
 							/*handleId = coUtil.getOldHandle(handleHolderBin,fotaJsonData
 									.get(DEVICE_SN));
@@ -391,6 +394,7 @@ public class FOTAServiceUtil {
 							*/
 							
 							handleId = getHandleNumber();
+
 							handleHolderBin.put(handleId, holder);
 							
 							//To capture chunk size

@@ -5,10 +5,14 @@ import static com.hillrom.vest.config.Constants.VEST;
 import static com.hillrom.vest.security.AuthoritiesConstants.CLINIC_ADMIN;
 import static com.hillrom.vest.security.AuthoritiesConstants.HCP;
 
+//import static com.hillrom.vest.config.Constants.ALL;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -54,6 +58,7 @@ import com.hillrom.monarch.repository.PatientMonarchDeviceDataRepository;
 import com.hillrom.monarch.service.AdherenceCalculationServiceMonarch;
 import com.hillrom.monarch.service.PatientComplianceMonarchService;
 import com.hillrom.monarch.service.PatientHCPMonarchService;
+import com.hillrom.monarch.service.PatientNoEventMonarchService;
 import com.hillrom.monarch.service.PatientProtocolMonarchService;
 import com.hillrom.monarch.service.PatientVestDeviceMonarchService;
 import com.hillrom.monarch.service.TherapySessionServiceMonarch;
@@ -106,6 +111,7 @@ import com.hillrom.vest.util.MessageConstants;
 import com.hillrom.vest.web.rest.dto.Filter;
 import com.hillrom.vest.web.rest.dto.Graph;
 import com.hillrom.vest.web.rest.dto.PatientComplianceVO;
+import com.hillrom.vest.web.rest.dto.PatientTestResultVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
 import com.hillrom.vest.web.rest.dto.ProtocolDTO;
 import com.hillrom.vest.web.rest.dto.ProtocolRevisionVO;
@@ -239,6 +245,8 @@ public class UserResource {
   	private 
   	PatientInfoRepository patientInfoRepository;
   	
+  	@Inject
+  	private PatientNoEventMonarchService patientNoEventMonarchService;
 	@Inject
 	private PateintTestResultService pateintTestResultService;
 
@@ -1676,8 +1684,8 @@ public class UserResource {
     		@RequestParam(value="from",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate from,
     		@RequestParam(value="to",required=true)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate to){
     	try{    
-    		List<PatientTestResult> patientTestResults;
-    		patientTestResults = pateintTestResultService.getPatientTestResultByUserId(id, from,to); //Get the test results of patient
+    		List<PatientTestResultVO> patientTestResults;
+    		patientTestResults = pateintTestResultService.getPatientTestResultAvgByUserId(id, from,to); //Get the test results of patient
     		if(patientTestResults.size() > 0){
     			Graph testResultsGraph = testResultsGraphService.populateGraphData(patientTestResults, new Filter(from,to,null,null)); //to populate the data for graph
     			return new ResponseEntity<>(testResultsGraph,HttpStatus.OK); 
@@ -1734,6 +1742,22 @@ public class UserResource {
 		adherenceCalculationServiceMonarch.processDeviceDetails();        	
 		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
     }
+    
+    
+    /**
+     * GET  Cron job for Adherence recalculation.
+     */
+    @RequestMapping(value = "/testingAdherenceTraningDateCron",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    public ResponseEntity<?> getAdherenceTraningDateCron() throws HillromException {
+        log.debug("REST request to getAdherenceTraningDateCron");
+        JSONObject jsonObject = new JSONObject();        
+        patientNoEventMonarchService.processAdherenceScoreForVestMonarchByTrainingDate();        	
+		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
+    }
+    
     
     /**
      * GET  /users/:userId/clinics/:clinicId/statistics -> get the patient statistics for clinic Badge associated with user.

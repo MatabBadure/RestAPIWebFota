@@ -129,7 +129,6 @@ public interface ClinicRepository extends JpaRepository<Clinic,String> , QueryDs
 			 		+ " order by count desc) b on a.dtype = b.pdtype " )
 	List<Object[]> findByDeviceTypeAndPatientCount(@Param("clinicId")String clinicId);
 	
-	
 	@Query(nativeQuery=true,
 			value=	"SELECT "
 					+ "   'HCP', "
@@ -491,4 +490,26 @@ public interface ClinicRepository extends JpaRepository<Clinic,String> , QueryDs
 					+ "associated_patient.userclinicId = associated_cadmin.clinicid")
 	List<Object[]> findPatientStatisticsClinicForActiveClinicsForWeek();
 	
+	@Query(nativeQuery=true,
+			 value= "Select us.*,ua.authority_name,group_concat(cua.clinics_id),group_concat(cpa.clinic_id),group_concat(eua.entity_id) "
+					+ " ,group_concat(cl.is_message_opted + \"\") "
+					+ "from "
+					+ "	USER us "
+					+ "join "
+					+ "	USER_AUTHORITY ua on ua.user_id = us.id and ua.authority_name in ('PATIENT','HCP','CLINIC_ADMIN') "
+					+ "left outer join "
+					+ "	CLINIC_USER_ASSOC cua on cua.users_id = us.id "
+					+ "left outer join "
+					+ "	USER_PATIENT_ASSOC upa on upa.user_id = us.id  and upa.relation_label = 'Self' "
+					+ "left outer join "
+					+ "	CLINIC_PATIENT_ASSOC cpa on cpa.patient_id = upa.patient_id  and ua.authority_name = 'PATIENT' "
+					+ "left outer join "
+					+ "	ENTITY_USER_ASSOC eua on eua.user_id = us.id and eua.user_role = 'CLINIC_ADMIN' and ua.authority_name = 'CLINIC_ADMIN' "
+					+ "left outer join CLINIC cl on "
+					+ "((cl.id = cua.clinics_id and ua.authority_name = 'HCP') OR (cl.id = cpa.clinic_id and ua.authority_name = 'PATIENT') "
+					+ "OR (cl.id = eua.entity_id and ua.authority_name = 'CLINIC_ADMIN')) "
+					+ "where "
+					+ "	us.id in (:userId) "
+					+ "group by us.id")
+	List<Object[]> findByUserId(@Param("userId") String userId);
 }

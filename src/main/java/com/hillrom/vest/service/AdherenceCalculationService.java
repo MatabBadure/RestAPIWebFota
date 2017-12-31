@@ -1,5 +1,7 @@
 package com.hillrom.vest.service;
 
+import static com.hillrom.monarch.service.util.PatientVestDeviceTherapyUtilMonarch.calculateHMRRunRatePerSessionBoth;
+import static com.hillrom.vest.config.AdherenceScoreConstants.ADHERENCE_SETTING_DEFAULT_DAYS;
 import static com.hillrom.vest.config.AdherenceScoreConstants.BONUS_POINTS;
 import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_COMPLIANCE_SCORE;
 import static com.hillrom.vest.config.AdherenceScoreConstants.DEFAULT_MISSED_THERAPY_DAYS_COUNT;
@@ -9,7 +11,9 @@ import static com.hillrom.vest.config.AdherenceScoreConstants.LOWER_BOUND_VALUE;
 import static com.hillrom.vest.config.AdherenceScoreConstants.MISSED_THERAPY_DAYS_COUNT_THRESHOLD;
 import static com.hillrom.vest.config.AdherenceScoreConstants.MISSED_THERAPY_POINTS;
 import static com.hillrom.vest.config.AdherenceScoreConstants.SETTING_DEVIATION_POINTS;
-import static com.hillrom.vest.config.AdherenceScoreConstants.UPPER_BOUND_VALUE;
+import static com.hillrom.vest.config.Constants.BOTH;
+import static com.hillrom.vest.config.Constants.MONARCH;
+import static com.hillrom.vest.config.Constants.VEST;
 import static com.hillrom.vest.config.NotificationTypeConstants.ADHERENCE_SCORE_RESET;
 import static com.hillrom.vest.config.NotificationTypeConstants.HMR_AND_SETTINGS_DEVIATION;
 import static com.hillrom.vest.config.NotificationTypeConstants.HMR_NON_COMPLIANCE;
@@ -17,16 +21,11 @@ import static com.hillrom.vest.config.NotificationTypeConstants.MISSED_THERAPY;
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION;
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_MONARCH;
 import static com.hillrom.vest.config.NotificationTypeConstants.SETTINGS_DEVIATION_VEST;
-import static com.hillrom.monarch.service.util.PatientVestDeviceTherapyUtilMonarch.calculateHMRRunRatePerSessionBoth;
-import static com.hillrom.vest.config.AdherenceScoreConstants.ADHERENCE_SETTING_DEFAULT_DAYS;
-import static com.hillrom.vest.service.util.DateUtil.getPlusOrMinusTodayLocalDate;
 import static com.hillrom.vest.service.util.DateUtil.getDateBeforeSpecificDays;
+import static com.hillrom.vest.service.util.DateUtil.getPlusOrMinusTodayLocalDate;
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateCumulativeDuration;
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateHMRRunRatePerSession;
 import static com.hillrom.vest.service.util.PatientVestDeviceTherapyUtil.calculateWeightedAvg;
-import static com.hillrom.vest.config.Constants.VEST;
-import static com.hillrom.vest.config.Constants.MONARCH;
-import static com.hillrom.vest.config.Constants.BOTH;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -39,7 +38,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -60,6 +58,14 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.hillrom.monarch.repository.PatientNoEventsMonarchRepository;
+import com.hillrom.monarch.service.AdherenceCalculationServiceMonarch;
+import com.hillrom.monarch.service.NotificationMonarchService;
+import com.hillrom.monarch.service.PatientComplianceMonarchService;
+import com.hillrom.monarch.service.PatientNoEventMonarchService;
+import com.hillrom.monarch.service.TherapySessionServiceMonarch;
+//hill-1956
+import com.hillrom.vest.domain.AdherenceReset;
 import com.hillrom.vest.domain.Clinic;
 import com.hillrom.vest.domain.Notification;
 import com.hillrom.vest.domain.PatientCompliance;
@@ -73,8 +79,8 @@ import com.hillrom.vest.domain.ProtocolConstantsMonarch;
 import com.hillrom.vest.domain.TherapySession;
 import com.hillrom.vest.domain.TherapySessionMonarch;
 import com.hillrom.vest.domain.User;
-import com.hillrom.vest.domain.UserPatientAssoc;
 import com.hillrom.vest.exceptionhandler.HillromException;
+import com.hillrom.vest.repository.AdherenceResetRepository;
 import com.hillrom.vest.repository.ClinicRepository;
 import com.hillrom.vest.repository.NotificationRepository;
 import com.hillrom.vest.repository.PatientComplianceRepository;
@@ -84,21 +90,11 @@ import com.hillrom.vest.repository.PatientNoEventsRepository;
 import com.hillrom.vest.repository.TherapySessionRepository;
 import com.hillrom.vest.repository.UserRepository;
 import com.hillrom.vest.service.util.DateUtil;
-import com.hillrom.vest.util.ExceptionConstants;
+import com.hillrom.vest.service.util.GraphUtils;
 import com.hillrom.vest.util.MessageConstants;
-import com.hillrom.vest.util.RelationshipLabelConstants;
 import com.hillrom.vest.web.rest.dto.CareGiverStatsNotificationVO;
 import com.hillrom.vest.web.rest.dto.ClinicStatsNotificationVO;
 import com.hillrom.vest.web.rest.dto.PatientStatsVO;
-import com.hillrom.monarch.repository.PatientNoEventsMonarchRepository;
-import com.hillrom.monarch.service.AdherenceCalculationServiceMonarch;
-import com.hillrom.monarch.service.NotificationMonarchService;
-import com.hillrom.monarch.service.PatientComplianceMonarchService;
-import com.hillrom.monarch.service.PatientNoEventMonarchService;
-import com.hillrom.monarch.service.TherapySessionServiceMonarch;
-//hill-1956
-import com.hillrom.vest.domain.AdherenceReset;
-import com.hillrom.vest.repository.AdherenceResetRepository;
 
 
 @Service
@@ -184,6 +180,7 @@ public class AdherenceCalculationService {
 	private PatientInfoRepository patientInfoRepository;
 
 	@Inject
+	@Lazy
 	private TherapySessionService therapySessionService;
 	
 	@Inject
@@ -207,14 +204,6 @@ public class AdherenceCalculationService {
 		return userIdProtolConstantsMap.get(patientUserId);
 	}
 
-	public ProtocolConstants getMergedProtocolByPatientUserId(
-			Long patientUserId) throws Exception{
-		List<Long> patientUserIds = new LinkedList<>();
-		patientUserIds.add(patientUserId);
-		Map<Long,ProtocolConstants> userIdProtolConstantsMap = protocolService.getMergedProtocolByPatientUserIds(patientUserIds);		
-		return userIdProtolConstantsMap.get(patientUserId);
-	}
-	
 	/**
 	 * Checks whether HMR Compliance violated(minHMRReading < actual < maxHMRReading)
 	 * @param protocolConstant
@@ -318,15 +307,16 @@ public class AdherenceCalculationService {
 					int globalHMRNonAdherenceCounter = compliance.getGlobalHMRNonAdherenceCounter();
 					int globalSettingsDeviationCounter = compliance.getGlobalSettingsDeviationCounter();
 					// For No transmission users , compliance shouldn't be updated until transmission happens
-					if(Objects.nonNull(noEvent)&& (Objects.isNull(noEvent.getFirstTransmissionDate()))){
+					if(Objects.nonNull(noEvent)&& (Objects.isNull(GraphUtils.getFirstTransmissionDateVestByType(noEvent)))){
+
 						PatientCompliance newCompliance = new PatientCompliance(compliance.getScore(), today,
 								compliance.getPatient(), compliance.getPatientUser(),compliance.getHmrRunRate(),true,
 								false,0);
 						newCompliance.setLatestTherapyDate(null);// since no transmission 
 						complianceMap.put(userId, newCompliance);
 						// HMR Compliance shouldn't be checked for Patients for initial adherence setting days of transmission date
-					}else if(Objects.nonNull(noEvent)&& (Objects.nonNull(noEvent.getFirstTransmissionDate()) && 
-							DateUtil.getDaysCountBetweenLocalDates(noEvent.getFirstTransmissionDate(), today) < (adherenceSettingDay-1) &&
+					}else if(Objects.nonNull(noEvent)&& (Objects.nonNull(GraphUtils.getFirstTransmissionDateVestByType(noEvent)) && 
+							DateUtil.getDaysCountBetweenLocalDates(GraphUtils.getFirstTransmissionDateVestByType(noEvent), today) < (adherenceSettingDay-1) &&
 							adherenceSettingDay > 1 )){
 						// For Transmitted users no notification till earlier day of adherence Setting day(s)
 						PatientCompliance newCompliance = new PatientCompliance(today,compliance.getPatient(),compliance.getPatientUser(),
@@ -1405,7 +1395,7 @@ public static Set<User> mailServiceNotificationForHcpandAdmin(Map<User, Map<Stri
 			LocalDate latestTherapyDate = null;
 			PatientInfo patient = null;
 			User patientUser = null;
-			
+			//GIMP 11
 			if(receivedTherapySessions.size() > 0){
 				patient = receivedTherapySessions.get(0).getPatientInfo();
 				patientUser = receivedTherapySessions.get(0).getPatientUser();						
@@ -1601,7 +1591,12 @@ public static Set<User> mailServiceNotificationForHcpandAdmin(Map<User, Map<Stri
 			LocalDate currentTherapySessionDate,
 			LocalDate firstTransmittedDate, PatientInfo patient,
 			User patientUser, int totalDuration, int adherenceSettingDay) throws Exception{
-		noEventService.updatePatientFirstTransmittedDate(patientUser.getId(), currentTherapySessionDate);
+		//Getting training date for ForAdherence
+		/*LocalDate trainingDate = getTrainingDateForAdherence(patient.getId());
+		if(Objects.isNull(trainingDate) || trainingDate.isBefore(currentTherapySessionDate)){
+			noEventService.updatePatientFirstTransmittedDate(patientUser.getId(), currentTherapySessionDate);
+		}*/
+		noEventService.updatePatientFirstTransmittedDate(patientUser.getId(), currentTherapySessionDate, patient.getId());
 		PatientCompliance currentCompliance = new PatientCompliance(DEFAULT_COMPLIANCE_SCORE, currentTherapySessionDate,
 				patient, patientUser,totalDuration/adherenceSettingDay,true,false,0d);
 		existingComplianceMap.put(currentTherapySessionDate, currentCompliance);
@@ -1619,7 +1614,7 @@ public static Set<User> mailServiceNotificationForHcpandAdmin(Map<User, Map<Stri
 			LocalDate currentTherapySessionDate,
 			LocalDate firstTransmittedDate, PatientInfo patient,
 			User patientUser, int totalDuration, int adherenceSettingDay) throws Exception{		
-		noEventService.updatePatientFirstTransmittedDate(patientUser.getId(), currentTherapySessionDate);		
+		noEventService.updatePatientFirstTransmittedDate(patientUser.getId(), currentTherapySessionDate, patient.getId());		
 		PatientComplianceMonarch currentComplianceMonarch = new PatientComplianceMonarch(DEFAULT_COMPLIANCE_SCORE, currentTherapySessionDate,
 				patient, patientUser,totalDuration/adherenceSettingDay,true,false,0d);
 		existingComplianceMonarchMap.put(currentTherapySessionDate, currentComplianceMonarch);		
@@ -1677,11 +1672,11 @@ public static Set<User> mailServiceNotificationForHcpandAdmin(Map<User, Map<Stri
 			}
 			//hill-1956
 			
-			
 			// First Transmission Date to be updated
-			if(firstTransmittedDate.isAfter(therapyDate)){
-				noEventService.updatePatientFirstTransmittedDate(patientUser.getId(),therapyDate);
-				firstTransmittedDate = therapyDate;
+			if (firstTransmittedDate.isAfter(therapyDate)) {
+				noEventService.updatePatientFirstTransmittedDate(
+						patientUser.getId(), therapyDate, patient.getId());
+						firstTransmittedDate = therapyDate;
 			}
 			
 			int daysBetween = DateUtil.getDaysCountBetweenLocalDates(firstTransmittedDate, therapyDate);
@@ -1756,6 +1751,11 @@ public static Set<User> mailServiceNotificationForHcpandAdmin(Map<User, Map<Stri
 	}
 	
 	
+	private LocalDate getTrainingDateForAdherence(String id) {
+		LocalDate trainingDate = patientDevicesAssocRepository.findOneByPatientIdAndDeviceType(id,"VEST").getTrainingDate();
+		return trainingDate;
+	}
+
 	private void calculateAdherenceScoreForTheDuration(
 			User patientUser,
 			PatientInfo patient,
@@ -1813,7 +1813,7 @@ public static Set<User> mailServiceNotificationForHcpandAdmin(Map<User, Map<Stri
 			
 			// First Transmission Date to be updated
 			if(firstTransmittedDate.isAfter(therapyDate)){
-				noEventService.updatePatientFirstTransmittedDate(patientUser.getId(),therapyDate);
+				noEventService.updatePatientFirstTransmittedDate(patientUser.getId(),therapyDate, patient.getId());
 				firstTransmittedDate = therapyDate;
 			}
 			
@@ -2042,15 +2042,14 @@ public static Set<User> mailServiceNotificationForHcpandAdmin(Map<User, Map<Stri
 				existingTherapySessionMapMonarch = 
 						therapySessionServiceMonarch.getAllTherapySessionsMapByPatientUserId(patientUser.getId());
 				
-				//ProtocolConstantsMonarch protocolConstantVest = adherenceCalculationServiceMonarch.getProtocolByPatientUserId(patientUser.getId()); 
+				ProtocolConstantsMonarch protocolConstantVest = adherenceCalculationServiceMonarch.getProtocolByPatientUserId(patientUser.getId()); 
 			
 				List<TherapySessionMonarch> latestSettingDaysTherapySessionsMonarch = adherenceCalculationServiceMonarch.prepareTherapySessionsForLastSettingdays(latestCompliance.getDate(),
 						existingTherapySessionMapMonarch,adherenceSettingDay);
 				
 				therapyMetricsMonarch = adherenceCalculationServiceMonarch.calculateTherapyMetricsPerSettingDays(latestSettingDaysTherapySessionsMonarch);
+				isHMRCompliantMonarch = adherenceCalculationServiceMonarch.isHMRCompliant(protocolConstantVest, therapyMetricsMonarch.get(TOTAL_DURATION),adherenceSettingDay);
 				
-				//isHMRCompliantMonarch = adherenceCalculationServiceMonarch.isHMRCompliant(protocolConstantVest, therapyMetricsMonarch.get(TOTAL_DURATION),adherenceSettingDay);
-				isHMRCompliantMonarch = isHMRCompliant(protocolConstant, therapyMetricsMonarch.get(TOTAL_DURATION), adherenceSettingDay);
 				
 				
 				
@@ -2079,10 +2078,9 @@ public static Set<User> mailServiceNotificationForHcpandAdmin(Map<User, Map<Stri
 					List<TherapySessionMonarch> latestSettingDaysTherapySessionsMonarch = adherenceCalculationServiceMonarch.prepareTherapySessionsForLastSettingdays(latestCompliance.getDate(),
 							existingTherapySessionMapMonarch,adherenceSettingDay);
 					
-					//ProtocolConstantsMonarch protocolConstantMonarch = adherenceCalculationServiceMonarch.getProtocolByPatientUserId(patientUser.getId());
+					ProtocolConstantsMonarch protocolConstantMonarch = adherenceCalculationServiceMonarch.getProtocolByPatientUserId(patientUser.getId());
 					
-					//isSettingsDeviatedMonarch = adherenceCalculationServiceMonarch.isSettingsDeviatedForSettingDays(latestSettingDaysTherapySessionsMonarch, protocolConstantMonarch, adherenceSettingDay);
-					isSettingsDeviatedMonarch = adherenceCalculationServiceMonarch.isSettingsDeviatedForSettingDays(latestSettingDaysTherapySessionsMonarch, protocolConstant, adherenceSettingDay);
+					isSettingsDeviatedMonarch = adherenceCalculationServiceMonarch.isSettingsDeviatedForSettingDays(latestSettingDaysTherapySessionsMonarch, protocolConstantMonarch, adherenceSettingDay);
 				}
 				
 				adherenceCalculationServiceMonarch.applySettingsDeviatedDaysCount(latestCompliance, complianceMap,
@@ -2494,14 +2492,6 @@ public static Set<User> mailServiceNotificationForHcpandAdmin(Map<User, Map<Stri
 		if(Objects.nonNull(therapySessionListExist) && !therapySessionListExist.isEmpty())
 			sortedExistTherapy = groupTherapySessionsByDate(therapySessionListExist);		
 
-		//SortedMap<LocalDate,List<TherapySession>> sortedTherapyToValidate = null;
-		
-		//if(Objects.nonNull(therapySessionList) && !therapySessionList.isEmpty()){
-			//therapySessionListExist.addAll(therapySessionList);
-			//sortedTherapyToValidate = groupTherapySessionsByDate(therapySessionListExist);			
-		//}
-		
-		//LocalDate lastestTransmissionDate = Objects.nonNull(sortedTherapyToValidate) ? sortedTherapyToValidate.lastKey() : null;
 		
 		// Getting compliance list of old patient
 		List<PatientCompliance> patientComplianceList = patientComplianceRepository.findByPatientUserId(userOld.getId());
@@ -2514,21 +2504,6 @@ public static Set<User> mailServiceNotificationForHcpandAdmin(Map<User, Map<Stri
 		SortedMap<LocalDate,List<PatientCompliance>> sortedComplianceToUpdate = 
 				new TreeMap<>(existpatientCompliance.stream().collect(Collectors.groupingBy(PatientCompliance :: getDate)));
 		
-		//List <PatientCompliance> existComplianceListToUpdate = new LinkedList<>();
-		
-		/*for(PatientCompliance tmpPatientCompliance : existpatientCompliance){
-			
-			sortedComplianceToUpdate.put(tmpPatientCompliance.getDate(), tmpPatientCompliance);
-			// Update and Adding of patient compliance latest transmission date to store
-			tmpPatientCompliance.setLatestTherapyDate(lastestTransmissionDate);
-			//existComplianceListToUpdate.add(tmpPatientCompliance);
-			
-			// Adding the date for the existing patient compliance dates
-			existComplianceDate.add(tmpPatientCompliance.getDate());
-		}*/
-		
-		// Updating all the patient compliance with the latest transmission date		
-		//complianceService.saveAll(existComplianceListToUpdate);
 		
 		List <PatientCompliance> complianceListToSave = new LinkedList<>();			
 		for(PatientCompliance patientCompliance : patientComplianceList){
@@ -2551,7 +2526,6 @@ public static Set<User> mailServiceNotificationForHcpandAdmin(Map<User, Map<Stri
 					patientCompliance.getHmr());
 				
 				complianceListToSave.add(compliance);
-			//}else if(Objects.nonNull(lastestTransmissionDate) && !lastestTransmissionDate.equals(patientCompliance.getLatestTherapyDate())){
 			}else{	
 				PatientCompliance existPatientComplianceToUpdate = sortedComplianceToUpdate.get(patientCompliance.getDate()).get(0);
 				/*existPatientComplianceToUpdate
@@ -2561,8 +2535,6 @@ public static Set<User> mailServiceNotificationForHcpandAdmin(Map<User, Map<Stri
 					existPatientComplianceToUpdate.setMissedTherapyCount(patientCompliance.getMissedTherapyCount());
 					complianceListToSave.add(existPatientComplianceToUpdate);
 				}
-				/*patientCompliance.setLatestTherapyDate(lastestTransmissionDate);
-				complianceListToSave.add(patientCompliance);*/
 			}
 		}
 		

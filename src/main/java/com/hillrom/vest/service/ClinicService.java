@@ -4,6 +4,7 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,6 +43,7 @@ import com.hillrom.vest.security.AuthoritiesConstants;
 import com.hillrom.vest.service.util.RandomUtil;
 import com.hillrom.vest.util.ExceptionConstants;
 import com.hillrom.vest.util.MessageConstants;
+import com.hillrom.vest.web.rest.dto.CareGiverStatsNotificationVO;
 import com.hillrom.vest.web.rest.dto.ClinicDTO;
 import com.hillrom.vest.web.rest.dto.ClinicVO;
 import com.hillrom.vest.web.rest.dto.PatientUserVO;
@@ -510,5 +512,28 @@ public class ClinicService {
 	public List<Clinic> getActiveClinicsWithPatients(boolean isDeleted) {
 		List<Clinic> clinics = clinicRepository.findByDeletedAndClinicPatientAssocIsNotEmpty(isDeleted);
 		return clinics;
+	}
+	
+	public Boolean isMessagesOpted(String userId){
+		try {
+			List<Object[]> results = clinicRepository.findByUserId(userId);
+			Boolean boolValue = false;
+			String strVal = "";
+			for(Object[] result : results){
+				strVal = String.valueOf(result[(result.length)-1]);
+			}
+			String[] strArray = strVal.split(",");
+			for(String s: strArray){
+				if(s.contains("1")){ 
+					boolValue = true;
+					break;
+				}
+			}
+			return boolValue;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

@@ -1510,12 +1510,12 @@ public class AdherenceCalculationServiceMonarch{
 				patientUserIds.add(notification.getPatientUser().getId());
 			}
 			
-			List<PatientComplianceMonarch> complianceList = patientComplianceMonarchRepository.findByDateBetweenAndPatientUserIdIn(weekTime,
+			/*List<PatientComplianceMonarch> complianceList = patientComplianceMonarchRepository.findByDateBetweenAndPatientUserIdIn(weekTime,
 					yesterday,patientUserIds);
 			Map<User,Integer> complianceMap = new HashMap<>();
 			for(PatientComplianceMonarch compliance : complianceList){
 				complianceMap.put(compliance.getPatientUser(), compliance.getMissedTherapyCount());
-			}
+			}*/
 			try{
 				notifications.forEach(notification -> {
 					User patientUser = notification.getPatientUser();
@@ -1628,7 +1628,7 @@ public class AdherenceCalculationServiceMonarch{
 			if (Objects.nonNull(userHcpsOrAdmins)) {
 				for (User usrHcpOrAdmin : userHcpsOrAdmins) {
 
-				mailService.sendNotificationMailToHCPAndClinicAdminMonarchBasedOnFreq(usrHcpOrAdmin);
+				mailService.sendNotificationMailToHCPAndClinicAdminBasedOnFreq(usrHcpOrAdmin);
 				}
 			}	
 			

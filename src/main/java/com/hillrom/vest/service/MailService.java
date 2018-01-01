@@ -763,23 +763,7 @@ public class MailService {
         
         sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
     }
-    public void sendNotificationMailToHCPAndClinicAdminMonarchBasedOnFreq(User user){
-    	log.debug("Sending password reset e-mail to '{}'", user.getEmail());
-        Context context = new Context();
-        context.setVariable("user", user.getFirstName());
-  //      context.setVariable("clinicStatisticsMap",statistics);
-        context.setVariable("today", DateUtil.convertLocalDateToStringFromat(org.joda.time.LocalDate.now().minusDays(1), "MMM dd,yyyy"));
-        context.setVariable("notificationUrl", hcpOrClinicAdminDashboardUrl);
-        log.debug("sendNotificationMailToHCPAndClinicAdminMonarchBasedOnFreq notificationUrl", hcpOrClinicAdminDashboardUrl);
-        String content = "";
-        String subject = "";
-
-        content = templateEngine.process("clinicPersonnelNotificationEmail", context);
-        subject = messageSource.getMessage("email.notificationEmail.subject", null, null);
-        
-        sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
-    }
-
+   
     public void sendNotificationCareGiverBasedOnFreq(CareGiverStatsNotificationVO careGiverStatsNotificationVO){
     	log.debug("Sending care giver statistics e-mail to '{}'", careGiverStatsNotificationVO.getCGEmail());
         Context context = new Context();

@@ -1014,12 +1014,12 @@ public class AdherenceCalculationService {
 				patientUserIds.add(notification.getPatientUser().getId());
 			}
 						
-			List<PatientCompliance> complianceList = patientComplianceRepository.findByDateBetweenAndPatientUserIdIn(weekTime,
+			/*List<PatientCompliance> complianceList = patientComplianceRepository.findByDateBetweenAndPatientUserIdIn(weekTime,
 					yesterday,patientUserIds);
 			Map<User,Integer> complianceMap = new HashMap<>();
 			for(PatientCompliance compliance : complianceList){
 				complianceMap.put(compliance.getPatientUser(), compliance.getMissedTherapyCount());
-			}			
+			}*/			
 			
 			Map<Long, List<PatientDevicesAssoc>> vestOnlyDevicesPatientsMap = getVestOnlyDevicePatientsMapData();
 			try{

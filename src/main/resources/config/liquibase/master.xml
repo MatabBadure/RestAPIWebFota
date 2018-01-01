@@ -154,10 +154,10 @@
 	<!-- Added liquibase script for calculation adherence score by tarining date -->
 	<include file="classpath:/config/liquibase/changelog/20171207111135_added_training_date_colums_to_patient_no_event_tables.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20171121044430_update_reason_for_user_deactivation.xml" relativeToChangelogFile="false"/>
-  <include file="classpath:/config/liquibase/changelog/20171121052530_add_extra_colum_deactivation_reason_to_User.xml" relativeToChangelogFile="false"/>
-  <include file="classpath:/config/liquibase/changelog/20171124160500_added_time_zone_to_USER_EXTENSION.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20171121052530_add_extra_colum_deactivation_reason_to_User.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:/config/liquibase/changelog/20171124160500_added_time_zone_to_USER_EXTENSION.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20171207203430_add_extra_column_to_USER.xml" relativeToChangelogFile="false"/>
-	<include file="classpath:/config/liquibase/changelog/20171227123845_added_notification_frequency.xml" relativeToChangelogFile="false"/>
-  <include file="classpath:/config/liquibase/changelog/20171227140930_add_extra_columns_to_notification_frequency.xml" relativeToChangelogFile="false"/>    
 	<include file="classpath:/config/liquibase/changelog/20171221160500_add_extra_column_to_CLINIC.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:/config/liquibase/changelog/20171208123845_added_notification_frequency.xml" relativeToChangelogFile="false"/>
+  <include file="classpath:/config/liquibase/changelog/20171208140930_add_extra_columns_to_notification_frequency.xml" relativeToChangelogFile="false"/>    
 </databaseChangeLog>

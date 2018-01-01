@@ -60,7 +60,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<Object[]> findUserPatientsMaturityDobAfterDays(int year, int month, int day);
        
 
-    @Query("from User user where LOWER(user.email) = ?1")
-    User findUserOneByEmail(String email);
+    
     
 }

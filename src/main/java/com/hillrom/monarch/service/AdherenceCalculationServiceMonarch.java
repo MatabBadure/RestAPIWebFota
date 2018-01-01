@@ -1510,26 +1510,26 @@ public class AdherenceCalculationServiceMonarch{
 				patientUserIds.add(notification.getPatientUser().getId());
 			}
 			
-			/*List<PatientComplianceMonarch> complianceList = patientComplianceMonarchRepository.findByDateBetweenAndPatientUserIdIn(weekTime,
+			List<PatientComplianceMonarch> complianceList = patientComplianceMonarchRepository.findByDateBetweenAndPatientUserIdIn(yesterday,
 					yesterday,patientUserIds);
 			Map<User,Integer> complianceMap = new HashMap<>();
 			for(PatientComplianceMonarch compliance : complianceList){
 				complianceMap.put(compliance.getPatientUser(), compliance.getMissedTherapyCount());
-			}*/
+			}
 			try{
-				notifications.forEach(notification -> {
-					User patientUser = notification.getPatientUser();
+					List<NotificationMonarch> existingNotifications = notificationMonarchRepository.findByDateBetweenAndIsAcknowledgedAndPatientUserIdIn(weekTime,yesterday,false,patientUserIds);
+					existingNotifications.forEach(existingNotification -> {
+					User patientUser = existingNotification.getPatientUser();
 					if(Objects.nonNull(patientUser.getEmail())){
-						User existingUser = userRepository.findUserOneByEmail(patientUser.getEmail());
 						// integrated Accepting mail notifications
-						String notificationType = notification.getNotificationType();
+						String notificationType = existingNotification.getNotificationType();
 			//			int missedTherapyCount = complianceMap.get(patientUser);
 						if(isPatientUserAcceptNotification(patientUser,
-								notificationType) && isPatientUserAcceptNotificationFreq(existingUser))
-							patientEmailSent.add(existingUser);			
+								notificationType) && isPatientUserAcceptNotificationFreq(patientUser))
+							patientEmailSent.add(patientUser);			
 					}
 				});	
-
+				
 				for(User emailPatient : patientEmailSent) {
 					mailService.sendNotificationMailToPatientBasedOnFreq(emailPatient);	
 				}

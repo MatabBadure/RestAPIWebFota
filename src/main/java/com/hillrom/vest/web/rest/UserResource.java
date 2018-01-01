@@ -1785,8 +1785,7 @@ public class UserResource {
     			return new ResponseEntity<>(jsonObject, HttpStatus.OK);
     	    }    
 
-    }
-    
+      
     /**
      * GET  /users/:userId/clinics/:clinicId/statistics -> get the patient statistics for clinic Badge associated with user.
      */

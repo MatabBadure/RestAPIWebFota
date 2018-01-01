@@ -8,9 +8,10 @@ public class ClinicStatsNotificationVO {
 	private BigInteger patientUserid;
 	private String patientFirstname;
 	private String patientLastname;
-	private BigInteger hcpIdOrclinicAdminId;
-	private String hcpFirstnameOrCaFirstname;
-	private String hcpLastnameOrCaLastname;
+	private BigInteger hcpId;
+	private BigInteger hcpUserId;
+	private String hcpFirstname;
+	private String hcpLastname;
 	private String clinicId;
 	private String clinicName;
 	private BigInteger clinicAdminId;
@@ -19,6 +20,19 @@ public class ClinicStatsNotificationVO {
 	private int missedTherapyCount;
 	private boolean isSettingsDeviated;
 	private boolean isHMRCompliant;
+	private boolean isHcpAcceptHMRNotification;
+	private boolean isHcpAcceptSettingsNotification;
+	private boolean isHcpAcceptTherapyNotification;
+	private String hcpEmail;
+	private String caEmail;
+	private boolean isCAAcceptHMRNotification;
+	private boolean isCAAcceptSettingsNotification;
+	private boolean isCAAcceptTherapyNotification;
+	
+	
+	private BigInteger hcpIdOrclinicAdminId;
+	private String hcpFirstnameOrCaFirstname;
+	private String hcpLastnameOrCaLastname;
 	private boolean isHcpOrIsCAAcceptHMRNotification;
 	private boolean isHcpOrIsCAAcceptSettingsNotification;
 	private boolean isHcpOrIsCAAcceptTherapyNotification;
@@ -28,6 +42,48 @@ public class ClinicStatsNotificationVO {
 	private String hcpEmailOrCaEmail;
 	private Integer adherenceSetting;
 
+	public ClinicStatsNotificationVO(BigInteger patientUserid,
+			String patientFirstname,String patientLastname,
+			BigInteger hcpId,BigInteger hcpUserId, String hname,
+			String clinicId,String clinicName,BigInteger clinicAdminId ,
+			int missedTherapyCount, boolean isSettingsDeviated,
+			boolean isHMRCompliant, boolean isHcpAcceptHMRNotification,
+			boolean isHcpAcceptSettingsNotification,
+			boolean isHcpAcceptTherapyNotification,
+			String hcpEmail,
+			String caName,
+			Integer isCAAcceptHMRNotification,
+			Integer isCAAcceptSettingsNotification,
+			Integer isCAAcceptTherapyNotification,
+			String caEmail,
+			Integer adherenceSetting
+			) {
+		super();
+		this.patientUserid = patientUserid;
+		this.patientFirstname = patientFirstname;
+		this.patientLastname = patientLastname;
+		this.hcpId = hcpId;
+		this.hcpUserId = hcpUserId;
+		this.hcpFirstname = hname.split(" ")[1];
+		this.hcpLastname = hname.split(" ")[0];
+		this.clinicId = clinicId;
+		this.clinicAdminId = clinicAdminId;
+		this.clinicName = clinicName;
+		this.missedTherapyCount = missedTherapyCount;
+		this.isSettingsDeviated = isSettingsDeviated;
+		this.isHMRCompliant = isHMRCompliant;
+		this.isHcpAcceptHMRNotification = isHcpAcceptHMRNotification;
+		this.isHcpAcceptSettingsNotification = isHcpAcceptSettingsNotification;
+		this.isHcpAcceptTherapyNotification = isHcpAcceptTherapyNotification;
+		this.hcpEmail = hcpEmail;
+		this.caFirstname = Objects.nonNull(caName)? caName.split(" ")[1]:"";
+		this.caLastname = Objects.nonNull(caName)?caName.split(" ")[0]:"";
+		this.isCAAcceptHMRNotification = convertIntegerToBoolean(isCAAcceptHMRNotification);
+		this.isCAAcceptSettingsNotification = convertIntegerToBoolean(isCAAcceptSettingsNotification);
+		this.isCAAcceptTherapyNotification = convertIntegerToBoolean(isCAAcceptTherapyNotification);
+		this.caEmail = caEmail;
+		this.adherenceSetting = adherenceSetting;
+	}
 	public ClinicStatsNotificationVO(BigInteger patientUserid,
 			String patientFirstname, String patientLastname,
 			BigInteger hcpIdOrclinicAdminId, String hname,
@@ -94,29 +150,45 @@ public class ClinicStatsNotificationVO {
 	}
 
 
-	public BigInteger getHcpIdOrclinicAdminId() {
-		return hcpIdOrclinicAdminId;
+	public BigInteger getHcpId() {
+		return hcpId;
 	}
 
-	public void setHcpIdOrclinicAdminId(BigInteger hcpIdOrclinicAdminId) {
-		this.hcpIdOrclinicAdminId = hcpIdOrclinicAdminId;
+
+	public void setHcpId(BigInteger hcpId) {
+		this.hcpId = hcpId;
 	}
 
-	public String getHcpFirstnameOrCaFirstname() {
-		return hcpFirstnameOrCaFirstname;
+
+	public BigInteger getHcpUserId() {
+		return hcpUserId;
 	}
 
-	public void setHcpFirstnameOrCaFirstname(String hcpFirstnameOrCaFirstname) {
-		this.hcpFirstnameOrCaFirstname = hcpFirstnameOrCaFirstname;
+
+	public void setHcpUserId(BigInteger hcpUserId) {
+		this.hcpUserId = hcpUserId;
 	}
 
-	public String getHcpLastnameOrCaLastname() {
-		return hcpLastnameOrCaLastname;
+
+	public String getHcpFirstname() {
+		return hcpFirstname;
 	}
 
-	public void setHcpLastnameOrCaLastname(String hcpLastnameOrCaLastname) {
-		this.hcpLastnameOrCaLastname = hcpLastnameOrCaLastname;
+
+	public void setHcpFirstname(String hcpFirstname) {
+		this.hcpFirstname = hcpFirstname;
 	}
+
+
+	public String getHcpLastname() {
+		return hcpLastname;
+	}
+
+
+	public void setHcpLastname(String hcpLastname) {
+		this.hcpLastname = hcpLastname;
+	}
+
 
 	public String getClinicId() {
 		return clinicId;
@@ -198,6 +270,110 @@ public class ClinicStatsNotificationVO {
 	}
 
 
+	public boolean isHcpAcceptHMRNotification() {
+		return isHcpAcceptHMRNotification;
+	}
+
+
+	public void setHcpAcceptHMRNotification(boolean isHcpAcceptHMRNotification) {
+		this.isHcpAcceptHMRNotification = isHcpAcceptHMRNotification;
+	}
+
+
+	public boolean isHcpAcceptSettingsNotification() {
+		return isHcpAcceptSettingsNotification;
+	}
+
+
+	public void setHcpAcceptSettingsNotification(
+			boolean isHcpAcceptSettingsNotification) {
+		this.isHcpAcceptSettingsNotification = isHcpAcceptSettingsNotification;
+	}
+
+
+	public boolean isHcpAcceptTherapyNotification() {
+		return isHcpAcceptTherapyNotification;
+	}
+
+
+	public void setHcpAcceptTherapyNotification(
+			boolean isHcpAcceptTherapyNotification) {
+		this.isHcpAcceptTherapyNotification = isHcpAcceptTherapyNotification;
+	}
+
+
+	public String getHcpEmail() {
+		return hcpEmail;
+	}
+
+
+	public void setHcpEmail(String hcpEmail) {
+		this.hcpEmail = hcpEmail;
+	}
+
+
+	public String getCaEmail() {
+		return caEmail;
+	}
+
+
+	public void setCaEmail(String caEmail) {
+		this.caEmail = caEmail;
+	}
+
+
+	public boolean isCAAcceptHMRNotification() {
+		return isCAAcceptHMRNotification;
+	}
+
+
+	public void setCAAcceptHMRNotification(boolean isCAAcceptHMRNotification) {
+		this.isCAAcceptHMRNotification = isCAAcceptHMRNotification;
+	}
+
+
+	public boolean isCAAcceptSettingsNotification() {
+		return isCAAcceptSettingsNotification;
+	}
+
+
+	public void setCAAcceptSettingsNotification(
+			boolean isCAAcceptSettingsNotification) {
+		this.isCAAcceptSettingsNotification = isCAAcceptSettingsNotification;
+	}
+
+
+	public boolean isCAAcceptTherapyNotification() {
+		return isCAAcceptTherapyNotification;
+	}
+
+
+	public void setCAAcceptTherapyNotification(boolean isCAAcceptTherapyNotification) {
+		this.isCAAcceptTherapyNotification = isCAAcceptTherapyNotification;
+	}
+	public BigInteger getHcpIdOrclinicAdminId() {
+		return hcpIdOrclinicAdminId;
+	}
+
+	public void setHcpIdOrclinicAdminId(BigInteger hcpIdOrclinicAdminId) {
+		this.hcpIdOrclinicAdminId = hcpIdOrclinicAdminId;
+	}
+
+	public String getHcpFirstnameOrCaFirstname() {
+		return hcpFirstnameOrCaFirstname;
+	}
+
+	public void setHcpFirstnameOrCaFirstname(String hcpFirstnameOrCaFirstname) {
+		this.hcpFirstnameOrCaFirstname = hcpFirstnameOrCaFirstname;
+	}
+
+	public String getHcpLastnameOrCaLastname() {
+		return hcpLastnameOrCaLastname;
+	}
+
+	public void setHcpLastnameOrCaLastname(String hcpLastnameOrCaLastname) {
+		this.hcpLastnameOrCaLastname = hcpLastnameOrCaLastname;
+	}
 	public boolean isHcpOrIsCAAcceptHMRNotification() {
 		return isHcpOrIsCAAcceptHMRNotification;
 	}

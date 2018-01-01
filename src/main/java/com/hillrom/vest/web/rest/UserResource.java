@@ -1027,10 +1027,29 @@ public class UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     
     @RolesAllowed({AuthoritiesConstants.PATIENT, AuthoritiesConstants.HCP, AuthoritiesConstants.CLINIC_ADMIN})
-    public ResponseEntity<JSONObject> updateUserNotification(@PathVariable Long id, @RequestBody Map<String, String> paramsMap) {
+    public ResponseEntity<JSONObject> updateUserNotification(@PathVariable Long id, @RequestBody Map<String, Boolean> paramsMap) {
     	JSONObject json = new JSONObject();
     	try {
 			json.put("user", userService.setUserNotificationSetting(id, paramsMap));
+			return new ResponseEntity<>(json,HttpStatus.OK);
+		} catch (HillromException e) {
+			json.put("ERROR", e.getMessage());
+			return new ResponseEntity<>(json,HttpStatus.NOT_FOUND);
+		}
+    }
+    
+    /**
+     * PUT  /user/:id/notifications -> update HRM notification setting for user  {id}.
+     */
+    @RequestMapping(value = "/users/{id}/notificationsettingAndFrequency",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @RolesAllowed({AuthoritiesConstants.PATIENT, AuthoritiesConstants.HCP, AuthoritiesConstants.CLINIC_ADMIN})
+    public ResponseEntity<JSONObject> updateUserNotificationAndFrequency(@PathVariable Long id, @RequestBody Map<String, String> paramsMap) {
+    	JSONObject json = new JSONObject();
+    	try {
+			json.put("user", userService.setUserNotificationSettingAndFrequency(id, paramsMap));
 			return new ResponseEntity<>(json,HttpStatus.OK);
 		} catch (HillromException e) {
 			json.put("ERROR", e.getMessage());

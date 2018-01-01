@@ -2039,7 +2039,21 @@ public class UserService {
 		}
 	 }
 	
-	public User setUserNotificationSetting(Long id, Map<String, String> paramsMap) throws HillromException {
+	public User setUserNotificationSetting(Long id, Map<String, Boolean> paramsMap) throws HillromException {
+		User user = userRepository.findOne(id);
+		if (Objects.nonNull(user)) {
+			user.setMissedTherapyNotification(paramsMap.get("isMissedTherapyNotification"));
+			user.setNonHMRNotification(paramsMap.get("isNonHMRNotification"));
+			user.setSettingDeviationNotification(paramsMap.get("isSettingDeviationNotification"));			
+			user.setMessageNotification(paramsMap.get("isMessageNotification"));
+			userRepository.save(user);
+			return user;
+		} else {
+			throw new HillromException(ExceptionConstants.HR_512);
+		}
+	}
+	
+	public User setUserNotificationSettingAndFrequency(Long id, Map<String, String> paramsMap) throws HillromException {
 		User user = userRepository.findOne(id);
 		if (Objects.nonNull(user)) {
 			user.setMissedTherapyNotification(Boolean.parseBoolean(paramsMap.get("isMissedTherapyNotification")));
@@ -2055,6 +2069,8 @@ public class UserService {
 			throw new HillromException(ExceptionConstants.HR_512);
 		}
 	}
+	
+	
 	
 	public Map<String, List<CareGiverVO>> getAssociatedPatientsForCaregiver(Long caregiverId) throws HillromException {
     	List<UserPatientAssoc> patientAssocList = new LinkedList<>();

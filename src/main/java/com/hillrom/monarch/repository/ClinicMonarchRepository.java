@@ -53,64 +53,16 @@ public interface ClinicMonarchRepository extends JpaRepository<Clinic,String> , 
 	List<Object[]> findPatientStatisticsClinicForActiveClinics();*/
 	
 	@Query(nativeQuery=true,
-			 value="select puserid,pfirstname,plastname,cgvr_id,CONCAT(clastName,' ', cfirstName) as cname,pc.missed_therapy_count,pc.is_settings_deviated,pc.is_hmr_compliant,"
-					+"cemail, isMissedTherapyNotification,settingDeviationNotification, nonHmrNotification  from ( "
-					+"select user.id as puserid,user.first_name as pfirstName,user.last_name as plastName,upa_cgvr.user_id as cgvr_id "
-					+"from USER user  "
-					+"join USER_AUTHORITY user_authority on user_authority.user_id = user.id and user_authority.authority_name = 'PATIENT' "
-					+"join USER_PATIENT_ASSOC  upa on user.id= upa.user_id and upa.relation_label = 'SELF'  "
-					+"join PATIENT_INFO patInfo on upa.patient_id = patInfo.id  "
-					+"join USER_PATIENT_ASSOC upa_cgvr on patInfo.id = upa_cgvr.patient_id  "
-					+"where user.is_deleted = 0 and user.activated=1) as associated_patient,  "
-					+"(select cuser.id as cuserid,cuser.first_name as cfirstName,cuser.last_name as clastName,cuser.email as cemail, "
-					+"missed_therapy_notification as isMissedTherapyNotification, setting_deviation_notification as settingDeviationNotification, "
-					+ "non_hmr_notification as nonHmrNotification from USER cuser  "
-					+"join USER_AUTHORITY user_authorityc on user_authorityc.user_id = cuser.id and user_authorityc.authority_name = 'CARE_GIVER')  "
-					+"as associated_cgvr, PATIENT_COMPLIANCE_MONARCH pc  where  "
-					+"puserid = pc.user_id AND pc.date=SUBDATE(CURDATE(),1) and  "
-					+"associated_patient.cgvr_id = associated_cgvr.cuserid ")
+			 value=QueryConstants.QUERY_PATIENT_STATISTICS_CAREGIVER_MONARCH)
 	List<Object[]> findPatientStatisticsCareGiver();
 	
 	
 	@Query(nativeQuery=true,
-			value=	QueryConstants.USER_QUERY_FOR_ACTIVE_CLINICS_MONARCH)
+			value=	QueryConstants.QUERY_FOR_ACTIVE_CLINICS_MONARCH)
 	List<Object[]> findPatientStatisticsClinicForActiveClinics();
 	
 	@Query(nativeQuery=true,
-			 value= "select puserid,pfirstname,plastname,cgvr_id,CONCAT(clastName,' ', cfirstName) as cname,pc.missed_therapy_count,pc.is_settings_deviated,pc.is_hmr_compliant, "
-					 + "cemail, "
-					 + "isMissedTherapyNotification, "
-					 + "settingDeviationNotification, "
-					 + "nonHmrNotification, "
-					 + "missedTherapyNotificationFreq, "
-					 + "  nonHmrNotificationFreq, "
-					 + "settingDeviationNotificationFreq "
-					 + "from "
-					 + "(select user.id as puserid,user.first_name as pfirstName,user.last_name as plastName,upa_cgvr.user_id as cgvr_id "
-					 + "from USER user "
-					 + " "
-					 + "join USER_AUTHORITY user_authority on user_authority.user_id = user.id and user_authority.authority_name = 'PATIENT' "
-					 + "join USER_PATIENT_ASSOC  upa on user.id= upa.user_id and upa.relation_label = 'SELF' "
-					 + "join PATIENT_INFO patInfo on upa.patient_id = patInfo.id "
-					 + "join USER_PATIENT_ASSOC upa_cgvr on patInfo.id = upa_cgvr.patient_id "
-					 + "where user.is_deleted = 0 and user.activated=1) as associated_patient, "
-					 + " "
-					 + "(select cuser.id as cuserid, "
-					 + "cuser.first_name as cfirstName, "
-					 + "cuser.last_name as clastName, "
-					 + "cuser.email as cemail, "
-					 + "cuser.missed_therapy_notification as isMissedTherapyNotification, "
-					 + "cuser.setting_deviation_notification as settingDeviationNotification, "
-					 + "cuser.non_hmr_notification as nonHmrNotification, "
-					 + "cuser.missed_therapy_notification_freq as missedTherapyNotificationFreq, "
-					 + "cuser.non_hmr_notification_freq as nonHmrNotificationFreq, "
-					 + "cuser.setting_deviation_notification_freq as settingDeviationNotificationFreq "
-					 + "from USER cuser "
-					 + " "
-					 + "join USER_AUTHORITY user_authorityc on user_authorityc.user_id = cuser.id and user_authorityc.authority_name = 'CARE_GIVER') "
-					 + "as associated_cgvr, PATIENT_COMPLIANCE_MONARCH pc  where "
-					 + "puserid = pc.user_id AND pc.date between DATE_SUB(curdate(), INTERVAL 1 WEEK) and CURDATE() AND "
-					 + "associated_patient.cgvr_id = associated_cgvr.cuserid")
+			 value= QueryConstants.QUERY_PATIENT_STATISTICS_CAREGIVER_DETAILS_MONARCH)
 	List<Object[]> findPatientStatisticsCareGiverDetails();
 
 }

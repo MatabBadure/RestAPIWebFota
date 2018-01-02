@@ -1121,8 +1121,6 @@ public class AdherenceCalculationService {
 	@Scheduled(cron="0 15 0 * * *")
 	public void processCareGiverNotifications() throws HillromException{
 		try{
-			Set<CareGiverStatsNotificationVO> caregiverEmailSent = new HashSet<CareGiverStatsNotificationVO>();
-			
 			List<CareGiverStatsNotificationVO> statsNotificationVOs = findPatientStatisticsCareGiver();
 
 			Map<String,CareGiverStatsNotificationVO> cgIdNameMap = new HashMap<>();

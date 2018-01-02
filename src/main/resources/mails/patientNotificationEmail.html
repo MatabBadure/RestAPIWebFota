@@ -1,6 +1,6 @@
 <html>
 <head>
-	<title th:text="#{email.messageNotification.title}">Message Notification</title>
+	<title th:text="#{email.messageNotification.title}">VisiView® Portal - Patient Notification</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body>
@@ -9,16 +9,18 @@
 			<h4 style="font-size: 14px;" th:text="#{email.reset.greeting(${user})}">Dear&nbsp;</h4>
 		</div>
 		<div>
-			<p style="font-size: 14px; ">You are being notified there is a message in your VisiView Health Portal Inbox. <br /><br />
-			Review patient message <a style="font-size: 14px;" th:href="@{|${baseUrl}/#/${messageURLStr}|}">Click here</a>.</p>
+			<p style="font-size: 14px; ">You are being notified you missed an airway clearance therapy goal set by your healthcare team. To review the
+			details of the notification in the VisiView® Portal, click the link below. <br /><br />
+			<!-- <a style="font-size: 14px;" th:href="@{|${baseUrl}/#/${messageURLStr}|}">Review your dashboard</a>.<insert hyper-link to clinic dashboard in the text>  -->
+			<a style="font-size: 14px;" th:href="@{|${notificationUrl}/#/login|}">Review your dashboard</a> 
+			</p> 
 		</div>
 		
 		<div style="margin: 10px 0px;">			
 		</div>
 		<div style="">
-			<p style="font-size: 14px;">If you experience any problems or have questions, please contact Customer Support at 800-426-4224 or submit your question online by  
-			<a href="https://respiratorycare.hill-rom.com/en/about-us/customer-service/">clicking here</a>.
-			
+			<p style="font-size: 14px;">If you have any problems or have questions, please contact Hill-Rom Respiratory Customer Support at 800-426-4224.
+						
 			</p>
 		</div>
 		<div style="margin: 40px 0px;">

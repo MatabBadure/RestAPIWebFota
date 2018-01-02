@@ -736,5 +736,49 @@ public class MailService {
 		return userName.substring(0, 1).toUpperCase()
 				+ userName.substring(1).toLowerCase();
 	}
+	
+    public void sendNotificationMailToPatientBasedOnFreq(User user){
+        log.debug("Sending Notification Mail To Patient email to '{}'", user.getEmail());
+        Context context = new Context();
+        context.setVariable("user", user.getFirstName());
+        context.setVariable("notificationUrl", patientDashboardUrl);
+        String content = "";
+        String subject = "";
+ 	   content = templateEngine.process("patientNotificationEmail", context);
+        subject = messageSource.getMessage("email.notificationEmail.subject", null, null);
+        sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
+     }
+    
+    public void sendNotificationMailToHCPAndClinicAdminBasedOnFreq(User user){
+    	log.debug("Sending Notification shall have a frequency for HCP and Clinic Admin '{}'", user.getEmail());
+        Context context = new Context();
+        context.setVariable("user", user.getFirstName());
+        context.setVariable("today", DateUtil.convertLocalDateToStringFromat(org.joda.time.LocalDate.now().minusDays(1), "MMM dd,yyyy"));
+        context.setVariable("notificationUrl", hcpOrClinicAdminDashboardUrl);
+        String content = "";
+        String subject = "";
+
+        content = templateEngine.process("clinicPersonnelNotificationEmail", context);
+        subject = messageSource.getMessage("email.notificationEmail.subject", null, null);
+        
+        sendEmail(new String[]{user.getEmail()}, subject, content, false, true);
+    }
+   
+    public void sendNotificationCareGiverBasedOnFreq(CareGiverStatsNotificationVO careGiverStatsNotificationVO){
+    	log.debug("Sending care giver statistics e-mail to '{}'", careGiverStatsNotificationVO.getCGEmail());
+        Context context = new Context();
+        context.setVariable("careGiverStatsNotificationVO", careGiverStatsNotificationVO.getCareGiverName());
+        
+        context.setVariable("today", DateUtil.convertLocalDateToStringFromat(org.joda.time.LocalDate.now().minusDays(1), "MMM dd,yyyy"));
+        context.setVariable("notificationUrl", careGiverDashboardUrl);
+        String content = "";
+        String subject = "";
+
+        content = templateEngine.process("caregiverNotificationEmail", context);
+        subject = messageSource.getMessage("email.notificationEmail.subject", null, null);
+        
+        sendEmail(new String[]{careGiverStatsNotificationVO.getCGEmail()}, subject, content, false, true);
+    }
+    
 }
 	

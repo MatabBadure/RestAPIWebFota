@@ -18,6 +18,7 @@ import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 
 import com.hillrom.vest.domain.Clinic;
+import com.hillrom.vest.repository.util.QueryConstants;
 import com.hillrom.vest.web.rest.dto.ClinicStatsNotificationVO;
 
 /**
@@ -59,7 +60,7 @@ public interface ClinicRepository extends JpaRepository<Clinic,String> , QueryDs
 	@Query("from Clinic clinic where clinic.deleted = ?1 and clinic.clinicPatientAssoc IS NOT EMPTY and clinic.users IS NOT EMPTY or clinic.clinicAdminId IS NOT NULL")
 	List<Clinic> findByDeletedAndClinicPatientAssocIsNotEmpty(boolean isDeleted);
 
-	@Query(nativeQuery=true,
+	/*@Query(nativeQuery=true,
 			value=" select puserid,pfirstname,plastname,hcp_id,huserid,CONCAT(hlastName,' ', hfirstName) as hname,clinicId,clinicname,clinicadminid,pc.missed_therapy_count,pc.is_settings_deviated,pc.is_hmr_compliant,"
 					+ " nhn, sdn,mtn,hemail,caname,a_cahmr,a_casdn,a_camtn,a_caemail,clinicadherencesetting from ( "
 					+ " select user.id as puserid,user.first_name as pfirstName,user.last_name as plastName,upa_hcp.user_id as hcp_id"
@@ -83,24 +84,9 @@ public interface ClinicRepository extends JpaRepository<Clinic,String> , QueryDs
 					+ " as associated_hcp, PATIENT_COMPLIANCE pc "
 					+ " where puserid = pc.user_id AND pc.date=SUBDATE(CURDATE(),1) and associated_patient.hcp_id = associated_hcp.huserid ")
 	List<Object[]> findPatientStatisticsClinicForActiveClinics();
-	
+	*/
 	@Query(nativeQuery=true,
-			 value="select puserid,pfirstname,plastname,cgvr_id,CONCAT(clastName,' ', cfirstName) as cname,pc.missed_therapy_count,pc.is_settings_deviated,pc.is_hmr_compliant,"
-					+"cemail, isMissedTherapyNotification,settingDeviationNotification, nonHmrNotification  from ( "
-					+"select user.id as puserid,user.first_name as pfirstName,user.last_name as plastName,upa_cgvr.user_id as cgvr_id "
-					+"from USER user  "
-					+"join USER_AUTHORITY user_authority on user_authority.user_id = user.id and user_authority.authority_name = 'PATIENT' "
-					+"join USER_PATIENT_ASSOC  upa on user.id= upa.user_id and upa.relation_label = 'SELF'  "
-					+"join PATIENT_INFO patInfo on upa.patient_id = patInfo.id  "
-					+"join USER_PATIENT_ASSOC upa_cgvr on patInfo.id = upa_cgvr.patient_id  "
-					+"where user.is_deleted = 0 and user.activated=1) as associated_patient,  "
-					+"(select cuser.id as cuserid,cuser.first_name as cfirstName,cuser.last_name as clastName,cuser.email as cemail, "
-					+"missed_therapy_notification as isMissedTherapyNotification, setting_deviation_notification as settingDeviationNotification, "
-					+ "non_hmr_notification as nonHmrNotification from USER cuser  "
-					+"join USER_AUTHORITY user_authorityc on user_authorityc.user_id = cuser.id and user_authorityc.authority_name = 'CARE_GIVER')  "
-					+"as associated_cgvr, PATIENT_COMPLIANCE pc  where  "
-					+"puserid = pc.user_id AND pc.date=SUBDATE(CURDATE(),1) and  "
-					+"associated_patient.cgvr_id = associated_cgvr.cuserid ")
+			 value= QueryConstants.QUERY_FIND_PATIENT_STATISTICS_CAREGIVER)
 	List<Object[]> findPatientStatisticsCareGiver();
 	
 	//start:HILL-2004
@@ -109,46 +95,19 @@ public interface ClinicRepository extends JpaRepository<Clinic,String> , QueryDs
   //start:HILL-2004
 	
 	@Query(nativeQuery=true,
-			 value=" Select dtype,if(count is null,0,count) from "
-			 		+ " (SELECT type_code as dtype FROM HILLROM_TYPE_CODE_VALUES"
-			 		+ " where type = 'patient_device_type') a left outer join "
-			 		+ "	(select PDA.device_type as pdtype,count(*) as count "
-			 		+ " from CLINIC_PATIENT_ASSOC CPA "
-			 		+ " left outer join "
-			 		+ "  ((select patient_id,device_type "
-			 		+ "		from PATIENT_DEVICES_ASSOC where is_active=1) " 
-			 		+ "			union "
-			 		+ "	  (select patient_id,'ALL' as device_type "
-			 		+ "		from PATIENT_DEVICES_ASSOC " 
-			 		+ "		where patient_type='CD' and is_active=1 "
-			 		+ "		group by patient_id)) PDA "
-
-			 		+ " on CPA.patient_id=PDA.patient_id "
-			 		+ " where CPA.is_active=1 and clinic_id = :clinicId "
-			 		+ " group by PDA.device_type "
-			 		+ " order by count desc) b on a.dtype = b.pdtype " )
+			 value= QueryConstants.QUERY_FIND_BY_DEVICETYPE_AND_PATIENT_COUNT)
 	List<Object[]> findByDeviceTypeAndPatientCount(@Param("clinicId")String clinicId);
-
+	
+	
 	@Query(nativeQuery=true,
-			 value= "Select us.*,ua.authority_name,group_concat(cua.clinics_id),group_concat(cpa.clinic_id),group_concat(eua.entity_id) "
-					+ " ,group_concat(cl.is_message_opted + \"\") "
-					+ "from "
-					+ "	USER us "
-					+ "join "
-					+ "	USER_AUTHORITY ua on ua.user_id = us.id and ua.authority_name in ('PATIENT','HCP','CLINIC_ADMIN') "
-					+ "left outer join "
-					+ "	CLINIC_USER_ASSOC cua on cua.users_id = us.id "
-					+ "left outer join "
-					+ "	USER_PATIENT_ASSOC upa on upa.user_id = us.id  and upa.relation_label = 'Self' "
-					+ "left outer join "
-					+ "	CLINIC_PATIENT_ASSOC cpa on cpa.patient_id = upa.patient_id  and ua.authority_name = 'PATIENT' "
-					+ "left outer join "
-					+ "	ENTITY_USER_ASSOC eua on eua.user_id = us.id and eua.user_role = 'CLINIC_ADMIN' and ua.authority_name = 'CLINIC_ADMIN' "
-					+ "left outer join CLINIC cl on "
-					+ "((cl.id = cua.clinics_id and ua.authority_name = 'HCP') OR (cl.id = cpa.clinic_id and ua.authority_name = 'PATIENT') "
-					+ "OR (cl.id = eua.entity_id and ua.authority_name = 'CLINIC_ADMIN')) "
-					+ "where "
-					+ "	us.id in (:userId) "
-					+ "group by us.id")
+			 value= QueryConstants.QUERY_FIND_PATIENT_STATISTICS_CAREGIVER_DETAILS)
+	List<Object[]> findPatientStatisticsCareGiverDetails();
+	
+	@Query(nativeQuery=true,
+			value=	QueryConstants.PATIENT_STATISTICS_FOR_ACTIVE_CLINICS)
+	List<Object[]> findPatientStatisticsClinicForActiveClinicsForWeek();
+	
+	@Query(nativeQuery=true,
+			 value= QueryConstants.QUERY_FIND_BY_USER_ID)
 	List<Object[]> findByUserId(@Param("userId") String userId);
 }

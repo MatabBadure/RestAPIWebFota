@@ -1022,7 +1022,7 @@ public class UserResource {
     /**
      * PUT  /user/:id/notifications -> update HRM notification setting for user  {id}.
      */
-    @RequestMapping(value = "/users/{id}/notificationsetting",
+    @RequestMapping(value = "/users/{id}/notificationsettingold",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     
@@ -1041,7 +1041,7 @@ public class UserResource {
     /**
      * PUT  /user/:id/notifications -> update HRM notification setting for user  {id}.
      */
-    @RequestMapping(value = "/users/{id}/notificationsettingAndFrequency",
+    @RequestMapping(value = "/users/{id}/notificationsetting",
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     

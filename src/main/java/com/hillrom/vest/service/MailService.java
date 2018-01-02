@@ -767,8 +767,7 @@ public class MailService {
     public void sendNotificationCareGiverBasedOnFreq(CareGiverStatsNotificationVO careGiverStatsNotificationVO){
     	log.debug("Sending care giver statistics e-mail to '{}'", careGiverStatsNotificationVO.getCGEmail());
         Context context = new Context();
-        context.setVariable("careGiverStatsNotificationVO", careGiverStatsNotificationVO.getCareGiverName());
-        
+        context.setVariable("user", careGiverStatsNotificationVO.getCareGiverName());        
         context.setVariable("today", DateUtil.convertLocalDateToStringFromat(org.joda.time.LocalDate.now().minusDays(1), "MMM dd,yyyy"));
         context.setVariable("notificationUrl", careGiverDashboardUrl);
         String content = "";

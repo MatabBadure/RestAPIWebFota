@@ -1543,32 +1543,45 @@ public class AdherenceCalculationServiceMonarch{
 	}
 	
 	public boolean isPatientUserAcceptNotificationFreq(User patientUser) {
-		
-		String dayOfWeek = DateUtil.getDayOfTheWeek();
-		
-		return(patientUser.getMissedTherapyNotificationFreq().equalsIgnoreCase(dayOfWeek) ||
-				patientUser.getNonHMRNotificationFreq().equalsIgnoreCase(dayOfWeek)	||
-				patientUser.getSettingDeviationNotificationFreq().equalsIgnoreCase(dayOfWeek) ||
-				patientUser.getMissedTherapyNotificationFreq().equalsIgnoreCase(DAILY) ||
-				patientUser.getNonHMRNotificationFreq().equalsIgnoreCase(DAILY)	||
-				patientUser.getSettingDeviationNotificationFreq().equalsIgnoreCase(DAILY));	
+		return getIsPatientTrueNotification(patientUser);
 	}
 	
+	private boolean getIsPatientTrueNotification(User patientUser) {
+		boolean isPatientNotification = false;
+		String dayOfWeek = DateUtil.getDayOfTheWeek();
+
+		if (Objects.nonNull(patientUser)) {
+			if (Objects.nonNull(patientUser.getMissedTherapyNotificationFreq()))
+				if(patientUser.getMissedTherapyNotificationFreq().equalsIgnoreCase(dayOfWeek) || patientUser.getMissedTherapyNotificationFreq().equalsIgnoreCase(DAILY)) {
+					isPatientNotification = true;
+				}
+		   else if (Objects.nonNull(patientUser.getNonHMRNotificationFreq())) 
+			    if(patientUser.getNonHMRNotificationFreq().equalsIgnoreCase(dayOfWeek) || patientUser.getNonHMRNotificationFreq().equalsIgnoreCase(DAILY)) {
+							isPatientNotification = true;		
+			    }
+		 else if (Objects.nonNull(patientUser.getSettingDeviationNotificationFreq())) 
+				if(patientUser.getSettingDeviationNotificationFreq().equalsIgnoreCase(dayOfWeek) || patientUser.getSettingDeviationNotificationFreq().equalsIgnoreCase(DAILY)) {
+							isPatientNotification = true;	
+								}
+				}		
+		return isPatientNotification;
+	}
+
 	private boolean isPatientUserAcceptNotification(User patientUser,
 			String notificationType) {
-		
+	
 		return isNonHMRNotificationCheck(patientUser, notificationType) ||
 				isSettingDeviationNotificationCheck(patientUser, notificationType) ||
 				(patientUser.isMissedTherapyNotification() && MISSED_THERAPY.equalsIgnoreCase(notificationType)) ||
 				isNonHMRSettingDeviationNotificationCheck(patientUser, notificationType); 
+			}
 				
-		
 		/*return (patientUser.isNonHMRNotification() && HMR_NON_COMPLIANCE.equalsIgnoreCase(notificationType)) || 
 				(patientUser.isSettingDeviationNotification() && SETTINGS_DEVIATION.equalsIgnoreCase(notificationType)) ||
 				(patientUser.isMissedTherapyNotification() && MISSED_THERAPY.equalsIgnoreCase(notificationType) ||
 				(HMR_AND_SETTINGS_DEVIATION.equalsIgnoreCase(notificationType) && 
 						(patientUser.isNonHMRNotification() || patientUser.isSettingDeviationNotification())));*/
-	}
+	
 	
 	private boolean isNonHMRNotificationCheck(User patientUser,
 			String notificationType){
@@ -1667,10 +1680,10 @@ public class AdherenceCalculationServiceMonarch{
 			
 			if(careGiverStatsNotification(cgIdNameMap))
 			{
-				for(CareGiverStatsNotificationVO careGiverStatsNotificationFreqStatus :careGiverStatsNotificationFreq(cgIdNameMap)){
-					mailService.sendNotificationCareGiverBasedOnFreq(careGiverStatsNotificationFreqStatus);
-				}				
-			}	
+				for(CareGiverStatsNotificationVO careGiverStatsNotificationFreqStatus : careGiverStatsNotificationFreq(cgIdNameMap)){
+					mailService.sendNotificationCareGiverBasedOnFreq(careGiverStatsNotificationFreqStatus); 
+				}
+			}
 			
 			
 		}catch(Exception ex){

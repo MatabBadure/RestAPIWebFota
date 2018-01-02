@@ -35,7 +35,7 @@ public class PatientNoEventService {
 		if(Objects.nonNull(patientNoEvent)){
 			return patientNoEvent;
 		}else{
-			patientNoEvent = noEventsRepository.save(newPatientWithNoEvent);
+		//	patientNoEvent = noEventsRepository.save(newPatientWithNoEvent);
 		}
 		return patientNoEvent;
 	}

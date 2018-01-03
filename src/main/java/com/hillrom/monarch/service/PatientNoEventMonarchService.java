@@ -65,7 +65,7 @@ public class PatientNoEventMonarchService {
 		if(Objects.nonNull(patientNoEvent)){
 			return patientNoEvent;
 		}else{
-			patientNoEvent = noEventsMonarchRepository.save(newPatientWithNoEvent);
+		//	patientNoEvent = noEventsMonarchRepository.save(newPatientWithNoEvent);
 		}
 		return patientNoEvent;
 	}
@@ -84,11 +84,15 @@ public class PatientNoEventMonarchService {
 				if ((Objects.nonNull(trainingDate)) && (Objects.isNull(patientNoEvent.getFirstTransmissionDateBeforeUpdate()))) {
 					patientNoEvent.setFirstTransmissionDateBeforeUpdate(transmittedDate);
 					patientNoEvent.setDateFirstTransmissionDateUpdated(new LocalDate());
+				}else if((Objects.nonNull(trainingDate)) && (patientNoEvent.getFirstTransmissionDateBeforeUpdate()).isAfter(transmittedDate)){
+					patientNoEvent.setFirstTransmissionDateBeforeUpdate(transmittedDate);
+					//patientNoEvent.setDateFirstTransmissionDateUpdated(new LocalDate());
 				}
 			}else if(Objects.nonNull(trainingDate) && trainingDate.equals(transmittedDate)){ 
-				patientNoEvent.setFirstTransmissionDate(transmittedDate);
+				//patientNoEvent.setFirstTransmissionDate(transmittedDate);
+				if(Objects.isNull(patientNoEvent.getFirstTransmissionDateBeforeUpdate())){
 				patientNoEvent.setFirstTransmissionDateBeforeUpdate(transmittedDate);
-				patientNoEvent.setFirstTransDateType(FIRST_TRANSMISSION_FIRTS_TYPE);
+				}
 			}else if(Objects.nonNull(trainingDate) && trainingDate.isBefore(transmittedDate)){
 				patientNoEvent.setFirstTransmissionDate(transmittedDate);
 				patientNoEvent.setFirstTransDateType(FIRST_TRANSMISSION_FIRTS_TYPE);

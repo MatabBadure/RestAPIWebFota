@@ -150,6 +150,7 @@
 	<include file="classpath:/config/liquibase/changelog/20171107055300_upload_canada_zip_codes.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20171114160100_upload_patient_diagnostic_codes.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20171116020900_create_city_state_zip_map_index.xml" relativeToChangelogFile="false"/>
+	
 	<!-- Added liquibase script for calculation adherence score by tarining date -->
 	<include file="classpath:/config/liquibase/changelog/20171207111135_added_training_date_colums_to_patient_no_event_tables.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20171121044430_update_reason_for_user_deactivation.xml" relativeToChangelogFile="false"/>

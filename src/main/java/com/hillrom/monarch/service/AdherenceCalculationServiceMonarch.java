@@ -1878,7 +1878,8 @@ public class AdherenceCalculationServiceMonarch{
 			idUserMap.put(statsNotificationVO.getHcpIdOrclinicAdminId(),new User(statsNotificationVO.getHcpFirstnameOrCaFirstname(),
 					statsNotificationVO.getHcpLastnameOrCaLastname(),statsNotificationVO.getHcpEmailOrCaEmail(),
 					statsNotificationVO.isHcpOrIsCAAcceptTherapyNotification(),statsNotificationVO.isHcpOrIsCAAcceptHMRNotification(),
-					statsNotificationVO.isHcpOrIsCAAcceptSettingsNotification()));
+					statsNotificationVO.isHcpOrIsCAAcceptSettingsNotification(),statsNotificationVO.getNonHmrNotificationFreq(),
+					statsNotificationVO.getMissedTherapyNotificationFreq(),statsNotificationVO.getSettingDeviationNotificationFreq()));
 			
 		}
 		return idUserMap;

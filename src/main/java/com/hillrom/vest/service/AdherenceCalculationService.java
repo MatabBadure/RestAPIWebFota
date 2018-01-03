@@ -2402,13 +2402,14 @@ public static Set<User> mailServiceNotificationForHcpandAdmin(Map<User, Map<Stri
 	
 	public boolean isSettingsDeviatedForSettingDays(List<TherapySession> lastSettingDaysTherapySessions,
 			ProtocolConstants protocol, Integer adherenceSettingDay){
+		
 		Map<LocalDate, List<TherapySession>> lastSettingDaysTherapySessionMap = lastSettingDaysTherapySessions
 				.stream().collect(
 						Collectors.groupingBy(TherapySession::getDate));
 		boolean isSettingsDeviated = false;
 		// This is for checking settings deviation, settings deviation should be calculated for consecutive adherence setting days
 		//(exclusive missed therapy)
-		if(lastSettingDaysTherapySessionMap.keySet().size() == adherenceSettingDay){
+	/*	if(lastSettingDaysTherapySessionMap.keySet().size() == adherenceSettingDay){
 			for(LocalDate d : lastSettingDaysTherapySessionMap.keySet()){
 				List<TherapySession> therapySeesionsPerDay = lastSettingDaysTherapySessionMap.get(d);
 				double weightedFrequency = calculateTherapyMetricsPerSettingDays(therapySeesionsPerDay).get(WEIGHTED_AVG_FREQUENCY);
@@ -2421,8 +2422,24 @@ public static Set<User> mailServiceNotificationForHcpandAdmin(Map<User, Map<Stri
 			}
 		}else{
 			return false;
-		}
+		} */
+		if(Objects.nonNull(lastSettingDaysTherapySessionMap) && (!lastSettingDaysTherapySessionMap.isEmpty())){
+			for(LocalDate d : lastSettingDaysTherapySessionMap.keySet()){
+				List<TherapySession> therapySeesionsPerDay = lastSettingDaysTherapySessionMap.get(d);
+				double weightedFrequency = calculateTherapyMetricsPerSettingDays(therapySeesionsPerDay).get(WEIGHTED_AVG_FREQUENCY);
+				if(!isSettingsDeviated(protocol, weightedFrequency)){
+					isSettingsDeviated = false;
+					break;
+				}else{
+					isSettingsDeviated = true;
+				}
+			}
+		}else{
+			return false;
+		}	
 		return isSettingsDeviated;
+			
+		
 	}
 	
 	private boolean isSettingDeviatedForUserOnDay(Long userId, LocalDate complianceDate,Integer adherenceSettingDay, ProtocolConstants userProtocolConstant){

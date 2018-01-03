@@ -65,7 +65,7 @@ public class PatientNoEventMonarchService {
 		if(Objects.nonNull(patientNoEvent)){
 			return patientNoEvent;
 		}else{
-			patientNoEvent = noEventsMonarchRepository.save(newPatientWithNoEvent);
+		//	patientNoEvent = noEventsMonarchRepository.save(newPatientWithNoEvent);
 		}
 		return patientNoEvent;
 	}

@@ -157,6 +157,4 @@
     <include file="classpath:/config/liquibase/changelog/20171124160500_added_time_zone_to_USER_EXTENSION.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20171207203430_add_extra_column_to_USER.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:/config/liquibase/changelog/20171221160500_add_extra_column_to_CLINIC.xml" relativeToChangelogFile="false"/>
-	<!-- Added Logs table for training date update -->
-	<include file="classpath:/config/liquibase/changelog/201801002201840_trigger_test_log_table.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

@@ -351,7 +351,7 @@ public class FOTAServiceUtil {
 							if(handleId == null){
 								handleId = getHandleNumber();
 								//Save device details to DB
-								saveInprogressDeviceDetails(holder);
+								//saveInprogressDeviceDetails(holder);
 								holder.setHandleId(handleId);
 								handleHolderBin.put(handleId, holder);
 
@@ -387,7 +387,7 @@ public class FOTAServiceUtil {
 							if(handleId == null){
 								handleId = getHandleNumber();
 								//Save device details to DB
-								saveInprogressDeviceDetails(holder);
+								//saveInprogressDeviceDetails(holder);
 								holder.setHandleId(handleId);
 								handleHolderBin.put(handleId, holder);
 							}

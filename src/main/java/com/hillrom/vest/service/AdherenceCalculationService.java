@@ -1031,7 +1031,7 @@ public class AdherenceCalculationService {
 						// integrated Accepting mail notifications
 						String notificationType = existingNotification.getNotificationType();
 						if(vestOnlyDevicesPatientsMap.containsKey(patientUser.getId())){
-							if(isPatientUserAcceptNotification(patientUser, notificationType ) && isPatientUserAcceptNotificationFreq(patientUser)){
+							if(isPatientUserAcceptNotification(patientUser, notificationType ) && isPatientUserAcceptNotificationFreq(patientUser,notificationType)){
 								patientEmailSent.add(patientUser);										
 							}
 								
@@ -1061,28 +1061,28 @@ public class AdherenceCalculationService {
 						(patientUser.isNonHMRNotification() || patientUser.isSettingDeviationNotification())));
 	}
 	
-	public boolean isPatientUserAcceptNotificationFreq(User patientUser) {
-		return getIsPatientTrueNotification(patientUser);
+	public boolean isPatientUserAcceptNotificationFreq(User patientUser, String notificationType) {
+		return getIsPatientTrueNotification(patientUser, notificationType);
 	}
 	
-	private boolean getIsPatientTrueNotification(User patientUser) {
+	private boolean getIsPatientTrueNotification(User patientUser, String notificationType) {
 		boolean isPatientNotification = false;
 		String dayOfWeek = DateUtil.getDayOfTheWeek();
 
 		if (Objects.nonNull(patientUser)) {
-			if (Objects.nonNull(patientUser.getMissedTherapyNotificationFreq()))
-				if(patientUser.getMissedTherapyNotificationFreq().equalsIgnoreCase(dayOfWeek) || patientUser.getMissedTherapyNotificationFreq().equalsIgnoreCase(DAILY)) {
-					isPatientNotification = true;
+			if (Objects.nonNull(patientUser.getMissedTherapyNotificationFreq())){
+				if(notificationType.equals(MISSED_THERAPY) && (patientUser.getMissedTherapyNotificationFreq().equalsIgnoreCase(dayOfWeek) || patientUser.getMissedTherapyNotificationFreq().equalsIgnoreCase(DAILY))) {
+					isPatientNotification = true; }
 				}
-		   else if (Objects.nonNull(patientUser.getNonHMRNotificationFreq())) 
-			    if(patientUser.getNonHMRNotificationFreq().equalsIgnoreCase(dayOfWeek) || patientUser.getNonHMRNotificationFreq().equalsIgnoreCase(DAILY)) {
-							isPatientNotification = true;		
+		   else if (Objects.nonNull(patientUser.getNonHMRNotificationFreq())) {
+			    if(notificationType.equals(HMR_NON_COMPLIANCE) && (patientUser.getNonHMRNotificationFreq().equalsIgnoreCase(dayOfWeek) || patientUser.getNonHMRNotificationFreq().equalsIgnoreCase(DAILY))) {
+			    		isPatientNotification = true;}		
 			    }
-		 else if (Objects.nonNull(patientUser.getSettingDeviationNotificationFreq())) 
-				if(patientUser.getSettingDeviationNotificationFreq().equalsIgnoreCase(dayOfWeek) || patientUser.getSettingDeviationNotificationFreq().equalsIgnoreCase(DAILY)) {
-							isPatientNotification = true;	
+		 else if (Objects.nonNull(patientUser.getSettingDeviationNotificationFreq())){
+			 	if(notificationType.endsWith(SETTINGS_DEVIATION) && (patientUser.getSettingDeviationNotificationFreq().equalsIgnoreCase(dayOfWeek) || patientUser.getSettingDeviationNotificationFreq().equalsIgnoreCase(DAILY))) {
+							isPatientNotification = true;	}
 								}
-				}		
+				}	
 		return isPatientNotification;
 	}
 

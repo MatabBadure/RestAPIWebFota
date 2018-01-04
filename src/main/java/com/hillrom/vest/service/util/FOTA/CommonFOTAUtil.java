@@ -671,14 +671,15 @@ public class CommonFOTAUtil {
 
 	}
 
-	public String getOldHandle(Map<String, HandleHolder> handleHolderBin, String devSN) {
+	public String getOldHandle(Map<String, HandleHolder> handleHolderBin, String devSN, PartNoHolder partNoHolder) {
 		Set<String> keys = handleHolderBin.keySet();
 		String handleId = null;
         for (String key : keys) {
         	log.debug("Handle HolderBin Keys:" +handleHolderBin.get(key));
             HandleHolder holder1 = new HandleHolder();
             holder1 = handleHolderBin.get(key);
-            if (holder1.getDeviceSerialNumber().equals(devSN)) {
+            //Added two more conditions to get Old handle id that is chunk size and part no.(01/04/2018)
+            if (holder1.getDeviceSerialNumber().equals(devSN) && partNoHolder.getChunkSize() == holder1.getChunkSize() && holder1.getPartNo().equals(partNoHolder.getPart_No())) {
             	handleId = holder1.getHandleId();
             	return handleId;
             }

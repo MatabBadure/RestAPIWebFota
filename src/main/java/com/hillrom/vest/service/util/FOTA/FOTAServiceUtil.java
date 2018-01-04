@@ -344,11 +344,10 @@ public class FOTAServiceUtil {
 						if ( crcValid == true) {
 							// Initially
 							HandleHolder holder = coUtil.getHandleHolderValuesFromPartNo(partNoHolder,fotaJsonData,fotaInfo,reqDev,reqReleaseDate);
-							
 
-							/*//Get Old Handle Id
+							//Get Old Handle Id
 							handleId = coUtil.getOldHandle(handleHolderBin,fotaJsonData
-									.get(DEVICE_SN));
+									.get(DEVICE_SN),partNoHolder);
 							if(handleId == null){
 								handleId = getHandleNumber();
 								//Save device details to DB
@@ -356,9 +355,9 @@ public class FOTAServiceUtil {
 								holder.setHandleId(handleId);
 								handleHolderBin.put(handleId, holder);
 
-							}*/
-							handleId = getHandleNumber();
-							handleHolderBin.put(handleId, holder);
+							}
+							/*handleId = getHandleNumber();
+							handleHolderBin.put(handleId, holder);*/
 							log.debug("New handleId="+handleId+": Same SoftwareVersion="+fotaInfo.getSoftVersion()+":same chunksize="+partNoHolder.getChunkSize());
 						} else {
 							//Send email notification for CRC validation failed
@@ -379,11 +378,12 @@ public class FOTAServiceUtil {
 							partNosBin.put(storePartNoKey, partNoHolder);
 							log.debug("New Part Number Key for different chunk Size="+storePartNoKey);
 							// Initially
-							HandleHolder holder = coUtil.getHandleHolderValuesForNewPartNo(chunkSize,fotaJsonData,fotaInfo,reqDev,reqReleaseDate);
-											
+							//HandleHolder holder = coUtil.getHandleHolderValuesForNewPartNo(chunkSize,fotaJsonData,fotaInfo,reqDev,reqReleaseDate);
+							// Initially
+							HandleHolder holder = coUtil.getHandleHolderValuesFromPartNo(partNoHolder,fotaJsonData,fotaInfo,reqDev,reqReleaseDate);				
 							//Get Old Handle Id
-							/*handleId = coUtil.getOldHandle(handleHolderBin,fotaJsonData
-									.get(DEVICE_SN));
+							handleId = coUtil.getOldHandle(handleHolderBin,fotaJsonData
+									.get(DEVICE_SN), partNoHolder);
 							if(handleId == null){
 								handleId = getHandleNumber();
 								//Save device details to DB
@@ -391,11 +391,10 @@ public class FOTAServiceUtil {
 								holder.setHandleId(handleId);
 								handleHolderBin.put(handleId, holder);
 							}
-							*/
 							
-							handleId = getHandleNumber();
+							/*handleId = getHandleNumber();
 
-							handleHolderBin.put(handleId, holder);
+							handleHolderBin.put(handleId, holder);*/
 							
 							//To capture chunk size
 							log.debug("New handleId="+handleId+":New software version="+fotaInfo.getSoftVersion()+":New chunksize="+partNoHolder.getChunkSize());

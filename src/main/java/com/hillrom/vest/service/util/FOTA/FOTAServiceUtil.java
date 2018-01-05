@@ -356,7 +356,7 @@ public class FOTAServiceUtil {
 								handleHolderBin.put(handleId, holder);
 
 							}
-							//holder.setHandleId(handleId);
+							holder.setHandleId(handleId);
 							handleHolderBin.put(handleId, holder);
 							/*handleId = getHandleNumber();
 							handleHolderBin.put(handleId, holder);*/
@@ -393,10 +393,7 @@ public class FOTAServiceUtil {
 								holder.setHandleId(handleId);
 								handleHolderBin.put(handleId, holder);
 							}
-							
-							/*handleId = getHandleNumber();
-
-							handleHolderBin.put(handleId, holder);*/
+							holder.setHandleId(handleId);
 							handleHolderBin.put(handleId, holder);
 							//To capture chunk size
 							log.debug("New handleId="+handleId+":New software version="+fotaInfo.getSoftVersion()+":New chunksize="+partNoHolder.getChunkSize());

@@ -1,0 +1,10 @@
+id,type,type_code,type_code_value
+72038,notification_frequency,Daily,Daily
+72039,notification_frequency,Sunday,Sunday
+72040,notification_frequency,Monday,Monday
+72041,notification_frequency,Tuesday,Tuesday
+72042,notification_frequency,Wednesday,Wednesday
+72043,notification_frequency,Thursday,Thursday
+72044,notification_frequency,Friday,Friday
+72045,notification_frequency,Saturday,Saturday
+

@@ -18,6 +18,7 @@ import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 
 import com.hillrom.vest.domain.Clinic;
+import com.hillrom.vest.repository.util.QueryConstants;
 import com.hillrom.vest.web.rest.dto.ClinicStatsNotificationVO;
 
 /**
@@ -26,7 +27,7 @@ import com.hillrom.vest.web.rest.dto.ClinicStatsNotificationVO;
 public interface ClinicMonarchRepository extends JpaRepository<Clinic,String> , QueryDslPredicateExecutor<Clinic> {
 	
 
-	@Query(nativeQuery=true,
+	/*@Query(nativeQuery=true,
 			value=" select puserid,pfirstname,plastname,hcp_id,huserid,CONCAT(hlastName,' ', hfirstName) as hname,clinicId,clinicname,clinicadminid,pc.missed_therapy_count,pc.is_settings_deviated,pc.is_hmr_compliant,"
 					+ " nhn, sdn,mtn,hemail,caname,a_cahmr,a_casdn,a_camtn,a_caemail,clinicadherencesetting from ( "
 					+ " select user.id as puserid,user.first_name as pfirstName,user.last_name as plastName,upa_hcp.user_id as hcp_id"
@@ -49,25 +50,19 @@ public interface ClinicMonarchRepository extends JpaRepository<Clinic,String> , 
 					+ " where clinic.is_deleted=0 and (huser.non_hmr_notification=1 or huser.setting_deviation_notification=1 or huser.missed_therapy_notification=1 )) "
 					+ " as associated_hcp, PATIENT_COMPLIANCE_MONARCH pc "
 					+ " where puserid = pc.user_id AND pc.date=SUBDATE(CURDATE(),1) and associated_patient.hcp_id = associated_hcp.huserid ")
+	List<Object[]> findPatientStatisticsClinicForActiveClinics();*/
+	
+	@Query(nativeQuery=true,
+			 value=QueryConstants.QUERY_PATIENT_STATISTICS_CAREGIVER_MONARCH)
+	List<Object[]> findPatientStatisticsCareGiver();
+	
+	
+	@Query(nativeQuery=true,
+			value=	QueryConstants.QUERY_FOR_ACTIVE_CLINICS_MONARCH)
 	List<Object[]> findPatientStatisticsClinicForActiveClinics();
 	
 	@Query(nativeQuery=true,
-			 value="select puserid,pfirstname,plastname,cgvr_id,CONCAT(clastName,' ', cfirstName) as cname,pc.missed_therapy_count,pc.is_settings_deviated,pc.is_hmr_compliant,"
-					+"cemail, isMissedTherapyNotification,settingDeviationNotification, nonHmrNotification  from ( "
-					+"select user.id as puserid,user.first_name as pfirstName,user.last_name as plastName,upa_cgvr.user_id as cgvr_id "
-					+"from USER user  "
-					+"join USER_AUTHORITY user_authority on user_authority.user_id = user.id and user_authority.authority_name = 'PATIENT' "
-					+"join USER_PATIENT_ASSOC  upa on user.id= upa.user_id and upa.relation_label = 'SELF'  "
-					+"join PATIENT_INFO patInfo on upa.patient_id = patInfo.id  "
-					+"join USER_PATIENT_ASSOC upa_cgvr on patInfo.id = upa_cgvr.patient_id  "
-					+"where user.is_deleted = 0 and user.activated=1) as associated_patient,  "
-					+"(select cuser.id as cuserid,cuser.first_name as cfirstName,cuser.last_name as clastName,cuser.email as cemail, "
-					+"missed_therapy_notification as isMissedTherapyNotification, setting_deviation_notification as settingDeviationNotification, "
-					+ "non_hmr_notification as nonHmrNotification from USER cuser  "
-					+"join USER_AUTHORITY user_authorityc on user_authorityc.user_id = cuser.id and user_authorityc.authority_name = 'CARE_GIVER')  "
-					+"as associated_cgvr, PATIENT_COMPLIANCE_MONARCH pc  where  "
-					+"puserid = pc.user_id AND pc.date=SUBDATE(CURDATE(),1) and  "
-					+"associated_patient.cgvr_id = associated_cgvr.cuserid ")
-	List<Object[]> findPatientStatisticsCareGiver();
-	
+			 value= QueryConstants.QUERY_PATIENT_STATISTICS_CAREGIVER_DETAILS_MONARCH)
+	List<Object[]> findPatientStatisticsCareGiverDetails();
+
 }

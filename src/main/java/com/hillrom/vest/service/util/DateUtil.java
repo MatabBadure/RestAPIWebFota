@@ -338,4 +338,13 @@ public class DateUtil {
 			return(result);
 	   }
 
+  public static String getDayOfTheWeek(){
+		   
+		    Date now = new Date();
+		   
+	        SimpleDateFormat simpleDateformat = new SimpleDateFormat("EEEE"); // the day of the week spelled out completely
+	        String dayOfTheWeek = simpleDateformat.format(now);
+	 
+	        return dayOfTheWeek;
+	   }
 }

@@ -343,7 +343,7 @@ public class FOTAServiceUtil {
 						crcValid = partNoHolder.checkCRC32(fotaInfo);
 						if ( crcValid == true) {
 							// Initially
-							HandleHolder holder = coUtil.getHandleHolderValuesFromPartNo(partNoHolder,fotaJsonData,fotaInfo,reqDev,reqReleaseDate);
+							//HandleHolder holder = coUtil.getHandleHolderValuesFromPartNo(partNoHolder,fotaJsonData,fotaInfo,reqDev,reqReleaseDate);
 
 							//Get Old Handle Id
 							handleId = coUtil.getOldHandle(handleHolderBin,fotaJsonData
@@ -352,12 +352,20 @@ public class FOTAServiceUtil {
 								handleId = getHandleNumber();
 								//Save device details to DB
 								//saveInprogressDeviceDetails(holder);
+								// Initially
+								HandleHolder holder = coUtil.getHandleHolderValuesFromPartNo(partNoHolder,fotaJsonData,fotaInfo,reqDev,reqReleaseDate);	
 								holder.setHandleId(handleId);
 								handleHolderBin.put(handleId, holder);
 
+							}else{
+								// Get Values from Handle Holder if old handle id
+								//HandleHolder holder = coUtil.getHandleHolderValuesFromPartNo(partNoHolder,fotaJsonData,fotaInfo,reqDev,reqReleaseDate);
+								HandleHolder holder = handleHolderBin.get(handleId);
+								holder.setHandleId(handleId);
+								handleHolderBin.put(handleId, holder);
 							}
-							holder.setHandleId(handleId);
-							handleHolderBin.put(handleId, holder);
+							/*holder.setHandleId(handleId);
+							handleHolderBin.put(handleId, holder);*/
 							/*handleId = getHandleNumber();
 							handleHolderBin.put(handleId, holder);*/
 							log.debug("New handleId="+handleId+": Same SoftwareVersion="+fotaInfo.getSoftVersion()+":same chunksize="+partNoHolder.getChunkSize());
@@ -381,20 +389,26 @@ public class FOTAServiceUtil {
 							log.debug("New Part Number Key for different chunk Size="+storePartNoKey);
 							// Initially
 							//HandleHolder holder = coUtil.getHandleHolderValuesForNewPartNo(chunkSize,fotaJsonData,fotaInfo,reqDev,reqReleaseDate);
-							// Initially
-							HandleHolder holder = coUtil.getHandleHolderValuesFromPartNo(partNoHolder,fotaJsonData,fotaInfo,reqDev,reqReleaseDate);				
+							
 							//Get Old Handle Id
 							handleId = coUtil.getOldHandle(handleHolderBin,fotaJsonData
 									.get(DEVICE_SN), partNoHolder);
+							
 							if(handleId == null){
 								handleId = getHandleNumber();
 								//Save device details to DB
 								//saveInprogressDeviceDetails(holder);
+								// Initially
+								HandleHolder holder = coUtil.getHandleHolderValuesFromPartNo(partNoHolder,fotaJsonData,fotaInfo,reqDev,reqReleaseDate);	
+								holder.setHandleId(handleId);
+								handleHolderBin.put(handleId, holder);
+							}else{
+								// Get Values from Handle Holder if old handle id
+								//HandleHolder holder = coUtil.getHandleHolderValuesFromPartNo(partNoHolder,fotaJsonData,fotaInfo,reqDev,reqReleaseDate);
+								HandleHolder holder = handleHolderBin.get(handleId);
 								holder.setHandleId(handleId);
 								handleHolderBin.put(handleId, holder);
 							}
-							holder.setHandleId(handleId);
-							handleHolderBin.put(handleId, holder);
 							//To capture chunk size
 							log.debug("New handleId="+handleId+":New software version="+fotaInfo.getSoftVersion()+":New chunksize="+partNoHolder.getChunkSize());
 						} else {

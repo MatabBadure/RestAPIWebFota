@@ -148,17 +148,17 @@ public class FOTAService {
 		if (fotaJsonData.get(RESULT).equals(OK)) {
 			//Added method to store device details
 			finalResponseStr = requestType3Response(finalResponseStr,handleId,SUCCESS_LIST,rawMessage,resultPair,crsResultValue);
-			handleHolderBin.remove(handleId);
+			//handleHolderBin.remove(handleId);
 			
 		} else if (fotaJsonData.get(RESULT).equals(NOT_OK)) {
 			//Added method to store device details
 			finalResponseStr = requestType3Response(finalResponseStr,handleId,FAILURE_LIST,rawMessage,resultPair,crsResultValue);
-			handleHolderBin.remove(handleId);
+			//handleHolderBin.remove(handleId);
 
 		} else if (fotaJsonData.get(RESULT).equals(ABORTED)) {
 			//Added method to store device details
 			finalResponseStr = requestType3Response(finalResponseStr,handleId,ABORTED_LIST,rawMessage,resultPair,crsResultValue);
-			handleHolderBin.remove(handleId);
+			//handleHolderBin.remove(handleId);
 		}
 		return finalResponseStr;
 	}

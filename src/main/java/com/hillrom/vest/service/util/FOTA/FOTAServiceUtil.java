@@ -84,15 +84,18 @@ public class FOTAServiceUtil {
 			holder = handleHolderBin.get(handleId);
 			FOTADeviceFWareUpdate fotaDeviceFWareUpdate = new FOTADeviceFWareUpdate();
 			// Get FOTADevice
-			fotaDeviceFWareUpdate = fotaDeviceRepository
-					.getFOTADeviceFWwareDetailsByDevSN(holder
-							.getDeviceSerialNumber(),INPROGRESS_LIST);
+			if(Objects.nonNull(holder)){
+				fotaDeviceFWareUpdate = fotaDeviceRepository
+						.getFOTADeviceFWwareDetailsByDevSN(holder
+								.getDeviceSerialNumber(),INPROGRESS_LIST,holder.getFotaInfoId());
+			}
 			if (fotaDeviceFWareUpdate != null) {
 				fotaDeviceFWareUpdate.setDownloadStartDateTime(holder
 						.getDownloadStartDateTime());
 				fotaDeviceFWareUpdate.setDownloadEndDateTime(new DateTime());
 				fotaDeviceFWareUpdate.setDownloadStatus(status);
 				fotaDeviceRepository.save(fotaDeviceFWareUpdate);
+				handleHolderBin.remove(handleId);
 			}
 		} catch (Exception ex) {
 			log.error(ex.getMessage());

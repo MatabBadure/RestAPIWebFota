@@ -6,9 +6,9 @@ public class CareGiverStatsNotificationVO {
 	
 	public CareGiverStatsNotificationVO(BigInteger patientUserid, String patientFirstname, String patientLastname,
 			BigInteger careGiverId, String careGiverName, int missedTherapyCount, boolean isSettingsDeviated,
-			boolean isHMRCompliant, String cGEmail, boolean isHcpAcceptHMRNotification,
-			boolean isHcpAcceptSettingsNotification, boolean isHcpAcceptTherapyNotification,
-			String nonHMRNotificationFreq, String missedTherapyNotificationFreq, 
+			boolean isHMRCompliant, String cGEmail, boolean isHcpAcceptTherapyNotification,
+			boolean isHcpAcceptSettingsNotification, boolean isHcpAcceptHMRNotification,			
+			String missedTherapyNotificationFreq,String nonHMRNotificationFreq, 
 			String settingDeviationNotificationFreq){
 		this.patientUserid = patientUserid;
 		this.patientFirstname = patientFirstname;
@@ -19,12 +19,12 @@ public class CareGiverStatsNotificationVO {
 		this.isSettingsDeviated = isSettingsDeviated;
 		this.isHMRCompliant = isHMRCompliant;
 		this.CGEmail = cGEmail;
-		this.isHcpAcceptHMRNotification = isHcpAcceptHMRNotification;
-		this.isHcpAcceptSettingsNotification = isHcpAcceptSettingsNotification;
 		this.isHcpAcceptTherapyNotification = isHcpAcceptTherapyNotification;
-		this.nonHMRNotificationFreq= nonHMRNotificationFreq;		
+		this.isHcpAcceptSettingsNotification = isHcpAcceptSettingsNotification;
+		this.isHcpAcceptHMRNotification = isHcpAcceptHMRNotification;		
 		this.missedTherapyNotificationFreq= missedTherapyNotificationFreq;
-		this.settingDeviationNotificationFreq= settingDeviationNotificationFreq;
+		this.nonHMRNotificationFreq= nonHMRNotificationFreq;	
+		this.settingDeviationNotificationFreq= settingDeviationNotificationFreq;			
 	}
 	
 	private BigInteger patientUserid;

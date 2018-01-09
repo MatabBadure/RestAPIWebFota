@@ -85,9 +85,11 @@ public class FOTAServiceUtil {
 			FOTADeviceFWareUpdate fotaDeviceFWareUpdate = new FOTADeviceFWareUpdate();
 			// Get FOTADevice
 			if(Objects.nonNull(holder)){
-				fotaDeviceFWareUpdate = fotaDeviceRepository
+				/*fotaDeviceFWareUpdate = fotaDeviceRepository
 						.getFOTADeviceFWwareDetailsByDevSN(holder
-								.getDeviceSerialNumber(),INPROGRESS_LIST,holder.getFotaInfoId());
+								.getDeviceSerialNumber(),INPROGRESS_LIST,holder.getFotaInfoId());*/
+				fotaDeviceFWareUpdate = fotaDeviceRepository
+						.getFOTADeviceFWwareDetailsByDevSN(holder.getDeviceId(),INPROGRESS_LIST);
 			}
 			if (fotaDeviceFWareUpdate != null) {
 				fotaDeviceFWareUpdate.setDownloadStartDateTime(holder
@@ -103,10 +105,11 @@ public class FOTAServiceUtil {
 		}
 	}
 
-	public void saveInprogressDeviceDetails(HandleHolder holder) {
+	public FOTADeviceFWareUpdate saveInprogressDeviceDetails(HandleHolder holder) {
+		FOTADeviceFWareUpdate fotaDeviceFWareUpdate = null;
+		
 		try {
-			
-			FOTADeviceFWareUpdate fotaDeviceFWareUpdate = new FOTADeviceFWareUpdate();
+			fotaDeviceFWareUpdate = new FOTADeviceFWareUpdate();
 			fotaDeviceFWareUpdate.setFotaInfoId(holder.getFotaInfoId());
 			fotaDeviceFWareUpdate.setDeviceSerialNumber(holder
 					.getDeviceSerialNumber());
@@ -121,13 +124,13 @@ public class FOTAServiceUtil {
 			fotaDeviceFWareUpdate.setConnectionType(holder.getConnectionType());
 			fotaDeviceFWareUpdate.setDownloadStatus("In progress");
 			fotaDeviceFWareUpdate.setDownloadStartDateTime(holder.getDownloadStartDateTime());
-			
 			fotaDeviceRepository.save(fotaDeviceFWareUpdate);
-
+			
 		} catch (Exception ex) {
 			log.error(ex.getMessage());
 			ex.printStackTrace();
 		}
+		return fotaDeviceFWareUpdate;
 	}
 
 	public String getRequestType2(String rawMessage, Map<String, HandleHolder> handleHolderBin, Map<String, PartNoHolder> partNosBin, Map<String, String> fotaJsonData) {

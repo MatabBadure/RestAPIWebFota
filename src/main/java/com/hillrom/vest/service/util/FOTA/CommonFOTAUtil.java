@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hillrom.vest.domain.FOTA.FOTADeviceFWareUpdate;
 import com.hillrom.vest.domain.FOTA.FOTAInfo;
 import com.hillrom.vest.web.rest.FOTA.dto.HandleHolder;
 import com.hillrom.vest.web.rest.FOTA.dto.PartNoHolder;
@@ -731,8 +732,12 @@ public class CommonFOTAUtil {
 				if(chunkNumber == 0 && (holder.getSendChunkReq() == false)){
 					holder.setDownloadStartDateTime(new DateTime());
 					//Save device details to DB
-					utilService.saveInprogressDeviceDetails(holder);
+					FOTADeviceFWareUpdate fotaDeviceFWareUpdate = null;
+					fotaDeviceFWareUpdate = utilService.saveInprogressDeviceDetails(holder);
 					holder.setSendChunkReq(true);
+					if(Objects.nonNull(fotaDeviceFWareUpdate)){
+						holder.setDeviceId(fotaDeviceFWareUpdate.getId());
+					}
 					handleHolderBin.put(handleId, holder);
 				}
 				log.debug("Send  Chunk with chunk number Handle Id ="+handleId);
@@ -839,7 +844,6 @@ public class CommonFOTAUtil {
 		//added new stmt
 		holder.setSoftwareVersion(fotaInfo.getSoftVersion());
 		//holder.setInitialReq(true);
-		
 		return holder;
 	}
 

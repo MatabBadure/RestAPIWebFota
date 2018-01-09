@@ -1249,43 +1249,41 @@ public static Set<User> mailServiceNotificationForHcpandAdmin(Map<User, Map<Stri
 		
 	}
 
-private Map<User, Map<String, Map<String, Integer>>> getProcessedUserClinicStatsMap(
-		Map<BigInteger, User> idUserMap,
-		Map<String, String> clinicIdNameMap,
-		Map<BigInteger, Map<String, Map<String, Integer>>> userClinicStats
-		) {
-	
-	int settingsDeviatedPatients =0; int hmrNonCompliantPatients =0; int missedTherapyPatients=0;
-	Map<User, Map<String, Map<String, Integer>>> userClinicStatsMap = new HashMap<>();
-	for(BigInteger userId: userClinicStats.keySet()){
-		User user = idUserMap.get(userId);
-		Map<String,Map<String,Integer>> clinicidStats =  userClinicStats.get(userId);
-		for(String clinicId : clinicidStats.keySet()){
-			String clinicName = clinicIdNameMap.get(clinicId);
-			Map<String,Integer> stats = clinicidStats.get(clinicId);
-			if(Objects.nonNull(user.isMissedTherapyNotification()) && user.isMissedTherapyNotification()){
-			missedTherapyPatients = Objects.nonNull(stats.get("patientsWithMissedTherapy"))?
-					stats.get("patientsWithMissedTherapy"):0;				
-			}
-			if(Objects.nonNull(user.isSettingDeviationNotification()) && user.isSettingDeviationNotification()){
-			settingsDeviatedPatients = Objects.nonNull(stats.get("patientsWithSettingDeviation"))?
-					stats.get("patientsWithSettingDeviation"):0;				
-			}			
-			if(Objects.nonNull(user.isNonHMRNotification()) && user.isNonHMRNotification()){
-			hmrNonCompliantPatients = Objects.nonNull(stats.get("patientsWithHmrNonCompliance"))?
-					stats.get("patientsWithHmrNonCompliance"):0;				
-			}
-			if(missedTherapyPatients > 0 || settingsDeviatedPatients > 0
-					|| hmrNonCompliantPatients > 0){
-				Map<String,Map<String,Integer>> clinicNameStatsMap = new HashMap<>();
-				clinicNameStatsMap.put(clinicName, stats);
-				userClinicStatsMap.put(user, clinicNameStatsMap);
+	private Map<User, Map<String, Map<String, Integer>>> getProcessedUserClinicStatsMap(
+			Map<BigInteger, User> idUserMap,
+			Map<String, String> clinicIdNameMap,
+			Map<BigInteger, Map<String, Map<String, Integer>>> userClinicStats
+			) {
+		int settingsDeviatedPatients =0; int hmrNonCompliantPatients =0; int missedTherapyPatients=0;
+		Map<User, Map<String, Map<String, Integer>>> userClinicStatsMap = new HashMap<>();
+		for(BigInteger userId: userClinicStats.keySet()){
+			User user = idUserMap.get(userId);
+			Map<String,Map<String,Integer>> clinicidStats =  userClinicStats.get(userId);
+			for(String clinicId : clinicidStats.keySet()){
+				String clinicName = clinicIdNameMap.get(clinicId);
+				Map<String,Integer> stats = clinicidStats.get(clinicId);
+				if(Objects.nonNull(user.isMissedTherapyNotification()) && user.isMissedTherapyNotification()){
+					missedTherapyPatients = Objects.nonNull(stats.get("patientsWithMissedTherapy"))?
+						stats.get("patientsWithMissedTherapy"):0;
+				}
+				if(Objects.nonNull(user.isSettingDeviationNotification()) && user.isSettingDeviationNotification()){
+					settingsDeviatedPatients = Objects.nonNull(stats.get("patientsWithSettingDeviation"))?
+						stats.get("patientsWithSettingDeviation"):0;
+				}
+				if(Objects.nonNull(user.isNonHMRNotification()) && user.isNonHMRNotification()){
+					hmrNonCompliantPatients = Objects.nonNull(stats.get("patientsWithHmrNonCompliance"))?
+						stats.get("patientsWithHmrNonCompliance"):0;
+				}
+				if(missedTherapyPatients > 0 || settingsDeviatedPatients > 0
+						|| hmrNonCompliantPatients > 0){
+					Map<String,Map<String,Integer>> clinicNameStatsMap = new HashMap<>();
+					clinicNameStatsMap.put(clinicName, stats);
+					userClinicStatsMap.put(user, clinicNameStatsMap);
+				}
 			}
 		}
+		return userClinicStatsMap;
 	}
-	return userClinicStatsMap;
-}
-	
 
 	private Map<BigInteger, Map<String, Map<String, Integer>>> getPatientStatsWithHcpClinicAssociation(
 			List<ClinicStatsNotificationVO> statsNotificationVOs) {

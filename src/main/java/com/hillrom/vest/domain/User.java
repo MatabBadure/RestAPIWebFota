@@ -644,20 +644,14 @@ public class User extends AbstractAuditingEntity implements Serializable {
 				+ missedTherapyNotificationFreq
 				+ ", settingDeviationNotificationFreq="
 				+ settingDeviationNotificationFreq + ", reRegister="
-				+ ", expirationDate=" + expirationDate + ", reRegister="
-				+ reRegister + ", nonHMRNotificationFreq="
-				+ nonHMRNotificationFreq + ", missedTherapyNotificationFreq="
-				+ missedTherapyNotificationFreq
-				+ ", settingDeviationNotificationFreq="
-				+ settingDeviationNotificationFreq + ", vestGarmentColor="
-				+ vestGarmentColor + ", vestGarmentSize=" + vestGarmentSize
-				+ ", vestGarmentType=" + vestGarmentType
-				+ ", monarchGarmentColor=" + monarchGarmentColor
-				+ ", monarchGarmentSize=" + monarchGarmentSize
-				+ ", monarchGarmentType=" + monarchGarmentType
-				+ ", deactivationReason=" + deactivationReason
-				+ ", userPreferenceTimezone=" + userPreferenceTimezone + "]";
-	}
-
+				+ reRegister + ", vestGarmentColor=" + vestGarmentColor
+				+ ", vestGarmentSize=" + vestGarmentSize + ", vestGarmentType="
+				+ vestGarmentType + ", monarchGarmentColor="
+				+ monarchGarmentColor + ", monarchGarmentSize="
+				+ monarchGarmentSize + ", monarchGarmentType="
+				+ monarchGarmentType + ", deactivationReason="
+				+ deactivationReason + ", userPreferenceTimezone="
+				+ userPreferenceTimezone + "]";
+	}	
 }
 

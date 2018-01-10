@@ -41,11 +41,11 @@ spring:
     recaptcha:
         recaptchaPrivateKey: 6LcXjQkTAAAAACiA7rx7o7wlifQ7n3VQ_It-sncc
     notification:
-        hcpOrClinicAdminDashboardUrl: http://qaserver.hillromvest.com
-        patientDashboardUrl: http://qaserver.hillromvest.com
-        careGiverDashboardUrl: http://qaserver.hillromvest.com
-        baseUrl: http://qaserver.hillromvest.com
-        fotaBaseUrl:  http://qaserver.hillromvest.com
+        hcpOrClinicAdminDashboardUrl: http://qaservernew.hillromvest.com
+        patientDashboardUrl: http://qaservernew.hillromvest.com
+        careGiverDashboardUrl: http://qaservernew.hillromvest.com
+        baseUrl: http://qaservernew.hillromvest.com
+        fotaBaseUrl:  http://qaservernew.hillromvest.com
         accountActivationReminderInterval: 72
     survey:
         surveyreportemailids: vijayanand.jayapal@lnttechservices.com,nagendra.tv@lnttechservices.com

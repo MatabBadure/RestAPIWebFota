@@ -33,7 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.hillrom.monarch.repository.PatientComplianceMonarchRepository;
 import com.hillrom.monarch.repository.PatientMonarchDeviceRepository;
 import com.hillrom.monarch.repository.PatientNoEventsMonarchRepository;
-import com.hillrom.monarch.service.PatientProtocolMonarchService;
 import com.hillrom.monarch.service.PatientVestDeviceMonarchService;
 import com.hillrom.vest.config.Constants;
 import com.hillrom.vest.domain.Announcements;
@@ -43,8 +42,6 @@ import com.hillrom.vest.domain.PatientDevicesAssoc;
 import com.hillrom.vest.domain.PatientInfo;
 import com.hillrom.vest.domain.PatientNoEvent;
 import com.hillrom.vest.domain.PatientNoEventMonarch;
-import com.hillrom.vest.domain.PatientProtocolData;
-import com.hillrom.vest.domain.PatientProtocolDataMonarch;
 import com.hillrom.vest.domain.PatientVestDeviceHistory;
 import com.hillrom.vest.domain.PatientVestDeviceHistoryMonarch;
 import com.hillrom.vest.domain.User;
@@ -143,12 +140,6 @@ public class TimsService {
 	@Inject
 	public EntityManager entityManager;
 	
-	@Inject
-	public PatientProtocolService patientProtocolService;
-	
-	@Inject
-	public PatientProtocolMonarchService patientProtocolMonarchService;
-	
 	
 	
 	 DateTimeFormatter dobFormat = DateTimeFormat.forPattern("yyyy-MM-dd");
@@ -162,7 +153,6 @@ public class TimsService {
 		 * @throws HillromException
 		 */
 		public void insertIntoProtocolDataTempTable(String patient_id,
-				                                    String device_type,
                 									String type,
 									                int treatments_per_day,
 									                String treatment_label,
@@ -699,32 +689,6 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 	}
 	
 	
-	
-	public void createDefaultProtocol(PatientInfoDTO patientInfoDTO) throws Exception{	
-
-			List<PatientProtocolData> protocol =  patientProtocolService.findOneByPatientUserIdAndStatus(Long.parseLong(patientInfoDTO.getPatient_user_id()), false);
-			
-			if(protocol.isEmpty()) {
-				//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
-					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"VEST","Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
-					patientInfoDTO.setOperation_type("Insert");
-					createPatientProtocol(patientInfoDTO);
-			}
-	}
-	
-	public void createDefaultProtocolMonarch(PatientInfoDTO patientInfoDTO) throws Exception{
-
-		List<PatientProtocolDataMonarch> protocol =  patientProtocolMonarchService.findOneByPatientUserIdAndStatus(Long.parseLong(patientInfoDTO.getPatient_user_id()), false);
-		
-		if(protocol.isEmpty()) {
-				// insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
-				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"MONARCH","Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
-				patientInfoDTO.setOperation_type("Insert");
-				createPatientProtocolMonarch(patientInfoDTO);
-		}
-	}
-	
-	
 	// All Cases start below <ScenarioName>Vest
 	//JIRA-ID HILL-2407 
 	public boolean CASE1_NeitherPatientNorDeviceExist_VEST(PatientInfoDTO patientInfoDTO){
@@ -747,8 +711,10 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
-				// Creating default protocol when there is no protocol
-				createDefaultProtocol(patientInfoDTO);
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocol(patientInfoDTO);
 				tims.processed_atleast_one = true;
 			
 			}
@@ -811,9 +777,10 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
-				
-				// Creating default protocol when there is no protocol
-				createDefaultProtocol(patientInfoDTO);
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocol(patientInfoDTO);
 				tims.processed_atleast_one = true;
 			}
 			catch(SQLException se)
@@ -893,9 +860,10 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
-			
-				// Creating default protocol when there is no protocol
-				createDefaultProtocol(patientInfoDTO);
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocol(patientInfoDTO);
 				tims.processed_atleast_one = true;
 			}
 			catch(SQLException se)
@@ -955,9 +923,10 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
-			
-				// Creating default protocol when there is no protocol
-				createDefaultProtocol(patientInfoDTO);
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocol(patientInfoDTO);
 				tims.processed_atleast_one = true;
 				
 			}
@@ -1008,8 +977,10 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setOperation_type("UPDATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 			
-				// Creating default protocol when there is no protocol
-				createDefaultProtocol(patientInfoDTO);
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocol(patientInfoDTO);
 				tims.processed_atleast_one = true;
 			}
 			catch(SQLException se)
@@ -1067,8 +1038,10 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDevice(patientInfoDTO);
 				
-				// Creating default protocol when there is no protocol
-				createDefaultProtocol(patientInfoDTO);
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocol(patientInfoDTO);
 				tims.processed_atleast_one = true;
 			}
 			catch(SQLException se)
@@ -1119,8 +1092,10 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
-				// Creating default protocol when there is no protocol
-				createDefaultProtocol(patientInfoDTO);
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocol(patientInfoDTO);
 				tims.processed_atleast_one = true;
 			}
 			catch(SQLException se)
@@ -1172,8 +1147,10 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
-				// Creating default protocol when there is no protocol
-				createDefaultProtocol(patientInfoDTO);
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocol(patientInfoDTO);
 				tims.processed_atleast_one = true;
 			}
 			catch(SQLException se)
@@ -1285,8 +1262,10 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 							filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
-					// Creating default protocol when there is no protocol
-					createDefaultProtocol(patientInfoDTO);
+				//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
+					patientInfoDTO.setOperation_type("Insert");
+					createPatientProtocol(patientInfoDTO);
 					tims.processed_atleast_one = true;
 				}
 				catch(SQLException se)
@@ -1367,9 +1346,10 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 							filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
-			
-					// Creating default protocol when there is no protocol
-					createDefaultProtocol(patientInfoDTO);
+				//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
+					patientInfoDTO.setOperation_type("Insert");
+					createPatientProtocol(patientInfoDTO);
 					tims.processed_atleast_one = true;
 					
 				}
@@ -1459,9 +1439,9 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 							filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
-					
-					// Creating default protocol when there is no protocol
-					createDefaultProtocol(patientInfoDTO);
+					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
+					patientInfoDTO.setOperation_type("Insert");
+					createPatientProtocol(patientInfoDTO);
 					tims.processed_atleast_one = true;
 				}
 				catch(SQLException se)
@@ -1522,8 +1502,10 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 		
-				// Creating default protocol when there is no protocol
-				createDefaultProtocolMonarch(patientInfoDTO);
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocolMonarch(patientInfoDTO);
 				tims.processed_atleast_one = true;
 		
 			}
@@ -1579,9 +1561,10 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
-			
-				// Creating default protocol when there is no protocol
-				createDefaultProtocolMonarch(patientInfoDTO);
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocolMonarch(patientInfoDTO);
 				tims.processed_atleast_one = true;
 			}catch(SQLException se)
 			{
@@ -1661,9 +1644,10 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
-			
-				// Creating default protocol when there is no protocol
-				createDefaultProtocolMonarch(patientInfoDTO);
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id()+new Random().nextInt(6));
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocolMonarch(patientInfoDTO);
 				tims.processed_atleast_one = true;
 			}
 			catch(SQLException se)
@@ -1722,9 +1706,10 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
-			
-				// Creating default protocol when there is no protocol
-				createDefaultProtocolMonarch(patientInfoDTO);
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocolMonarch(patientInfoDTO);
 				tims.processed_atleast_one = true;
 			}
 			catch(SQLException se)
@@ -1777,9 +1762,10 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setOperation_type("UPDATE");
 				managePatientDeviceAssociationMonarch(patientInfoDTO);
 								
-			
-				// Creating default protocol when there is no protocol
-				createDefaultProtocolMonarch(patientInfoDTO);
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocolMonarch(patientInfoDTO);
 				tims.processed_atleast_one = true;
 			}
 			catch(SQLException se)
@@ -1840,9 +1826,10 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
              	patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceMonarch(patientInfoDTO);   //if it's required please uncomment
 				
-			 
-				// Creating default protocol when there is no protocol
-				createDefaultProtocolMonarch(patientInfoDTO);
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocolMonarch(patientInfoDTO);
 				tims.processed_atleast_one = true;
 			}
 			catch(SQLException se)
@@ -1898,8 +1885,10 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setOperation_type("CREATE");
 				managePatientDeviceAssociation(patientInfoDTO);
 				
-				// Creating default protocol when there is no protocol
-				createDefaultProtocolMonarch(patientInfoDTO);
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocolMonarch(patientInfoDTO);
 				tims.processed_atleast_one = true;
 			}catch(SQLException se)
 			{
@@ -1956,8 +1945,10 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 				patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 				patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 						filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
-				// Creating default protocol when there is no protocol
-				createDefaultProtocolMonarch(patientInfoDTO);
+			//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+				insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
+				patientInfoDTO.setOperation_type("Insert");
+				createPatientProtocolMonarch(patientInfoDTO);
 				tims.processed_atleast_one = true;
 			}catch(SQLException se)
 			{
@@ -2075,9 +2066,10 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 							filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
-					
-					// Creating default protocol when there is no protocol
-					createDefaultProtocolMonarch(patientInfoDTO);
+				//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
+					patientInfoDTO.setOperation_type("Insert");
+					createPatientProtocolMonarch(patientInfoDTO);
 					tims.processed_atleast_one = true;
 				}catch(SQLException se)
 				{
@@ -2154,9 +2146,10 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 							filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
-					
-					// Creating default protocol when there is no protocol
-                    createDefaultProtocolMonarch(patientInfoDTO);
+				//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
+					patientInfoDTO.setOperation_type("Insert");
+					createPatientProtocolMonarch(patientInfoDTO);
 					tims.processed_atleast_one = true;
 				}
 				catch(SQLException se)
@@ -2256,9 +2249,10 @@ public boolean isHillromIdHasVestDeviceInPatientDeviceAssoc(String hillromId){
 					patientInfoDTO.setPatient_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getId());
 					patientInfoDTO.setPatient_user_id(patientInfoService.findOneByHillromId(patientInfoDTO.getTims_cust()).get().getUserPatientAssoc().stream().
 							filter(userPatientAssoc -> RelationshipLabelConstants.SELF.equals(userPatientAssoc.getRelationshipLabel())).collect(Collectors.toList()).get(0).getUser().getId().toString());
-				
-					// Creating default protocol when there is no protocol
-					createDefaultProtocolMonarch(patientInfoDTO);
+				//	insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,10,14,1,10,1,patientInfoDTO.getPatient_user_id());
+					insertIntoProtocolDataTempTable(patientInfoDTO.getPatient_id(),"Normal",2,null,5,20,5,20,1,10,1,patientInfoDTO.getPatient_user_id());
+					patientInfoDTO.setOperation_type("Insert");
+					createPatientProtocolMonarch(patientInfoDTO);
 					tims.processed_atleast_one = true;
 				}
 				catch(SQLException se)

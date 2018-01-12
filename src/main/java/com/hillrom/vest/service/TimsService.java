@@ -176,6 +176,7 @@ public class TimsService {
 									                String user_id) throws SQLException, HillromException{	
 			try{
 					timsUserRepository.insertIntoProtocolDataTempTable(patient_id,
+													device_type,
 													type,
 									                treatments_per_day,
 									                treatment_label,

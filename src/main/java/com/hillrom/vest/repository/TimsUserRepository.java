@@ -435,7 +435,7 @@ public class TimsUserRepository{
                          entityManager
                          .createNativeQuery("insert into protocol_data_temp_table("
                                 + "patient_id,"
-                        		+ "device_type"
+                        		+ "device_type,"
                                 + "type,"
                                 + "treatments_per_day,"          
                                 + "treatment_label,"      
@@ -448,6 +448,7 @@ public class TimsUserRepository{
                                 + "to_be_inserted,"
                                 + "id) values ("
                                 + ":patient_id,"
+                                + ":device_type,"
                                 + ":type,"
                                 + ":treatments_per_day,"         
                                 + ":treatment_label,"            

@@ -33,7 +33,7 @@ public class HillromTypeCodeFormatService {
 			return typeCodeList;
 	}
 
-	// fetch the generic time zones from DateUtil 
+	// fetches the time zones from TimeZoneUtil
 	public Map<String, String> getTimeZoneList(){
 		Map<String,String> timeZones = new LinkedHashMap<String,String>();
 		try {

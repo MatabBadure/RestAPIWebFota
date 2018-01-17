@@ -91,7 +91,7 @@ public class UtilResource {
     	Map<String,String> map = new LinkedHashMap<String, String>();
 		
     	try {
-			map = hillromTypeCodeFormatService.getTimeZones();
+			map = hillromTypeCodeFormatService.getGenericWindowsTimeZonesList();
 			if(map.size() > 0){
 				jsonObject.put("message","Time zones fetched succesfully");
 				jsonObject.put("timezones",map);

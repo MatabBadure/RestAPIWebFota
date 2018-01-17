@@ -46,8 +46,8 @@ public class HillromTypeCodeFormatService {
 		return null;
 	}	
 
-	// fetch the time zones from TimeZoneUtil 
-	public Map<String,String> getTimeZones(){
+	// fetch the generic windows time zones from TimeZoneUtil 
+	public Map<String,String> getGenericWindowsTimeZonesList(){
 		Map<String,String> timeZones = new LinkedHashMap<String,String>();
 		try {
 			timeZones =  TimeZoneUtil.getTimezones();

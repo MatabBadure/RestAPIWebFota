@@ -419,6 +419,7 @@ public class TimsUserRepository{
 			
 			@Transactional
             public void insertIntoProtocolDataTempTable(String patient_id,
+            																	String device_type,
                                                                                 String type,
                                                                                 int treatments_per_day,
                                                                                 String treatment_label,
@@ -434,6 +435,7 @@ public class TimsUserRepository{
                          entityManager
                          .createNativeQuery("insert into protocol_data_temp_table("
                                 + "patient_id,"
+                        		+ "device_type,"
                                 + "type,"
                                 + "treatments_per_day,"          
                                 + "treatment_label,"      
@@ -446,6 +448,7 @@ public class TimsUserRepository{
                                 + "to_be_inserted,"
                                 + "id) values ("
                                 + ":patient_id,"
+                                + ":device_type,"
                                 + ":type,"
                                 + ":treatments_per_day,"         
                                 + ":treatment_label,"            
@@ -458,6 +461,7 @@ public class TimsUserRepository{
                                 + ":to_be_inserted,"
                                 + ":id)")
                          .setParameter("patient_id", patient_id)
+                         .setParameter("device_type", device_type)
                          .setParameter("type", type)
                          .setParameter("treatments_per_day",treatments_per_day)
                          .setParameter("treatment_label", treatment_label)     

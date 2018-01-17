@@ -1,6 +1,5 @@
 package com.hillrom.vest.web.rest;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +10,6 @@ import net.minidev.json.JSONObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hillrom.vest.domain.HillromTypeCodeFormat;
 import com.hillrom.vest.exceptionhandler.HillromException;
-import com.hillrom.vest.repository.HillromTypeCodeFormatRepository;
 import com.hillrom.vest.service.HillromTypeCodeFormatService;
 import com.hillrom.vest.util.MessageConstants;
 
@@ -94,7 +91,7 @@ public class UtilResource {
     	Map<String,String> map = new LinkedHashMap<String, String>();
 		
     	try {
-			map = hillromTypeCodeFormatService.getTimeZoneList();
+			map = hillromTypeCodeFormatService.getGenericWindowsTimeZonesList();
 			if(map.size() > 0){
 				jsonObject.put("message","Time zones fetched succesfully");
 				jsonObject.put("timezones",map);

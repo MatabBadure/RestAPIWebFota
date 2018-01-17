@@ -1,6 +1,7 @@
 package com.hillrom.vest.web.rest;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -90,10 +91,10 @@ public class UtilResource {
     public ResponseEntity<JSONObject> genericTimeZonesList() throws HillromException {
     	log.debug("REST request to get timezones : ");
     	JSONObject jsonObject = new JSONObject();
-    	Map<String,String> map = new HashMap<String, String>();
+    	Map<String,String> map = new LinkedHashMap<String, String>();
 		
     	try {
-			map = hillromTypeCodeFormatService.getGenericTimeZonesList();
+			map = hillromTypeCodeFormatService.getTimeZoneList();
 			if(map.size() > 0){
 				jsonObject.put("message","Time zones fetched succesfully");
 				jsonObject.put("timezones",map);

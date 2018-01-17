@@ -1,9 +1,11 @@
 package com.hillrom.vest.service;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.hillrom.vest.domain.HillromTypeCodeFormat;
 import com.hillrom.vest.repository.HillromTypeCodeFormatRepository;
 import com.hillrom.vest.service.util.DateUtil;
+import com.hillrom.vest.service.util.TimeZoneUtil;
 
 @Service
 @Transactional
@@ -29,19 +32,17 @@ public class HillromTypeCodeFormatService {
 			List<HillromTypeCodeFormat> typeCodeList = hillromTypeCodeFormatRepository.findDiagnosisTypeCode(searchString);
 			return typeCodeList;
 	}
-	
 
 	// fetch the generic time zones from DateUtil 
-	public Map<String,String> getGenericTimeZonesList(){
-		Map<String,String> timeZones = new HashMap<String,String>();
+	public Map<String, String> getTimeZoneList(){
+		Map<String,String> timeZones = new LinkedHashMap<String,String>();
 		try {
-			timeZones =  DateUtil.getTimeZoneList();
-			Map<String,String> treeMap = new TreeMap<String,String>(timeZones); // to sort the keys(time zones) in alphabetical order
-			return treeMap;
+			timeZones = TimeZoneUtil.getTimezones();
+			return timeZones;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
-	}	
+	}
 
 }

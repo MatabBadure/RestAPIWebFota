@@ -5,7 +5,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -32,17 +31,30 @@ public class HillromTypeCodeFormatService {
 			List<HillromTypeCodeFormat> typeCodeList = hillromTypeCodeFormatRepository.findDiagnosisTypeCode(searchString);
 			return typeCodeList;
 	}
+	
 
-	// fetches the time zones from TimeZoneUtil
-	public Map<String, String> getTimeZoneList(){
+	// fetch the generic time zones from DateUtil 
+	public Map<String,String> getGenericTimeZonesList(){
+		Map<String,String> timeZones = new HashMap<String,String>();
+		try {
+			timeZones =  DateUtil.getTimeZoneList();
+			Map<String,String> treeMap = new TreeMap<String,String>(timeZones); // to sort the keys(time zones) in alphabetical order
+			return treeMap;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}	
+
+	// fetch the time zones from TimeZoneUtil 
+	public Map<String,String> getTimeZonesList(){
 		Map<String,String> timeZones = new LinkedHashMap<String,String>();
 		try {
-			timeZones = TimeZoneUtil.getTimezones();
+			timeZones =  TimeZoneUtil.getTimezones();
 			return timeZones;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
-	}
-
+	}	
 }

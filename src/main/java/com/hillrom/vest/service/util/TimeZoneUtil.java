@@ -74,6 +74,7 @@ public class TimeZoneUtil {
 		timeZones.put("Europe/Bucharest", "(UTC+02:00) Athens, Bucharest");
 		timeZones.put("Asia/Beirut", "(UTC+02:00) Beirut");
 		timeZones.put("Africa/Cairo", "(UTC+02:00) Cairo");
+		timeZones.put("Europe/Chisinau", "(UTC+02:00) Chisinau");
 		timeZones.put("Asia/Damascus", "(UTC+02:00) Damascus");
 		timeZones.put("Asia/Hebron", "(UTC+02:00) Gaza, Hebron");
 		timeZones.put("Africa/Johannesburg", "(UTC+02:00) Harare, Pretoria");

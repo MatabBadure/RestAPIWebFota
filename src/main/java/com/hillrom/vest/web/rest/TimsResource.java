@@ -164,10 +164,8 @@ public class TimsResource {
 
 		JSONObject jsonObject = new JSONObject();
 		System.out.println("I am here in call of createpatientprotocolmonarch ");
-		try{
-				
-				
-			timsUserRepository.insertIntoProtocolDataTempTable("HR2015000002", "Normal", 2, "3", 5, 20, 10, 14, 1, 10, 1, "214");
+		try{				
+			timsUserRepository.insertIntoProtocolDataTempTable("HR2015000002","MONARCH", "Normal", 2, "3", 5, 20, 10, 14, 1, 10, 1, "214");
 			  jsonObject.put("timsMsg", "Record in protocol data temp table created successfully");
 			  return new ResponseEntity<>(jsonObject, HttpStatus.CREATED);			
 		}catch(Exception ex){

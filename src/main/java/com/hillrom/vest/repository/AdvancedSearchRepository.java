@@ -716,6 +716,7 @@ public class AdvancedSearchRepository {
 		String parsedDate = formatter.format(initDate);
 		return parsedDate.toString();
 	}
+
 	
 	/*
 	 * Replace string values having apostrophe with escape sequence and convert into comma separated values
@@ -731,3 +732,4 @@ public class AdvancedSearchRepository {
 		return csvValues;
 	}
 }
+

@@ -6,6 +6,7 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -127,7 +128,7 @@ public class ClinicService {
     			}
     		}
     		assignUpdatedValues(clinicDTO, clinic);
-
+    		
     		if((clinicDTO.getMakeParent()) || (clinicDTO.getMakeChild())){
 	    		if(clinicDTO.getMakeParent()){
 	    			clinic.setParent(true);
@@ -139,6 +140,10 @@ public class ClinicService {
 	    			clinic.setParent(false);
 	    			Clinic parentClinic = clinicRepository.getOne(clinicDTO.getParentClinic().get("id"));
 	    			clinic.setParentClinic(parentClinic);
+	    			List<Clinic> existingChildClinics = clinic.getChildClinics();
+	    			for(Clinic childClinic : existingChildClinics) {
+	    	   				childClinic.setParentClinic(parentClinic);	    				
+	    			}
 	    			List<Clinic> existingChildClinicsList = parentClinic.getChildClinics();
 	    			existingChildClinicsList.add(clinic);
 	    			existingChildClinicsList.addAll(clinic.getChildClinics());

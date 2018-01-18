@@ -60,8 +60,39 @@ public class ClinicVO implements Serializable,Comparable<ClinicVO> {
     
     @JsonIgnore
     private List<ClinicVO> childClinicVOs = new LinkedList<>();
+    
+    public ClinicVO(String id, String name, String address, String address2, String zipcode, String city, String state,
+			String country, String phoneNumber, String faxNumber, String speciality, String hillromId,
+			Long clinicAdminId, String parentClinicId, ClinicVO parentClinic, boolean deleted, boolean parent,
+			DateTime createdAt, Integer adherenceSetting, DateTime adherenceSettingModifiedDte,
+			Boolean adherenceSettingFlag, Boolean isMessageOpted, List<ClinicVO> childClinicVOs) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.address = address;
+		this.address2 = address2;
+		this.zipcode = zipcode;
+		this.city = city;
+		this.state = state;
+		this.country = country;
+		this.phoneNumber = phoneNumber;
+		this.faxNumber = faxNumber;
+		this.speciality = speciality;
+		this.hillromId = hillromId;
+		this.clinicAdminId = clinicAdminId;
+		this.parentClinicId = parentClinicId;
+		this.parentClinic = parentClinic;
+		this.deleted = deleted;
+		this.parent = parent;
+		this.createdAt = createdAt;
+		this.adherenceSetting = adherenceSetting;
+		this.adherenceSettingModifiedDte = adherenceSettingModifiedDte;
+		this.adherenceSettingFlag = adherenceSettingFlag;
+		this.isMessageOpted = isMessageOpted;
+		this.childClinicVOs = childClinicVOs;
+	}
 
-    public ClinicVO(String id,String name, String address, String address2, String zipcode, String city,
+	public ClinicVO(String id,String name, String address, String address2, String zipcode, String city,
 			String state, String phoneNumber, String faxNumber, String speciality, Long clinicAdminId,
 			Boolean parent, String hillromId,Boolean deleted,DateTime createdAt,Integer adherenceSetting, 
 			DateTime adherenceSettingModifiedDte

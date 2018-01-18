@@ -6,3 +6,5 @@ ALTER table hillromvest_xxxx.BATCH_JOB_EXECUTION_PARAMS MODIFY COLUMN STRING_VAL
 
 ALTER TABLE `hillrom-everest`.hillrom_type_code_values MODIFY COLUMN type_code_value VARCHAR(255)  
     CHARACTER SET utf8 COLLATE utf8_general_ci;
+    
+ALTER TABLE `hillromvest_qa`.`protocol_data_temp_table` ADD COLUMN `device_type` VARCHAR(45) NULL AFTER `id`;

@@ -2876,7 +2876,8 @@ public class AdherenceCalculationServiceMonarch{
 		
 		// Identifying both device patient by the size more than 1
 		List<PatientDevicesAssoc> devAssForPatientList = patientDevicesAssocRepository.findByPatientId(patDevice.getPatientId());
-		if(devAssForPatientList.size()>1 && !patDevice.getOldPatientId().equals(patDevice.getPatientId())){
+		if(Objects.nonNull(patDevice.getOldPatientId())){
+			if(devAssForPatientList.size()>1 && !patDevice.getOldPatientId().equals(patDevice.getPatientId())){
 			LocalDate vestCreatedDate = null;
 			LocalDate monarchCreatedDate = null;
 			String vestSerialNumber = null;
@@ -3149,6 +3150,7 @@ public class AdherenceCalculationServiceMonarch{
 					
 			}
 		}
+	}
 	}
 	
 	/**

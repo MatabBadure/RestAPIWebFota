@@ -59,7 +59,7 @@ public class UserExtension extends User implements Serializable {
 	@Column(name = "npi_number")
 	private String npiNumber;
 
-	@ManyToMany(fetch=FetchType.EAGER)
+	@OneToMany(fetch=FetchType.EAGER)
 	@JoinTable(name = "CLINIC_USER_ASSOC", joinColumns = { @JoinColumn(name = "users_id", referencedColumnName = "user_id") }, inverseJoinColumns = { @JoinColumn(name = "clinics_id", referencedColumnName = "id") })
 	@AuditJoinTable
 	private Set<Clinic> clinics = new HashSet<>();

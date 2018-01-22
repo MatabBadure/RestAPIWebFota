@@ -1749,20 +1749,8 @@ public class UserResource {
 		adherenceCalculationServiceMonarch.processMergeSwapDeviceDetails();        	
 		return new ResponseEntity<>(jsonObject, HttpStatus.OK);
 
-    }  
-    
-    @RequestMapping(value = "/processHcpClinicAdminNotification",
-    	     method = RequestMethod.GET,
-    	     produces = MediaType.APPLICATION_JSON_VALUE)	
-    public ResponseEntity<?> processHcpClinicAdminNotificationsFreq() throws HillromException {
-    	        log.debug("REST request to get testing Device Cron");
-    	        JSONObject jsonObject = new JSONObject();        
-    	        adherenceCalculationService.processCareGiverNotifications();        	
-    			return new ResponseEntity<>(jsonObject, HttpStatus.OK);
-    	    }    
-
-    }
-    
+    }    
+   
     /**
      * GET  /users/:userId/clinics/:clinicId/statistics -> get the patient statistics for clinic Badge associated with user.
      */

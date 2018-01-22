@@ -545,40 +545,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
 		this.expirationDate = expirationDate;
 	}
 	
-	public String getNonHMRNotificationFreq() {
-		return nonHMRNotificationFreq;
-	}
-
-	public void setNonHMRNotificationFreq(String nonHMRNotificationFreq) {
-		this.nonHMRNotificationFreq = nonHMRNotificationFreq;
-	}
-
-	public String getMissedTherapyNotificationFreq() {
-		return missedTherapyNotificationFreq;
-	}
-
-	public void setMissedTherapyNotificationFreq(
-			String missedTherapyNotificationFreq) {
-		this.missedTherapyNotificationFreq = missedTherapyNotificationFreq;
-	}
-
-	public String getSettingDeviationNotificationFreq() {
-		return settingDeviationNotificationFreq;
-	}
-
-	public void setSettingDeviationNotificationFreq(
-			String settingDeviationNotificationFreq) {
-		this.settingDeviationNotificationFreq = settingDeviationNotificationFreq;
-	}
-
-	public Boolean isReRegister() {
-		return reRegister;
-	}
-
-	public void setReRegister(Boolean reRegister) {
-		this.reRegister = reRegister;
-	}
-  
+	
 	@Override
     public boolean equals(Object o) {
         if (this == o) {

@@ -2403,7 +2403,7 @@ public class UserService {
                       int day = cal.get(Calendar.DAY_OF_MONTH);
 
                    	  // get all patients Details through repository 
-                      patientDtlsList = userRepository.findUserPatientsMaturityDobAfter90Days(year,month,day);
+                      patientDtlsList = userRepository.findUserPatientsMaturityDobAfterDays(year,month,day);
                    
 
                       patientDtlsList.stream().collect(Collectors.groupingBy(object->(String)object[0]));
@@ -2437,61 +2437,7 @@ public class UserService {
     			mailService.sendJobFailureNotification("processPatientReRegister",writer.toString());
     		}
             return;
-     }     
-
-	//@Scheduled(cron="0 10 00 * * *")
-		public void processPatientReRegister(){
-        
-		List<Object[]> patientDtlsList = new ArrayList<Object[]>();;
-		        
-		
-		String eMail = "";
-			
-		try{
-			       
-			log.debug("Started calculating patients who is reaching 18 years in next 30/3/2/1 days ");
-			               
-			int alertDays[]=new int[4];
-			alertDays[0]=30;alertDays[1]=3;alertDays[2]=2;alertDays[3]=1;
-
-			Calendar cal = null;
-			for(int i=0;i<alertDays.length;i++){
-				cal = Calendar.getInstance();
-				cal.add(Calendar.DATE, alertDays[i]);
-
-				int year = cal.get(Calendar.YEAR);
-				int month = cal.get(Calendar.MONTH)+1;
-				int day = cal.get(Calendar.DAY_OF_MONTH);
-
-				// get all patients Details through repository 
-				patientDtlsList.addAll(userRepository.findUserPatientsMaturityDobAfterDays(year,month,day));
-			}
-
-			patientDtlsList.stream().collect(Collectors.groupingBy(object->(String)object[0]));
-
-			// send activation link to those patients
-			for (Object[] object : patientDtlsList) {
-
-				//eMail =  (String) object[3];
-				User user = userRepository.getOne(((BigInteger) object[1]).longValue());
-				eMail = user.getEmail();
-				if(StringUtils.isNotEmpty(eMail) && !user.isReRegister()) {
-					mailService.sendMailTo18YearOldPatient(user);
-				}
-			}
-
-		}
-		catch(Exception ex){
-			StringWriter writer = new StringWriter();
-			PrintWriter printWriter = new PrintWriter( writer );
-			ex.printStackTrace( printWriter );
-			System.out.println("ex :"+ex);
-			mailService.sendJobFailureNotification("processPatientReRegister",writer.toString());
-		}
-		return;
-		}
-	   
-     
+     }   
   
 }
 

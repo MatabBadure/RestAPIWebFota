@@ -139,6 +139,10 @@ public class ClinicService {
 	    			clinic.setParent(false);
 	    			Clinic parentClinic = clinicRepository.getOne(clinicDTO.getParentClinic().get("id"));
 	    			clinic.setParentClinic(parentClinic);
+	    			List<Clinic> existingChildClinics = clinic.getChildClinics();
+	    			for(Clinic childClinic : existingChildClinics) {
+	    	   				childClinic.setParentClinic(parentClinic);	    				
+	    			}
 	    			List<Clinic> existingChildClinicsList = parentClinic.getChildClinics();
 	    			existingChildClinicsList.add(clinic);
 	    			existingChildClinicsList.addAll(clinic.getChildClinics());

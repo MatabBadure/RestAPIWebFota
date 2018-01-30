@@ -540,7 +540,8 @@ public class UserService {
 		log.debug("Created Information for Patient : {}", patientInfo);
 		
 		// /Insert Garament details in patient device ass info
-		
+			newUser = savePatientUser(userExtensionDTO,newUser,patientInfo);
+			
 			String deviceTypeArray[] = userExtensionDTO.getDeviceType().split(",");
 			String deviceTypeB = deviceTypeArray[0];
 			for(int i =0; i<deviceTypeArray.length;i++)
@@ -567,7 +568,6 @@ public class UserService {
 					deviceTypeB = deviceTypeArray[i+1];
 				
 			}
-			newUser = savePatientUser(userExtensionDTO,newUser,patientInfo);
 		
 		return newUser;
 	}

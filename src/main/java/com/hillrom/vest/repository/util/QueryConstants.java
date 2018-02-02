@@ -7,9 +7,8 @@ import static com.hillrom.vest.util.RelationshipLabelConstants.SELF;
 public class QueryConstants {
 	
 
-	public static String QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_MONARCH = " and "
-			+ " patient_dev_assoc.ptype in ('MONARCH','ALL') "
-			+ " and (lower(user.first_name) "			
+	public static String QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_MONARCH = " and (lower(user.first_name) "
+
 			+ " like lower(:queryString) or lower(user.last_name) like lower(:queryString) "
 			+ " or lower(user.email) like lower(:queryString) or lower(CONCAT(user.first_name,' ',user.last_name)) "
 			+ " like lower(:queryString) or lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:queryString) "

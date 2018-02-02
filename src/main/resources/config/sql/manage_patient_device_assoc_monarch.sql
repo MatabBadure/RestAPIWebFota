@@ -198,7 +198,7 @@ ELSEIF operation_type_indicator ='UPDATE' THEN
 			IF  temp_patient_info_id IS NOT NULL THEN
 				START TRANSACTION;
 				
-
+                   
 					UPDATE PATIENT_DEVICES_ASSOC PVDA SET 
 					`patient_id` = vest_device_patient_id,
 					`hillrom_id` = vest_device_hillrom_id ,
@@ -233,28 +233,57 @@ ELSEIF operation_type_indicator ='UPDATE' THEN
 		ELSE 
 		
 			-- Case 2: New Monarch System (initially created from VisiView). Subsequently following details coming in from TIMS
-			IF temp_patient_info_id IS NOT NULL AND temp_serial_number IS NOT NULL  THEN
+			IF `device_patient_type` = 'SD' THEN
+			
+			    IF temp_patient_info_id IS NOT NULL AND temp_serial_number IS NOT NULL  THEN
+				    START TRANSACTION;
+					
+						UPDATE `PATIENT_DEVICES_ASSOC` pvda SET
+						`patient_id` = pat_patient_id,
+						`device_type` = pat_device_type,
+						`is_active` = true,
+						`serial_number` = pat_device_serial_number,
+						`hub_id` = pat_hub_id,
+						`bluetooth_id` = pat_bluetooth_id,
+						`hillrom_id` = pat_hillrom_id,
+						`patient_type` = device_patient_type,
+						`old_patient_id` = pat_old_id,
+						`training_date` = pat_training_date,
+						`diagnosis1` = pat_diagnosis_code1,
+						`diagnosis2` = pat_diagnosis_code2,
+						`diagnosis3` = pat_diagnosis_code3,
+						`diagnosis4` = pat_diagnosis_code4,
+						`garment_type` = pat_garment_type,
+						`garment_size` = pat_garment_size,
+						`garment_color` = pat_garment_color
+						WHERE pvda.`patient_id` = pat_patient_id;
+				 
+					COMMIT;
+				END IF;	
+				
+			ELSE
 				START TRANSACTION;
 			
-				UPDATE `PATIENT_DEVICES_ASSOC` pvda SET
-				`patient_id` = pat_patient_id,
-				`device_type` = pat_device_type,
-				`is_active` = true,
-				`serial_number` = pat_device_serial_number,
-				`hub_id` = pat_hub_id,
-				`bluetooth_id` = pat_bluetooth_id,
-				`hillrom_id` = pat_hillrom_id,
-				`patient_type` = device_patient_type,
-				`old_patient_id` = pat_old_id,
-				`training_date` = pat_training_date,
-				`diagnosis1` = pat_diagnosis_code1,
-				`diagnosis2` = pat_diagnosis_code2,
-				`diagnosis3` = pat_diagnosis_code3,
-				`diagnosis4` = pat_diagnosis_code4,
-				`garment_type` = pat_garment_type,
-				`garment_size` = pat_garment_size,
-				`garment_color` = pat_garment_color
-				 WHERE pvda.`patient_id` = pat_patient_id;
+					UPDATE `PATIENT_DEVICES_ASSOC` pvda SET
+					`patient_id` = pat_patient_id,
+					`device_type` = pat_device_type,
+					`is_active` = true,
+					`serial_number` = pat_device_serial_number,
+					`hub_id` = pat_hub_id,
+					`bluetooth_id` = pat_bluetooth_id,
+					`hillrom_id` = pat_hillrom_id,
+					`patient_type` = device_patient_type,
+					`old_patient_id` = pat_old_id,
+					`training_date` = pat_training_date,
+					`diagnosis1` = pat_diagnosis_code1,
+					`diagnosis2` = pat_diagnosis_code2,
+					`diagnosis3` = pat_diagnosis_code3,
+					`diagnosis4` = pat_diagnosis_code4,
+					`garment_type` = pat_garment_type,
+					`garment_size` = pat_garment_size,
+					`garment_color` = pat_garment_color
+					WHERE pvda.`patient_id` = pat_patient_id AND pvda.`serial_number` = pat_device_serial_number;
+				 
 
 				COMMIT;
 			END IF;

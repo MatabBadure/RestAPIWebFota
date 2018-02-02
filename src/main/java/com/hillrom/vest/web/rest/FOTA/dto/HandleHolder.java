@@ -20,7 +20,17 @@ public class HandleHolder {
 	int chunkSize = 0;
 	private String handleId;
 	private boolean sendChunkReq = false;
+	private Long deviceId; 
 	
+
+	public Long getDeviceId() {
+		return deviceId;
+	}
+
+	public void setDeviceId(Long deviceId) {
+		this.deviceId = deviceId;
+	}
+
 
 	public boolean getSendChunkReq() {
 		return sendChunkReq;

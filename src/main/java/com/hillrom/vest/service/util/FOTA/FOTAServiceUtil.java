@@ -84,15 +84,20 @@ public class FOTAServiceUtil {
 			holder = handleHolderBin.get(handleId);
 			FOTADeviceFWareUpdate fotaDeviceFWareUpdate = new FOTADeviceFWareUpdate();
 			// Get FOTADevice
-			fotaDeviceFWareUpdate = fotaDeviceRepository
-					.getFOTADeviceFWwareDetailsByDevSN(holder
-							.getDeviceSerialNumber(),INPROGRESS_LIST);
+			if(Objects.nonNull(holder)){
+				/*fotaDeviceFWareUpdate = fotaDeviceRepository
+						.getFOTADeviceFWwareDetailsByDevSN(holder
+								.getDeviceSerialNumber(),INPROGRESS_LIST,holder.getFotaInfoId());*/
+				fotaDeviceFWareUpdate = fotaDeviceRepository
+						.getFOTADeviceFWwareDetailsByDevSN(holder.getDeviceId(),INPROGRESS_LIST);
+			}
 			if (fotaDeviceFWareUpdate != null) {
 				fotaDeviceFWareUpdate.setDownloadStartDateTime(holder
 						.getDownloadStartDateTime());
 				fotaDeviceFWareUpdate.setDownloadEndDateTime(new DateTime());
 				fotaDeviceFWareUpdate.setDownloadStatus(status);
 				fotaDeviceRepository.save(fotaDeviceFWareUpdate);
+				handleHolderBin.remove(handleId);
 			}
 		} catch (Exception ex) {
 			log.error(ex.getMessage());
@@ -100,10 +105,11 @@ public class FOTAServiceUtil {
 		}
 	}
 
-	public void saveInprogressDeviceDetails(HandleHolder holder) {
+	public FOTADeviceFWareUpdate saveInprogressDeviceDetails(HandleHolder holder) {
+		FOTADeviceFWareUpdate fotaDeviceFWareUpdate = null;
+		
 		try {
-			
-			FOTADeviceFWareUpdate fotaDeviceFWareUpdate = new FOTADeviceFWareUpdate();
+			fotaDeviceFWareUpdate = new FOTADeviceFWareUpdate();
 			fotaDeviceFWareUpdate.setFotaInfoId(holder.getFotaInfoId());
 			fotaDeviceFWareUpdate.setDeviceSerialNumber(holder
 					.getDeviceSerialNumber());
@@ -118,13 +124,13 @@ public class FOTAServiceUtil {
 			fotaDeviceFWareUpdate.setConnectionType(holder.getConnectionType());
 			fotaDeviceFWareUpdate.setDownloadStatus("In progress");
 			fotaDeviceFWareUpdate.setDownloadStartDateTime(holder.getDownloadStartDateTime());
-			
 			fotaDeviceRepository.save(fotaDeviceFWareUpdate);
-
+			
 		} catch (Exception ex) {
 			log.error(ex.getMessage());
 			ex.printStackTrace();
 		}
+		return fotaDeviceFWareUpdate;
 	}
 
 	public String getRequestType2(String rawMessage, Map<String, HandleHolder> handleHolderBin, Map<String, PartNoHolder> partNosBin, Map<String, String> fotaJsonData) {
@@ -343,22 +349,31 @@ public class FOTAServiceUtil {
 						crcValid = partNoHolder.checkCRC32(fotaInfo);
 						if ( crcValid == true) {
 							// Initially
-							HandleHolder holder = coUtil.getHandleHolderValuesFromPartNo(partNoHolder,fotaJsonData,fotaInfo,reqDev,reqReleaseDate);
-							
+							//HandleHolder holder = coUtil.getHandleHolderValuesFromPartNo(partNoHolder,fotaJsonData,fotaInfo,reqDev,reqReleaseDate);
 
-							/*//Get Old Handle Id
+							//Get Old Handle Id
 							handleId = coUtil.getOldHandle(handleHolderBin,fotaJsonData
-									.get(DEVICE_SN));
+									.get(DEVICE_SN),partNoHolder);
 							if(handleId == null){
 								handleId = getHandleNumber();
 								//Save device details to DB
-								saveInprogressDeviceDetails(holder);
+								//saveInprogressDeviceDetails(holder);
+								// Initially
+								HandleHolder holder = coUtil.getHandleHolderValuesFromPartNo(partNoHolder,fotaJsonData,fotaInfo,reqDev,reqReleaseDate);	
 								holder.setHandleId(handleId);
 								handleHolderBin.put(handleId, holder);
 
-							}*/
-							handleId = getHandleNumber();
-							handleHolderBin.put(handleId, holder);
+							}else{
+								// Get Values from Handle Holder if old handle id
+								//HandleHolder holder = coUtil.getHandleHolderValuesFromPartNo(partNoHolder,fotaJsonData,fotaInfo,reqDev,reqReleaseDate);
+								HandleHolder holder = handleHolderBin.get(handleId);
+								holder.setHandleId(handleId);
+								handleHolderBin.put(handleId, holder);
+							}
+							/*holder.setHandleId(handleId);
+							handleHolderBin.put(handleId, holder);*/
+							/*handleId = getHandleNumber();
+							handleHolderBin.put(handleId, holder);*/
 							log.debug("New handleId="+handleId+": Same SoftwareVersion="+fotaInfo.getSoftVersion()+":same chunksize="+partNoHolder.getChunkSize());
 						} else {
 							//Send email notification for CRC validation failed
@@ -379,24 +394,27 @@ public class FOTAServiceUtil {
 							partNosBin.put(storePartNoKey, partNoHolder);
 							log.debug("New Part Number Key for different chunk Size="+storePartNoKey);
 							// Initially
-							HandleHolder holder = coUtil.getHandleHolderValuesForNewPartNo(chunkSize,fotaJsonData,fotaInfo,reqDev,reqReleaseDate);
-											
+							//HandleHolder holder = coUtil.getHandleHolderValuesForNewPartNo(chunkSize,fotaJsonData,fotaInfo,reqDev,reqReleaseDate);
+							
 							//Get Old Handle Id
-							/*handleId = coUtil.getOldHandle(handleHolderBin,fotaJsonData
-									.get(DEVICE_SN));
+							handleId = coUtil.getOldHandle(handleHolderBin,fotaJsonData
+									.get(DEVICE_SN), partNoHolder);
+							
 							if(handleId == null){
 								handleId = getHandleNumber();
 								//Save device details to DB
-								saveInprogressDeviceDetails(holder);
+								//saveInprogressDeviceDetails(holder);
+								// Initially
+								HandleHolder holder = coUtil.getHandleHolderValuesFromPartNo(partNoHolder,fotaJsonData,fotaInfo,reqDev,reqReleaseDate);	
+								holder.setHandleId(handleId);
+								handleHolderBin.put(handleId, holder);
+							}else{
+								// Get Values from Handle Holder if old handle id
+								//HandleHolder holder = coUtil.getHandleHolderValuesFromPartNo(partNoHolder,fotaJsonData,fotaInfo,reqDev,reqReleaseDate);
+								HandleHolder holder = handleHolderBin.get(handleId);
 								holder.setHandleId(handleId);
 								handleHolderBin.put(handleId, holder);
 							}
-							*/
-							
-							handleId = getHandleNumber();
-
-							handleHolderBin.put(handleId, holder);
-							
 							//To capture chunk size
 							log.debug("New handleId="+handleId+":New software version="+fotaInfo.getSoftVersion()+":New chunksize="+partNoHolder.getChunkSize());
 						} else {

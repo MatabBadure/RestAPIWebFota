@@ -9,6 +9,7 @@ import static com.hillrom.vest.config.FOTA.FOTAConstants.HANDLE_RAW;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.HEX;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.INPROGRESS_LIST;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.NOT_OK;
+import static com.hillrom.vest.config.FOTA.FOTAConstants.No;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.OK;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.REQUEST_TYPE;
 import static com.hillrom.vest.config.FOTA.FOTAConstants.REQUEST_TYPE1;
@@ -115,7 +116,7 @@ public class FOTAService {
 					
 				}else if (fotaJsonData.get(REQUEST_TYPE).equals(REQUEST_TYPE3)) {
 					//Software update
-					finalResponseStr = getRequestType3(rawMessage, handleId, resultPair, crcPair, fotaJsonData);
+					finalResponseStr = getRequestType3(rawMessage, handleId,handleHolderBin,resultPair, crcPair, fotaJsonData);
 					log.debug("finalResponseStr: " + finalResponseStr);
 					
 				}else if (fotaJsonData.get(REQUEST_TYPE).equals(REQUEST_TYPE12)) {
@@ -140,25 +141,38 @@ public class FOTAService {
 	}
 	
 	private String getRequestType3(String rawMessage, String crsResultValue,
-			String handleId,String resultPair, Map<String, String> fotaJsonData) {
+			Map<String, HandleHolder> handleHolderBin, String handleId,String resultPair, Map<String, String> fotaJsonData) {
 		String finalResponseStr = "";
-		//Get handle from request
+		String crcPair = "";
+		// Initially
+		HandleHolder holder = new HandleHolder();
+		// Get handle from request
 		handleId = coUtil.getValuesFromRequest(rawMessage,HANDLE_RAW);
 		log.debug("Send Chunk Handle Id ="+handleId);
-		if (fotaJsonData.get(RESULT).equals(OK)) {
-			//Added method to store device details
-			finalResponseStr = requestType3Response(finalResponseStr,handleId,SUCCESS_LIST,rawMessage,resultPair,crsResultValue);
-			handleHolderBin.remove(handleId);
-			
-		} else if (fotaJsonData.get(RESULT).equals(NOT_OK)) {
-			//Added method to store device details
-			finalResponseStr = requestType3Response(finalResponseStr,handleId,FAILURE_LIST,rawMessage,resultPair,crsResultValue);
-			handleHolderBin.remove(handleId);
+		// Get handle object based on handleId
+		holder = handleHolderBin.get(handleId);
+		// Frame key to get partNumber details
+		if (Objects.nonNull(holder)) {
+			if (fotaJsonData.get(RESULT).equals(OK)) {
+				//Added method to store device details
+				finalResponseStr = requestType3Response(finalResponseStr,handleId,SUCCESS_LIST,rawMessage,resultPair,crsResultValue);
+				//handleHolderBin.remove(handleId);
+				
+			} else if (fotaJsonData.get(RESULT).equals(NOT_OK)) {
+				//Added method to store device details
+				finalResponseStr = requestType3Response(finalResponseStr,handleId,FAILURE_LIST,rawMessage,resultPair,crsResultValue);
+				//handleHolderBin.remove(handleId);
 
-		} else if (fotaJsonData.get(RESULT).equals(ABORTED)) {
-			//Added method to store device details
-			finalResponseStr = requestType3Response(finalResponseStr,handleId,ABORTED_LIST,rawMessage,resultPair,crsResultValue);
-			handleHolderBin.remove(handleId);
+			} else if (fotaJsonData.get(RESULT).equals(ABORTED)) {
+				//Added method to store device details
+				finalResponseStr = requestType3Response(finalResponseStr,handleId,ABORTED_LIST,rawMessage,resultPair,crsResultValue);
+				//handleHolderBin.remove(handleId);
+			}
+		} else {
+			// Added No Response
+			finalResponseStr = coUtil.failedResponse(finalResponseStr, crsResultValue,
+					No, resultPair, crcPair);
+			//return finalResponseStr;
 		}
 		return finalResponseStr;
 	}

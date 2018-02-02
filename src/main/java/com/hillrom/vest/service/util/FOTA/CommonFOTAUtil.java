@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hillrom.vest.domain.FOTA.FOTADeviceFWareUpdate;
 import com.hillrom.vest.domain.FOTA.FOTAInfo;
 import com.hillrom.vest.web.rest.FOTA.dto.HandleHolder;
 import com.hillrom.vest.web.rest.FOTA.dto.PartNoHolder;
@@ -671,14 +672,15 @@ public class CommonFOTAUtil {
 
 	}
 
-	public String getOldHandle(Map<String, HandleHolder> handleHolderBin, String devSN) {
+	public String getOldHandle(Map<String, HandleHolder> handleHolderBin, String devSN, PartNoHolder partNoHolder) {
 		Set<String> keys = handleHolderBin.keySet();
 		String handleId = null;
         for (String key : keys) {
         	log.debug("Handle HolderBin Keys:" +handleHolderBin.get(key));
             HandleHolder holder1 = new HandleHolder();
             holder1 = handleHolderBin.get(key);
-            if (holder1.getDeviceSerialNumber().equals(devSN)) {
+            //Added two more conditions to get Old handle id that is chunk size and part no.(01/04/2018)
+            if (holder1.getDeviceSerialNumber().equals(devSN) && partNoHolder.getChunkSize() == holder1.getChunkSize() && holder1.getPartNo().equals(partNoHolder.getPart_No())) {
             	handleId = holder1.getHandleId();
             	return handleId;
             }
@@ -730,8 +732,12 @@ public class CommonFOTAUtil {
 				if(chunkNumber == 0 && (holder.getSendChunkReq() == false)){
 					holder.setDownloadStartDateTime(new DateTime());
 					//Save device details to DB
-					utilService.saveInprogressDeviceDetails(holder);
+					FOTADeviceFWareUpdate fotaDeviceFWareUpdate = null;
+					fotaDeviceFWareUpdate = utilService.saveInprogressDeviceDetails(holder);
 					holder.setSendChunkReq(true);
+					if(Objects.nonNull(fotaDeviceFWareUpdate)){
+						holder.setDeviceId(fotaDeviceFWareUpdate.getId());
+					}
 					handleHolderBin.put(handleId, holder);
 				}
 				log.debug("Send  Chunk with chunk number Handle Id ="+handleId);

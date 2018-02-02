@@ -195,7 +195,6 @@ ELSEIF operation_type_indicator ='UPDATE' THEN
 		IF temp_serial_number =  pat_device_serial_number AND  device_patient_type ='SD' AND temp_device_type = 'MONARCH' AND device_hillrom_id = null THEN
 			SELECT `hillrom_id`,`patient_id` INTO vest_device_hillrom_id ,vest_device_patient_id FROM `PATIENT_DEVICES_ASSOC` WHERE `hillrom_id` = pat_hillrom_id AND `device_type` = 'VEST' AND `patient_type` = 'SD';
 
-			insert into sp_debug(message) values ('adding new device in case-4');
 			IF  temp_patient_info_id IS NOT NULL THEN
 				START TRANSACTION;
 				

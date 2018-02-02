@@ -108,15 +108,15 @@
 				<constraints nullable="false" />
 			</column>
 			<column name="device_serial_number" type="varchar(255)">
-				<constraints nullable="true" />
+				<constraints nullable="false" />
 			</column>
 
 			<column name="connection_type" type="varchar(255)">
-				<constraints nullable="true" />
+				<constraints nullable="false" />
 			</column>
 
 			<column name="device_software_version" type="varchar(255)">
-				<constraints nullable="true" />
+				<constraints nullable="false" />
 			</column>
 			
 			<column name="device_software_date_time" type="timestamp">
@@ -124,23 +124,23 @@
 			</column>
 
 			<column name="updated_software_version" type="varchar(255)">
-				<constraints nullable="true" />
+				<constraints nullable="false" />
 			</column>
 
 			<column name="checkupdate_date_time" type="timestamp">
-				<constraints nullable="true" />
+				<constraints nullable="false" />
 			</column>
 
 			<column name="download_start_date_time" type="timestamp">
-				<constraints nullable="true" />
+				<constraints nullable="false" />
 			</column>
 			
 			<column name="download_end_date_time" type="timestamp">
-				<constraints nullable="true" />
+				<constraints nullable="false" />
 			</column>
 
 			<column name="downloaded_status" type="varchar(255)">
-				<constraints nullable="true" />
+				<constraints nullable="false" />
 			</column>
 			
 

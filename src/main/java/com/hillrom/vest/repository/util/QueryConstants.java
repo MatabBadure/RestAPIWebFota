@@ -16,6 +16,16 @@ public class QueryConstants {
 	
 	public static String QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_VEST = " and "
 
+			+ " patient_dev_assoc.ptype in ('VEST', 'ALL') "
+
+			+ " and (lower(user.first_name) "
+			+ " like lower(:queryString) or lower(user.last_name) like lower(:queryString) "
+			+ " or lower(user.email) like lower(:queryString) or lower(CONCAT(user.first_name,' ',user.last_name)) "
+			+ " like lower(:queryString) or lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:queryString) "
+			+ " or lower(user.hillrom_id) like lower(:queryString) or lower(IFNULL(patient_clinic.mrn_id,0)) like lower(:queryString)) ";
+	
+	public static String QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_VEST_ONLY = " and "
+
 			+ " patient_dev_assoc.ptype in ('VEST') "
 
 			+ " and (lower(user.first_name) "
@@ -517,6 +527,8 @@ public class QueryConstants {
 	
 	public static String QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_MONARCH_ALL = " and patient_dev_assoc.ptype in ('MONARCH','ALL')";
 	public static String QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_MONARCH_DEVTYPE = " and patient_dev_assoc.ptype in ('MONARCH')";
+	
+	public static String QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_MONARCH_DEVTYPE_ALL = " and patient_dev_assoc.ptype in ('MONARCH','ALL')";
 
 	public static final String QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_ALL_DEVTYPE = " and patient_dev_assoc.ptype in ('ALL')";
 	

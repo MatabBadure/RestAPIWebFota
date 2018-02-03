@@ -16,7 +16,17 @@ public class QueryConstants {
 	
 	public static String QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_VEST = " and "
 
-			+ " patient_dev_assoc.ptype in ('VEST','ALL') "
+			+ " patient_dev_assoc.ptype in ('VEST', 'ALL') "
+
+			+ " and (lower(user.first_name) "
+			+ " like lower(:queryString) or lower(user.last_name) like lower(:queryString) "
+			+ " or lower(user.email) like lower(:queryString) or lower(CONCAT(user.first_name,' ',user.last_name)) "
+			+ " like lower(:queryString) or lower(CONCAT(user.last_name,' ',user.first_name)) like lower(:queryString) "
+			+ " or lower(user.hillrom_id) like lower(:queryString) or lower(IFNULL(patient_clinic.mrn_id,0)) like lower(:queryString)) ";
+	
+	public static String QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_VEST_ONLY = " and "
+
+			+ " patient_dev_assoc.ptype in ('VEST') "
 
 			+ " and (lower(user.first_name) "
 			+ " like lower(:queryString) or lower(user.last_name) like lower(:queryString) "
@@ -517,6 +527,8 @@ public class QueryConstants {
 	
 	public static String QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_MONARCH_ALL = " and patient_dev_assoc.ptype in ('MONARCH','ALL')";
 	public static String QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_MONARCH_DEVTYPE = " and patient_dev_assoc.ptype in ('MONARCH')";
+	
+	public static String QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_MONARCH_DEVTYPE_ALL = " and patient_dev_assoc.ptype in ('MONARCH','ALL')";
 
 	public static final String QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_ALL_DEVTYPE = " and patient_dev_assoc.ptype in ('ALL')";
 	
@@ -880,10 +892,11 @@ public class QueryConstants {
 			                 				+ "clinic.id as pclinicid,  GROUP_CONCAT(clinic.name) as clinicName, user.expired as isExpired, "
 			                 				+ "pc.compliance_score as adherence,   max(pc.last_therapy_session_date)  as last_date, "
 			                 				+ "pc.is_hmr_compliant as isHMRNonCompliant, pc.is_settings_deviated  as isSettingsDeviated, "
-			                 				+ "pc.missed_therapy_count as isMissedTherapy,  clinic.adherence_setting as adherencesetting, 'ALL' as devType, "
+			                 				+ "pc.missed_therapy_count as isMissedTherapy,  clinic.adherence_setting as adherencesetting, "
+			                 				+ "group_concat(distinct(patient_dev_assoc.device_type)) as devType, "
 			                 				+ "cszm.country as pcountry, patient_dev_assoc.diagnosis1 as diag1,patient_dev_assoc.diagnosis2 as diag2, "
 			                 				+ "patient_dev_assoc.diagnosis3 as diag3,patient_dev_assoc.diagnosis4  as diag4, patient_dev_assoc. "
-			                 				+ "is_active as deviceActiveInactive, patient_dev_assoc.serial_number as deviceSerialNumber, "
+			                 				+ "is_active as deviceActiveInactive, group_concat(distinct(patient_dev_assoc.serial_number)) as deviceSerialNumber, "
 			                 				+ "IFNULL(pvdh.hmr,0) + IFNULL(pvdhm.hmr,0) as hmr, "
 			                 				+ "GREATEST(pvdh.last_modified_date,pvdhm.last_modified_date) as activeDeviceAddedDate, "
 			                 				+ "LEAST(COALESCE(pne.first_transmission_date,sysdate()),coalesce(pnem.first_transmission_date,sysdate())) as transmissionRecorded, "

@@ -706,7 +706,7 @@ public class UserSearchRepository {
 			findPatientUserQuery = QueryConstants.QUERY_PATIENT_SEARCH_UNDER_HCP_USER_FOR_VEST;
 
 			
-			searchQuery = QueryConstants.QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_VEST;			
+			searchQuery = QueryConstants.QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_VEST_ONLY;			
 			
 
 			if (StringUtils.isEmpty(clinicId) | "all".equalsIgnoreCase(clinicId)) {
@@ -723,9 +723,8 @@ public class UserSearchRepository {
 			//MONARCH
 			findPatientUserQuery = QueryConstants.QUERY_PATIENT_SEARCH_UNDER_HCP_USER_FOR_MONARCH;
 
-			
 			searchQuery = QueryConstants.QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_MONARCH;
-			searchQuery += QueryConstants.QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_MONARCH_DEVTYPE;
+			searchQuery += QueryConstants.QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_MONARCH_DEVTYPE_ALL;
 			
 
 			if (StringUtils.isEmpty(clinicId) | "all".equalsIgnoreCase(clinicId)) {

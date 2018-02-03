@@ -16,7 +16,7 @@ public class QueryConstants {
 	
 	public static String QUERY_PATIENT_SEARCH_UNDER_HCP_USER_WHERE_CLAUSE_FOR_VEST = " and "
 
-			+ " patient_dev_assoc.ptype in ('VEST','ALL') "
+			+ " patient_dev_assoc.ptype in ('VEST') "
 
 			+ " and (lower(user.first_name) "
 			+ " like lower(:queryString) or lower(user.last_name) like lower(:queryString) "

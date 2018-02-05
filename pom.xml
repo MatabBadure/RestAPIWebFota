@@ -11,11 +11,11 @@
 	</parent>
 
 	<groupId>com.hillrom.vest</groupId>
-	<artifactId>hillromvest</artifactId>
+	<artifactId>hillromfota</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 
-	<name>HillRomVest</name>
+	<name>HillRomFota</name>
 
 	<prerequisites>
 		<maven>3.0.0</maven>
@@ -586,8 +586,8 @@
 					<changeLogFile>src/main/resources/config/liquibase/master.xml</changeLogFile>
 					<diffChangeLogFile>src/main/resources/config/liquibase/changelog/${maven.build.timestamp}_changelog.xml</diffChangeLogFile>
 					<driver>com.mysql.jdbc.Driver</driver>
-					<url>jdbc:mysql://hillrom.ckyg8erbez54.us-west-2.rds.amazonaws.com:3306/hillromvest-dev</url>
-					<defaultSchemaName>HillRomVest</defaultSchemaName>
+					<url>jdbc:mysql://hillrom.ckyg8erbez54.us-west-2.rds.amazonaws.com:3306/hillromfota-dev</url>
+					<defaultSchemaName>HillRomFota</defaultSchemaName>
 					<username>root</username>
 					<password>hillrom123</password>
 					<referenceUrl>hibernate:spring:com.hillrom.vest.domain?dialect=org.hibernate.dialect.MySQLInnoDBDialect</referenceUrl>

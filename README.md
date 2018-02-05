@@ -1,9 +1,9 @@
-**README FOR HILLROMVEST**
+**README FOR HILLROMFOTA**
 --------------------------
 
 Introduction:
 -------------
-This is a Hill-Rom Vest web application. Which will provide visualisation for the Hill-Rom vest users / physicians and associates of Hill-Rom.
+This is a Hill-Rom Fota web application. Which will help download firmware to devices of Hill-Rom.
 
 Tech-Stack
 ----------
